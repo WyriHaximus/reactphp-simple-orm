@@ -1,0 +1,34 @@
+{
+  "name": "wyrihaximus/react-simple-orm",
+  "description": "EXPERIMENTAL: Package to see how feasible a simple ORM in ReactPHP is",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Cees-Jan Kiewiet",
+      "email": "ceesjank@gmail.com",
+      "homepage": "https://www.wyrihaximus.net/"
+    }
+  ],
+  "require": {
+    "php": "^7.3"
+  },
+  "require-dev": {
+    "wyrihaximus/async-test-utilities": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "React\\SimpleORM\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "React\\Tests\\SimpleORM\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "platform": {
+      "php": "7.3"
+    }
+  }
+}
