@@ -17,12 +17,12 @@
   },
   "autoload": {
     "psr-4": {
-      "React\\SimpleORM\\": "src/"
+      "WyriHaximus\\React\\SimpleORM\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "React\\Tests\\SimpleORM\\": "tests/"
+      "WyriHaximus\\React\\Tests\\SimpleORM\\": "tests/"
     }
   },
   "config": {
