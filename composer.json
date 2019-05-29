@@ -11,7 +11,11 @@
   ],
   "require": {
     "php": "^7.3",
-    "ocramius/generated-hydrator": "^3.0"
+    "api-clients/rx": "^2.2",
+    "ocramius/generated-hydrator": "^3.0",
+    "plasma/core": "^0.2.1|dev-master",
+    "plasma/sql-common": "dev-master",
+    "voryx/pgasync": "^2.0"
   },
   "require-dev": {
     "wyrihaximus/async-test-utilities": "^1.0"
