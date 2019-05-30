@@ -7,7 +7,7 @@ use Plasma\SQL\Grammar\PostgreSQL;
 use Plasma\SQL\QueryBuilder;
 use Rx\Observable;
 
-final class Client
+final class Client implements ClientInterface
 {
     /** @var PgClient */
     private $client;

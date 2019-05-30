@@ -5,6 +5,7 @@ namespace WyriHaximus\React\SimpleORM\Annotation;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
+ * @Annotation
  * @Target("CLASS")
  */
 final class Table
@@ -12,9 +13,9 @@ final class Table
     /** @var string */
     private $table;
 
-    public function __construct(string $table)
+    public function __construct(array $table)
     {
-        $this->table = $table;
+        $this->table = \current($table);
     }
 
     public function getTable(): string

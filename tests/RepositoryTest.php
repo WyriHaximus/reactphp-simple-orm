@@ -2,11 +2,50 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
-use WyriHaximus\TestUtilities\TestCase;
+use function ApiClients\Tools\Rx\observableFromArray;
+use Plasma\SQL\QueryBuilder;
+use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
+use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
+use WyriHaximus\React\SimpleORM\ClientInterface;
+use WyriHaximus\React\SimpleORM\Repository;
 
 /**
  * @internal
  */
-final class RepositoryTest extends TestCase
+final class RepositoryTest extends AsyncTestCase
 {
+    /**
+     * @var ObjectProphecy
+     */
+    private $client;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->client = $this->prophesize(ClientInterface::class);
+    }
+
+    public function testCount(): void
+    {
+        $count = 123;
+
+        $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
+            self::assertCount(0, $builder->getParameters());
+            $query = $builder->getQuery();
+            self::assertStringContainsString('tables', $query);
+            self::assertStringContainsString('COUNT(*) AS count', $query);
+
+            return true;
+        }))->willReturn(observableFromArray([
+            [
+                'count' => $count,
+            ],
+        ]));
+
+        $repository = new Repository($this->client->reveal(), EntityStub::class);
+
+        self::assertSame($count, $this->await($repository->count()));
+    }
 }
