@@ -15,6 +15,9 @@ final class Repository
     /** @var Hydrator */
     private $hydrator;
 
+    /** @var QueryBuilder */
+    private $baseQuery;
+
     /** @var string */
     private $table;
 
@@ -28,11 +31,25 @@ final class Repository
     public function count(): PromiseInterface
     {
         return $this->client->fetch(
-            QueryBuilder::create()->from($this->table)->select([
+            $this->getBaseQuery()->select([
                 'COUNT(*) AS count',
             ])
         )->take(1)->toPromise()->then(function (array $row): int {
             return (int)$row['count'];
         });
+    }
+
+    private function getBaseQuery(): QueryBuilder
+    {
+        if ($this->baseQuery === null) {
+            $this->baseQuery = $this->buildBaseQuery();
+        }
+
+        return $this->baseQuery;
+    }
+
+    private function buildBaseQuery(): QueryBuilder
+    {
+        return QueryBuilder::create()->from($this->table);
     }
 }
