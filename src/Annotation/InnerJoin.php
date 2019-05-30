@@ -3,8 +3,6 @@
 namespace WyriHaximus\React\SimpleORM\Annotation;
 
 use Doctrine\Common\Annotations\Annotation\Target;
-use ReflectionClass;
-use ReflectionProperty;
 
 /**
  * @Annotation
@@ -32,11 +30,9 @@ final class InnerJoin
 
     public function __construct(array $table)
     {
-        /** @var ReflectionProperty $property */
-        foreach ((new ReflectionClass(self::class))->getProperties() as $property) {
-            $propertyName = $property->getName();
-            if (isset($table[$propertyName])) {
-                $this->$propertyName = $table[$propertyName];
+        foreach ($this as $name => $value) {
+            if (isset($table[$name])) {
+                $this->$name = $table[$name];
             }
         }
     }
