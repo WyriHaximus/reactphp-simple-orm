@@ -31,8 +31,8 @@ final class Repository
             QueryBuilder::create()->from($this->table)->select([
                 'COUNT(*) AS count',
             ])
-        )->take(1)->toPromise()->then(function (array $row) {
-            return $row['count'];
+        )->take(1)->toPromise()->then(function (array $row): int {
+            return (int)$row['count'];
         });
     }
 }

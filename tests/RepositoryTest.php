@@ -29,8 +29,6 @@ final class RepositoryTest extends AsyncTestCase
 
     public function testCount(): void
     {
-        $count = 123;
-
         $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
             self::assertCount(0, $builder->getParameters());
             $query = $builder->getQuery();
@@ -40,12 +38,12 @@ final class RepositoryTest extends AsyncTestCase
             return true;
         }))->willReturn(observableFromArray([
             [
-                'count' => $count,
+                'count' => '123',
             ],
         ]));
 
         $repository = new Repository($this->client->reveal(), EntityStub::class);
 
-        self::assertSame($count, $this->await($repository->count()));
+        self::assertSame(123, $this->await($repository->count()));
     }
 }
