@@ -12,10 +12,12 @@
   "require": {
     "php": "^7.3",
     "api-clients/rx": "^2.2",
+    "doctrine/annotations": "^1.6",
     "ocramius/generated-hydrator": "^3.0",
     "plasma/core": "^0.2.1|dev-master",
     "plasma/sql-common": "dev-master",
-    "voryx/pgasync": "^2.0"
+    "voryx/pgasync": "^2.0",
+    "wyrihaximus/doctrine-annotation-autoloader": "^1.0"
   },
   "require-dev": {
     "wyrihaximus/async-test-utilities": "^1.0"

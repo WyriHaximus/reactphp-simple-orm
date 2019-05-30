@@ -2,7 +2,12 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
-class HydrateStub
+use WyriHaximus\React\SimpleORM\Annotation\Table;
+
+/**
+ * @Table("tables")
+ */
+class EntityStub
 {
     /** @var int */
     protected $id;

@@ -15,8 +15,8 @@ final class HydratorTest extends TestCase
         $id = 123;
         $title = 'null';
 
-        /** @var HydrateStub $entity */
-        $entity = (new Hydrator())->hydrate(HydrateStub::class, [
+        /** @var EntityStub $entity */
+        $entity = (new Hydrator())->hydrate(EntityStub::class, [
             'id' => $id,
             'title' => $title,
         ]);
