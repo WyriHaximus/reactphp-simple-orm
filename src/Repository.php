@@ -7,6 +7,8 @@ use Doctrine\Common\Annotations\Reader;
 use Plasma\SQL\QueryBuilder;
 use React\Promise\PromiseInterface;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
+use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
+use WyriHaximus\React\SimpleORM\Annotation\RightJoin;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 
 final class Repository
@@ -68,8 +70,16 @@ final class Repository
 
         /** @var InnerJoin|null $annotation */
         foreach ($annotations as $annotation) {
-            if ($annotation instanceof InnerJoin === false) {
+            if ($annotation instanceof InnerJoin === false && $annotation instanceof LeftJoin === false  && $annotation instanceof RightJoin === false) {
                 continue;
+            }
+
+            $joinMethod = 'innerJoin';
+            if ($annotation instanceof LeftJoin) {
+                $joinMethod = 'leftJoin';
+            }
+            if ($annotation instanceof RightJoin) {
+                $joinMethod = 'rightJoin';
             }
 
             $foreignTable = $this->annotationReader->getClassAnnotation(new \ReflectionClass($annotation->getEntity()), Table::class)->getTable();
@@ -81,7 +91,7 @@ final class Repository
             if ($annotation->getLocalCast() !== null) {
                 $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $annotation->getLocalCast() . ')';
             }
-            $query = $query->innerJoin(
+            $query = $query->$joinMethod(
                 $foreignTable,
                 $foreignTable
             )->on(

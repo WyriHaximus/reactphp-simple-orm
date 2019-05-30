@@ -47,7 +47,7 @@ final class RepositoryTest extends AsyncTestCase
         self::assertSame(123, $this->await($repository->count()));
     }
 
-    public function testCountWithJoin(): void
+    public function testCountWithJoins(): void
     {
         $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
             self::assertCount(0, $builder->getParameters());
@@ -56,6 +56,10 @@ final class RepositoryTest extends AsyncTestCase
             self::assertStringContainsString('COUNT(*) AS count', $query);
             self::assertStringContainsString('INNER JOIN', $query);
             self::assertStringContainsString('tables.id = CAST(table_with_joins.id AS VARCHAR)', $query);
+            self::assertStringContainsString('LEFT JOIN', $query);
+            self::assertStringContainsString('tables.id = CAST(table_with_joins.id AS BJIGINT)', $query);
+            self::assertStringContainsString('RIGHT JOIN', $query);
+            self::assertStringContainsString('CAST(tables.id AS VARCHAR) = table_with_joins.id', $query);
 
             return true;
         }))->willReturn(observableFromArray([
