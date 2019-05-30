@@ -3,8 +3,10 @@
 namespace WyriHaximus\React\SimpleORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\Reader;
 use Plasma\SQL\QueryBuilder;
 use React\Promise\PromiseInterface;
+use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 
 final class Repository
@@ -21,11 +23,21 @@ final class Repository
     /** @var string */
     private $table;
 
+    /** @var Reader */
+    private $annotationReader;
+
+    /**
+     * @var string
+     */
+    private $entity;
+
     public function __construct(ClientInterface $client, string $entity)
     {
         $this->client = $client;
+        $this->entity = $entity;
         $this->hydrator = new Hydrator();
-        $this->table = (new AnnotationReader())->getClassAnnotation(new \ReflectionClass($entity), Table::class)->getTable();
+        $this->annotationReader = new AnnotationReader();
+        $this->table = $this->annotationReader->getClassAnnotation(new \ReflectionClass($entity), Table::class)->getTable();
     }
 
     public function count(): PromiseInterface
@@ -50,6 +62,34 @@ final class Repository
 
     private function buildBaseQuery(): QueryBuilder
     {
-        return QueryBuilder::create()->from($this->table);
+        $query = QueryBuilder::create()->from($this->table, $this->table);
+
+        $annotations = $this->annotationReader->getClassAnnotations(new \ReflectionClass($this->entity));
+
+        /** @var InnerJoin|null $annotation */
+        foreach ($annotations as $annotation) {
+            if ($annotation instanceof InnerJoin === false) {
+                continue;
+            }
+
+            $foreignTable = $this->annotationReader->getClassAnnotation(new \ReflectionClass($annotation->getEntity()), Table::class)->getTable();
+            $onLeftSide = $foreignTable . '.' . $annotation->getForeignKey();
+            if ($annotation->getForeignCast() !== null) {
+                $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $annotation->getForeignCast() . ')';
+            }
+            $onRightSide = $this->table . '.' . $annotation->getLocalKey();
+            if ($annotation->getLocalCast() !== null) {
+                $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $annotation->getLocalCast() . ')';
+            }
+            $query = $query->innerJoin(
+                $foreignTable,
+                $foreignTable
+            )->on(
+                $onLeftSide,
+                $onRightSide
+            );
+        }
+
+        return $query;
     }
 }
