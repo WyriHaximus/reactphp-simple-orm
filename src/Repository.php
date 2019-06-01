@@ -6,6 +6,9 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
 use Plasma\SQL\QueryBuilder;
 use React\Promise\PromiseInterface;
+use ReflectionClass;
+use ReflectionProperty;
+use Rx\Observable;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
 use WyriHaximus\React\SimpleORM\Annotation\RightJoin;
@@ -28,18 +31,23 @@ final class Repository
     /** @var Reader */
     private $annotationReader;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $entity;
 
-    public function __construct(ClientInterface $client, string $entity)
+    /** @var string[] */
+    private $fields;
+
+    /** @var EntityInspector */
+    private $entityInspector;
+
+    public function __construct(string $entity, EntityInspector $entityInspector, ClientInterface $client)
     {
-        $this->client = $client;
         $this->entity = $entity;
+        $this->entityInspector = $entityInspector;
+        $this->client = $client;
         $this->hydrator = new Hydrator();
         $this->annotationReader = new AnnotationReader();
-        $this->table = $this->annotationReader->getClassAnnotation(new \ReflectionClass($entity), Table::class)->getTable();
+        $this->table = $this->entityInspector->getTable($this->entity);
     }
 
     public function count(): PromiseInterface
@@ -53,20 +61,61 @@ final class Repository
         });
     }
 
+    public function page(int $page, array $where = []): Observable
+    {
+        return $this->client->fetch(
+            (function (QueryBuilder $query, array $where, int $page): QueryBuilder {
+                foreach ($where as $constraint) {
+                    $query = $query->where(...$constraint);
+                }
+
+                $query = $query->limit(50)->offset(--$page * 50)->orderBy('screenshots___id', true);
+
+                return $query;
+            })($this->getBaseQuery()->select($this->fields), $where, $page)
+        )->map(function (array $row): array {
+            return $this->inflate($row);
+        })->map(function (array $row): object {
+            return $this->hydrator->hydrate($this->entity, $row);
+        });
+    }
+
+    public function fetch(array $where = []): Observable
+    {
+        return $this->client->fetch(
+            (function (QueryBuilder $query, array $where): QueryBuilder {
+                foreach ($where as $constraint) {
+                    $query = $query->where(...$constraint);
+                }
+
+                return $query;
+            })($this->getBaseQuery()->select($this->fields), $where)
+        )->map(function (array $row): array {
+            return $this->inflate($row);
+        })->map(function (array $row): object {
+            return $this->hydrator->hydrate($this->entity, $row);
+        });
+    }
+
     private function getBaseQuery(): QueryBuilder
     {
         if ($this->baseQuery === null) {
             $this->baseQuery = $this->buildBaseQuery();
         }
 
-        return $this->baseQuery;
+        return clone $this->baseQuery;
     }
 
     private function buildBaseQuery(): QueryBuilder
     {
         $query = QueryBuilder::create()->from($this->table, $this->table);
 
-        $annotations = $this->annotationReader->getClassAnnotations(new \ReflectionClass($this->entity));
+        /** @var ReflectionProperty $property */
+        foreach ((new ReflectionClass($this->entity))->getProperties() as $property) {
+            $this->fields[$this->table . '___' . $property->getName()] = $this->table . '.' . $property->getName();
+        }
+
+        $annotations = $this->annotationReader->getClassAnnotations(new ReflectionClass($this->entity));
 
         /** @var InnerJoin|null $annotation */
         foreach ($annotations as $annotation) {
@@ -82,7 +131,7 @@ final class Repository
                 $joinMethod = 'rightJoin';
             }
 
-            $foreignTable = $this->annotationReader->getClassAnnotation(new \ReflectionClass($annotation->getEntity()), Table::class)->getTable();
+            $foreignTable = $this->annotationReader->getClassAnnotation(new ReflectionClass($annotation->getEntity()), Table::class)->getTable();
             $onLeftSide = $foreignTable . '.' . $annotation->getForeignKey();
             if ($annotation->getForeignCast() !== null) {
                 $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $annotation->getForeignCast() . ')';
@@ -98,8 +147,29 @@ final class Repository
                 $onLeftSide,
                 $onRightSide
             );
+
+            /** @var ReflectionProperty $property */
+            foreach ((new ReflectionClass($annotation->getEntity()))->getProperties() as $property) {
+                $this->fields[$foreignTable . '___' . $property->getName()] = $foreignTable . '.' . $property->getName();
+            }
+
+            if ($annotation->getProperty() !== null) {
+                unset($this->fields[$this->table . '___' . $annotation->getProperty()]);
+            }
         }
 
         return $query;
+    }
+
+    private function inflate(array $row): array
+    {
+        $tables = [];
+
+        foreach ($row as $key => $value) {
+            [$table, $field] = \explode('___', $key);
+            $tables[$table][$field] = $value;
+        }
+
+        return $tables;
     }
 }

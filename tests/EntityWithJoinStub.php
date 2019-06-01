@@ -14,21 +14,21 @@ use WyriHaximus\React\SimpleORM\Annotation\Table;
         local_key="id",
         local_cast="VARCHAR",
         foreign_key="id",
-        property="joined_entity"
+        property="joined_inner_entity"
  * )
  * @LeftJoin(
         entity=EntityStub::class,
         local_key="id",
         local_cast="BJIGINT",
         foreign_key="id",
-        property="joined_entity"
+        property="joined_left_entity"
  * )
  * @RightJoin(
         entity=EntityStub::class,
         local_key="id",
         foreign_key="id",
         foreign_cast="VARCHAR",
-        property="joined_entity"
+        property="joined_right_entity"
  * )
  */
 class EntityWithJoinStub
@@ -42,19 +42,42 @@ class EntityWithJoinStub
     /** @var string */
     protected $title;
 
-    /**
-     * @return int
-     */
+    /** @var EntityStub */
+    protected $joined_inner_entity;
+
+    /** @var EntityStub */
+    protected $joined_left_entity;
+
+    /** @var EntityStub */
+    protected $joined_right_entity;
+
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
+    public function getForeignId(): int
+    {
+        return $this->foreign_id;
+    }
+
     public function getTitle(): string
     {
         return $this->title;
+    }
+
+    public function getJoinedInnerEntity(): EntityStub
+    {
+        return $this->joined_inner_entity;
+    }
+
+    public function getJoinedLeftEntity(): EntityStub
+    {
+        return $this->joined_left_entity;
+    }
+
+    public function getJoinedRightEntity(): EntityStub
+    {
+        return $this->joined_right_entity;
     }
 }

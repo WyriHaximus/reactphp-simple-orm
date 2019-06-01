@@ -24,4 +24,19 @@ final class HydratorTest extends TestCase
         self::assertSame($id, $entity->getId());
         self::assertSame($title, $entity->getTitle());
     }
+
+    public function testHydrateWithJoins(): void
+    {
+        $id = 123;
+        $title = 'null';
+
+        /** @var EntityStub $entity */
+        $entity = (new Hydrator())->hydrate(EntityWithJoinStub::class, [
+            'id' => $id,
+            'title' => $title,
+        ]);
+
+        self::assertSame($id, $entity->getId());
+        self::assertSame($title, $entity->getTitle());
+    }
 }
