@@ -29,7 +29,7 @@ final class Client implements ClientInterface
     public function getRepository(string $entity): Repository
     {
         if (!isset($this->repositories[$entity])) {
-            $this->repositories[$entity] = new Repository($entity, $this->entityInspector, $this);
+            $this->repositories[$entity] = new Repository($this->entityInspector->getEntity($entity), $this);
         }
 
         return $this->repositories[$entity];

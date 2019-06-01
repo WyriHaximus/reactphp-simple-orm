@@ -2,23 +2,38 @@
 
 namespace WyriHaximus\React\SimpleORM;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\Reader;
-use Plasma\SQL\QueryBuilder;
-use React\Promise\PromiseInterface;
-use ReflectionClass;
-use ReflectionProperty;
-use Rx\Observable;
-use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
-use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
-use WyriHaximus\React\SimpleORM\Annotation\RightJoin;
-use WyriHaximus\React\SimpleORM\Annotation\Table;
+use WyriHaximus\React\SimpleORM\Entity\Field;
 
 final class InspectedEntity
 {
+    /** @var string */
+    private $class;
+
     /** @var string */
     private $table;
 
     /** @var Field[] */
     private $fields = [];
+
+    public function __construct(string $class, string $table, array $fields)
+    {
+        $this->class = $class;
+        $this->table = $table;
+        $this->fields = $fields;
+    }
+
+    public function getClass(): string
+    {
+        return $this->class;
+    }
+
+    public function getTable(): string
+    {
+        return $this->table;
+    }
+
+    public function getFields(): array
+    {
+        return $this->fields;
+    }
 }

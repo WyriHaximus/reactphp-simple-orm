@@ -13,14 +13,15 @@ use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
 use WyriHaximus\React\SimpleORM\Annotation\RightJoin;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
+use WyriHaximus\React\SimpleORM\Entity\Field;
 
 final class EntityInspector
 {
     /** @var Reader */
     private $annotationReader;
 
-    /** @var string[] */
-    private $tables = [];
+    /** @var InspectedEntity[] */
+    private $entities = [];
 
     public function __construct(Reader $annotationReader)
     {
@@ -29,10 +30,23 @@ final class EntityInspector
 
     public function getEntity(string $entity): InspectedEntity
     {
-        if (!isset($this->tables[$entity])) {
-            $this->tables[$entity] = 'adsdsa';
+        if (!isset($this->entities[$entity])) {
+            $class = new ReflectionClass($entity);
+            $this->entities[$entity] = new InspectedEntity(
+                $entity,
+                $this->annotationReader->getClassAnnotation($class, Table::class)->getTable(),
+                $this->getFields(),
+            );
         }
 
-        return $this->tables[$entity];
+        return $this->entities[$entity];
+    }
+
+    private function getFields(ReflectionClass $class): iterable
+    {
+        /** @var ReflectionProperty $property */
+        foreach ($class->getProperties() as $property) {
+            yield new Field($property->getName(), );
+        }
     }
 }

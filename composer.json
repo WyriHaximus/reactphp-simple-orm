@@ -17,7 +17,8 @@
     "plasma/core": "^0.2.1|dev-master",
     "plasma/sql-common": "dev-master",
     "voryx/pgasync": "^2.0",
-    "wyrihaximus/doctrine-annotation-autoloader": "^1.0"
+    "wyrihaximus/doctrine-annotation-autoloader": "^1.0",
+    "wyrihaximus/iterator-or-array-to-array": "^1.1"
   },
   "require-dev": {
     "wyrihaximus/async-test-utilities": "^1.0"

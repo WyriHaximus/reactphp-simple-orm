@@ -2,8 +2,6 @@
 
 namespace WyriHaximus\React\SimpleORM;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\Reader;
 use Plasma\SQL\QueryBuilder;
 use React\Promise\PromiseInterface;
 use ReflectionClass;
@@ -16,6 +14,9 @@ use WyriHaximus\React\SimpleORM\Annotation\Table;
 
 final class Repository
 {
+    /** @var InspectedEntity */
+    private $entity;
+
     /** @var ClientInterface */
     private $client;
 
@@ -25,29 +26,11 @@ final class Repository
     /** @var QueryBuilder */
     private $baseQuery;
 
-    /** @var string */
-    private $table;
-
-    /** @var Reader */
-    private $annotationReader;
-
-    /** @var string */
-    private $entity;
-
-    /** @var string[] */
-    private $fields;
-
-    /** @var EntityInspector */
-    private $entityInspector;
-
-    public function __construct(string $entity, EntityInspector $entityInspector, ClientInterface $client)
+    public function __construct(InspectedEntity $entity, ClientInterface $client)
     {
         $this->entity = $entity;
-        $this->entityInspector = $entityInspector;
         $this->client = $client;
         $this->hydrator = new Hydrator();
-        $this->annotationReader = new AnnotationReader();
-        $this->table = $this->entityInspector->getTable($this->entity);
     }
 
     public function count(): PromiseInterface
@@ -61,22 +44,22 @@ final class Repository
         });
     }
 
-    public function page(int $page, array $where = []): Observable
+    public function page(int $page, array $where = [], array $order = [], int $perPage = 50): Observable
     {
         return $this->client->fetch(
-            (function (QueryBuilder $query, array $where, int $page): QueryBuilder {
+            (function (QueryBuilder $query, array $where, int $page, int $perPage): QueryBuilder {
                 foreach ($where as $constraint) {
                     $query = $query->where(...$constraint);
                 }
 
-                $query = $query->limit(50)->offset(--$page * 50)->orderBy('screenshots___id', true);
+                $query = $query->limit($perPage)->offset(--$page * $perPage)->orderBy('screenshots___id', true);
 
                 return $query;
-            })($this->getBaseQuery()->select($this->fields), $where, $page)
+            })($this->getBaseQuery()->select($this->entity->getFields()), $where, $page, $perPage)
         )->map(function (array $row): array {
             return $this->inflate($row);
         })->map(function (array $row): object {
-            return $this->hydrator->hydrate($this->entity, $row);
+            return $this->hydrator->hydrate($this->entity->getClass(), $row);
         });
     }
 
@@ -89,11 +72,11 @@ final class Repository
                 }
 
                 return $query;
-            })($this->getBaseQuery()->select($this->fields), $where)
+            })($this->getBaseQuery()->select($this->entity->getFields()), $where)
         )->map(function (array $row): array {
             return $this->inflate($row);
         })->map(function (array $row): object {
-            return $this->hydrator->hydrate($this->entity, $row);
+            return $this->hydrator->hydrate($this->entity->getClass(), $row);
         });
     }
 

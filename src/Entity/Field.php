@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace WyriHaximus\React\SimpleORM;
+namespace WyriHaximus\React\SimpleORM\Entity;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
