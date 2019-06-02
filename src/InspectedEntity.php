@@ -3,6 +3,7 @@
 namespace WyriHaximus\React\SimpleORM;
 
 use WyriHaximus\React\SimpleORM\Entity\Field;
+use WyriHaximus\React\SimpleORM\Entity\Join;
 
 final class InspectedEntity
 {
@@ -15,11 +16,15 @@ final class InspectedEntity
     /** @var Field[] */
     private $fields = [];
 
-    public function __construct(string $class, string $table, array $fields)
+    /** @var Join[] */
+    private $joins = [];
+
+    public function __construct(string $class, string $table, array $fields, array $joins)
     {
         $this->class = $class;
         $this->table = $table;
         $this->fields = $fields;
+        $this->joins = $joins;
     }
 
     public function getClass(): string
@@ -35,5 +40,13 @@ final class InspectedEntity
     public function getFields(): array
     {
         return $this->fields;
+    }
+
+    /**
+     * @return Join[]
+     */
+    public function getJoins(): array
+    {
+        return $this->joins;
     }
 }

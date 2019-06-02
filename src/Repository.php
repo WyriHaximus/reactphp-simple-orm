@@ -8,6 +8,7 @@ use ReflectionClass;
 use ReflectionProperty;
 use Rx\Observable;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
+use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
 use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
 use WyriHaximus\React\SimpleORM\Annotation\RightJoin;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
@@ -25,6 +26,9 @@ final class Repository
 
     /** @var QueryBuilder */
     private $baseQuery;
+
+    /** @var string[] */
+    private $fields = [];
 
     public function __construct(InspectedEntity $entity, ClientInterface $client)
     {
@@ -72,7 +76,7 @@ final class Repository
                 }
 
                 return $query;
-            })($this->getBaseQuery()->select($this->entity->getFields()), $where)
+            })($this->getBaseQuery()->select($this->fields), $where)
         )->map(function (array $row): array {
             return $this->inflate($row);
         })->map(function (array $row): object {
@@ -91,37 +95,30 @@ final class Repository
 
     private function buildBaseQuery(): QueryBuilder
     {
-        $query = QueryBuilder::create()->from($this->table, $this->table);
+        $query = QueryBuilder::create()->from($this->entity->getTable(), $this->entity->getTable());
 
         /** @var ReflectionProperty $property */
         foreach ((new ReflectionClass($this->entity))->getProperties() as $property) {
-            $this->fields[$this->table . '___' . $property->getName()] = $this->table . '.' . $property->getName();
+            $this->fields[$this->entity->getTable() . '___' . $property->getName()] = $this->entity->getTable() . '.' . $property->getName();
         }
 
-        $annotations = $this->annotationReader->getClassAnnotations(new ReflectionClass($this->entity));
-
-        /** @var InnerJoin|null $annotation */
-        foreach ($annotations as $annotation) {
-            if ($annotation instanceof InnerJoin === false && $annotation instanceof LeftJoin === false  && $annotation instanceof RightJoin === false) {
-                continue;
-            }
-
+        foreach ($this->entity->getJoins() as $join) {
             $joinMethod = 'innerJoin';
-            if ($annotation instanceof LeftJoin) {
+            if ($join->getType() === 'left') {
                 $joinMethod = 'leftJoin';
             }
-            if ($annotation instanceof RightJoin) {
+            if ($join->getType() === 'right') {
                 $joinMethod = 'rightJoin';
             }
 
-            $foreignTable = $this->annotationReader->getClassAnnotation(new ReflectionClass($annotation->getEntity()), Table::class)->getTable();
-            $onLeftSide = $foreignTable . '.' . $annotation->getForeignKey();
-            if ($annotation->getForeignCast() !== null) {
-                $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $annotation->getForeignCast() . ')';
+            $foreignTable = $join->getEntity()->getTable();
+            $onLeftSide = $foreignTable . '.' . $join->getForeignKey();
+            if ($join->getForeignCast() !== null) {
+                $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $join->getForeignCast() . ')';
             }
-            $onRightSide = $this->table . '.' . $annotation->getLocalKey();
-            if ($annotation->getLocalCast() !== null) {
-                $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $annotation->getLocalCast() . ')';
+            $onRightSide = $this->entity->getTable() . '.' . $join->getLocalKey();
+            if ($join->getLocalCast() !== null) {
+                $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $join->getLocalCast() . ')';
             }
             $query = $query->$joinMethod(
                 $foreignTable,
@@ -132,12 +129,12 @@ final class Repository
             );
 
             /** @var ReflectionProperty $property */
-            foreach ((new ReflectionClass($annotation->getEntity()))->getProperties() as $property) {
+            foreach ((new ReflectionClass($join->getEntity()))->getProperties() as $property) {
                 $this->fields[$foreignTable . '___' . $property->getName()] = $foreignTable . '.' . $property->getName();
             }
 
-            if ($annotation->getProperty() !== null) {
-                unset($this->fields[$this->table . '___' . $annotation->getProperty()]);
+            if ($join->getProperty() !== null) {
+                unset($this->fields[$this->entity->getTable() . '___' . $join->getProperty()]);
             }
         }
 

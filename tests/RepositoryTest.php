@@ -3,11 +3,13 @@
 namespace WyriHaximus\React\Tests\SimpleORM;
 
 use function ApiClients\Tools\Rx\observableFromArray;
+use Doctrine\Common\Annotations\AnnotationReader;
 use Plasma\SQL\QueryBuilder;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\ClientInterface;
+use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\SimpleORM\Repository;
 
 /**
@@ -42,7 +44,10 @@ final class RepositoryTest extends AsyncTestCase
             ],
         ]));
 
-        $repository = new Repository($this->client->reveal(), EntityStub::class);
+        $repository = new Repository(
+            (new EntityInspector(new AnnotationReader()))->getEntity(EntityStub::class),
+            $this->client->reveal()
+        );
 
         self::assertSame(123, $this->await($repository->count()));
     }
@@ -68,7 +73,10 @@ final class RepositoryTest extends AsyncTestCase
             ],
         ]));
 
-        $repository = new Repository($this->client->reveal(), EntityWithJoinStub::class);
+        $repository = new Repository(
+            (new EntityInspector(new AnnotationReader()))->getEntity(EntityWithJoinStub::class),
+            $this->client->reveal()
+        );
 
         self::assertSame(123, $this->await($repository->count()));
     }
@@ -78,9 +86,7 @@ final class RepositoryTest extends AsyncTestCase
         $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
             self::assertCount(0, $builder->getParameters());
             $query = $builder->getQuery();
-            self::assertStringContainsString('NEIN', $query);
             self::assertStringContainsString('tables', $query);
-            self::assertStringContainsString('COUNT(*) AS count', $query);
             self::assertStringContainsString('INNER JOIN', $query);
             self::assertStringContainsString('tables.id = CAST(table_with_joins.id AS VARCHAR)', $query);
             self::assertStringContainsString('LEFT JOIN', $query);
@@ -95,7 +101,10 @@ final class RepositoryTest extends AsyncTestCase
             ],
         ]));
 
-        $repository = new Repository($this->client->reveal(), EntityWithJoinStub::class);
+        $repository = new Repository(
+            (new EntityInspector(new AnnotationReader()))->getEntity(EntityWithJoinStub::class),
+            $this->client->reveal()
+        );
 
         self::assertSame(123, $this->await($repository->fetch()));
     }

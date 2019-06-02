@@ -8,7 +8,7 @@ use Doctrine\Common\Annotations\Annotation\Target;
  * @Annotation
  * @Target("CLASS")
  */
-final class InnerJoin
+final class InnerJoin implements JoinInterface
 {
     /** @var string */
     private $entity;
@@ -40,6 +40,11 @@ final class InnerJoin
     public function getEntity(): string
     {
         return $this->entity;
+    }
+
+    public function getType(): string
+    {
+        return 'inner';
     }
 
     public function getLocalKey(): string

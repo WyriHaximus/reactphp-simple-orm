@@ -8,7 +8,7 @@ use Doctrine\Common\Annotations\Annotation\Target;
  * @Annotation
  * @Target("CLASS")
  */
-final class LeftJoin
+final class LeftJoin implements JoinInterface
 {
     /** @var string */
     private $entity;
@@ -40,6 +40,11 @@ final class LeftJoin
     public function getEntity(): string
     {
         return $this->entity;
+    }
+
+    public function getType(): string
+    {
+        return 'left';
     }
 
     public function getLocalKey(): string
