@@ -96,9 +96,16 @@ final class RepositoryTest extends AsyncTestCase
 
             return true;
         }))->willReturn(observableFromArray([
-            [
-                'count' => '123',
-            ],
+                [
+                    'table_with_joins___class' => 'table_with_joins.class',
+                    'table_with_joins___table' => 'table_with_joins.table',
+                    'table_with_joins___fields' => 'table_with_joins.fields',
+                    'table_with_joins___joins' => 'table_with_joins.joins',
+                    'tables___class' => 'tables.class',
+                    'tables___table' => 'tables.table',
+                    'tables___fields' => 'tables.fields',
+                    'tables___joins' => 'tables.joins',
+                ],
         ]));
 
         $repository = new Repository(
@@ -106,6 +113,6 @@ final class RepositoryTest extends AsyncTestCase
             $this->client->reveal()
         );
 
-        self::assertSame(123, $this->await($repository->fetch()));
+        self::assertSame(123, $this->await($repository->fetch()->toArray()->toPromise()));
     }
 }

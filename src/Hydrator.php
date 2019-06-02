@@ -46,7 +46,7 @@ final class Hydrator
                 unset($data[(new AnnotationReader())->getClassAnnotation(new \ReflectionClass($annotation->getEntity()), Table::class)->getTable()]);
             }
         }
-
+var_export($data);
         return $this->hydrators[$class]->hydrate($data[$table], new $class());
     }
 }

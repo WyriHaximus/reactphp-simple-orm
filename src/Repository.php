@@ -144,7 +144,7 @@ final class Repository
     private function inflate(array $row): array
     {
         $tables = [];
-
+var_export($this->fields);
         foreach ($row as $key => $value) {
             [$table, $field] = \explode('___', $key);
             $tables[$table][$field] = $value;
