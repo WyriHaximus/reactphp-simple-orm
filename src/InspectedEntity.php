@@ -37,6 +37,9 @@ final class InspectedEntity
         return $this->table;
     }
 
+    /**
+     * @return Field[]
+     */
     public function getFields(): array
     {
         return $this->fields;

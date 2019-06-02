@@ -97,14 +97,11 @@ final class RepositoryTest extends AsyncTestCase
             return true;
         }))->willReturn(observableFromArray([
                 [
-                    'table_with_joins___class' => 'table_with_joins.class',
-                    'table_with_joins___table' => 'table_with_joins.table',
-                    'table_with_joins___fields' => 'table_with_joins.fields',
-                    'table_with_joins___joins' => 'table_with_joins.joins',
-                    'tables___class' => 'tables.class',
-                    'tables___table' => 'tables.table',
-                    'tables___fields' => 'tables.fields',
-                    'tables___joins' => 'tables.joins',
+                    'table_with_joins___id' => 1,
+                    'table_with_joins___foreign_id' => 2,
+                    'table_with_joins___title' => 'table_with_joins.fields',
+                    'tables___id' => 3,
+                    'tables___title' => 'tables.title',
                 ],
         ]));
 
@@ -113,6 +110,15 @@ final class RepositoryTest extends AsyncTestCase
             $this->client->reveal()
         );
 
-        self::assertSame(123, $this->await($repository->fetch()->toArray()->toPromise()));
+        $rows = $this->await($repository->fetch()->toArray()->toPromise());
+
+        /** @var EntityWithJoinStub $row */
+        $row = current($rows);
+
+        self::assertCount(1, $rows);
+        self::assertInstanceOf(EntityWithJoinStub::class, $row);
+        self::assertSame(1, $row->getId());
+        self::assertSame(2, $row->getForeignId());
+        self::assertSame('table_with_joins.fields', $row->getTitle());
     }
 }

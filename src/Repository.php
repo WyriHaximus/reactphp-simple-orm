@@ -7,11 +7,6 @@ use React\Promise\PromiseInterface;
 use ReflectionClass;
 use ReflectionProperty;
 use Rx\Observable;
-use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
-use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
-use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
-use WyriHaximus\React\SimpleORM\Annotation\RightJoin;
-use WyriHaximus\React\SimpleORM\Annotation\Table;
 
 final class Repository
 {
@@ -63,7 +58,7 @@ final class Repository
         )->map(function (array $row): array {
             return $this->inflate($row);
         })->map(function (array $row): object {
-            return $this->hydrator->hydrate($this->entity->getClass(), $row);
+            return $this->hydrator->hydrate($this->entity, $row);
         });
     }
 
@@ -80,7 +75,7 @@ final class Repository
         )->map(function (array $row): array {
             return $this->inflate($row);
         })->map(function (array $row): object {
-            return $this->hydrator->hydrate($this->entity->getClass(), $row);
+            return $this->hydrator->hydrate($this->entity, $row);
         });
     }
 
@@ -128,9 +123,8 @@ final class Repository
                 $onRightSide
             );
 
-            /** @var ReflectionProperty $property */
-            foreach ((new ReflectionClass($join->getEntity()))->getProperties() as $property) {
-                $this->fields[$foreignTable . '___' . $property->getName()] = $foreignTable . '.' . $property->getName();
+            foreach ($join->getEntity()->getFields() as $field) {
+                $this->fields[$foreignTable . '___' . $field->getName()] = $foreignTable . '.' . $field->getName();
             }
 
             if ($join->getProperty() !== null) {

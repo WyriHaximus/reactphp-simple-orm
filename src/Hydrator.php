@@ -2,13 +2,7 @@
 
 namespace WyriHaximus\React\SimpleORM;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use GeneratedHydrator\Configuration;
-use ReflectionClass;
-use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
-use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
-use WyriHaximus\React\SimpleORM\Annotation\RightJoin;
-use WyriHaximus\React\SimpleORM\Annotation\Table;
 
 final class Hydrator
 {
@@ -18,35 +12,27 @@ final class Hydrator
     /** @var callable[] */
     private $middleware = [];
 
-    public function hydrate(string $class, array $data): object
+    public function hydrate(InspectedEntity $inspectedEntity, array $data): object
     {
-        $table = (new AnnotationReader())->getClassAnnotation(new \ReflectionClass($class), Table::class)->getTable();
-
+        $class = $inspectedEntity->getClass();
         if (!isset($this->hydrators[$class])) {
-            $this->hydrators[$class] = (function ($class) {
+            $this->hydrators[$inspectedEntity->getClass()] = (function ($class) {
                 $hydratorClass = (new Configuration($class))->createFactory()->getHydratorClass();
 
                 return new $hydratorClass();
             })($class);
         }
 
-        $annotations = (new AnnotationReader())->getClassAnnotations(new ReflectionClass($class));
-
-        /** @var InnerJoin|null $annotation */
-        foreach ($annotations as $annotation) {
-            if ($annotation instanceof InnerJoin === false && $annotation instanceof LeftJoin === false  && $annotation instanceof RightJoin === false) {
-                continue;
-            }
-
-            if ($annotation->getProperty() !== null) {
-                $data[$table][$annotation->getProperty()] = $this->hydrate(
-                    $annotation->getEntity(),
+        foreach ($inspectedEntity->getJoins() as $join) {
+            if ($join->getProperty() !== null) {
+                $data[$inspectedEntity->getTable()][$join->getProperty()] = $this->hydrate(
+                    $join->getEntity(),
                     $data
                 );
-                unset($data[(new AnnotationReader())->getClassAnnotation(new \ReflectionClass($annotation->getEntity()), Table::class)->getTable()]);
+                unset($data[$inspectedEntity->getTable()][$join->getProperty()]);
             }
         }
-var_export($data);
-        return $this->hydrators[$class]->hydrate($data[$table], new $class());
+
+        return $this->hydrators[$class]->hydrate($data[$inspectedEntity->getTable()], new $class());
     }
 }
