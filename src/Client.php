@@ -26,7 +26,7 @@ final class Client implements ClientInterface
         $this->entityInspector = new EntityInspector($annotationReader ?? new AnnotationReader());
     }
 
-    public function getRepository(string $entity): Repository
+    public function getRepository(string $entity): RepositoryInterface
     {
         if (!isset($this->repositories[$entity])) {
             $this->repositories[$entity] = new Repository($this->entityInspector->getEntity($entity), $this);

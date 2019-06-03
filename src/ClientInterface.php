@@ -7,7 +7,7 @@ use Rx\Observable;
 
 interface ClientInterface
 {
-    public function getRepository(string $entity): Repository;
+    public function getRepository(string $entity): RepositoryInterface;
 
     public function fetch(QueryBuilder $query): Observable;
 }
