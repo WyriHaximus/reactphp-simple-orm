@@ -8,7 +8,7 @@ use ReflectionClass;
 use ReflectionProperty;
 use Rx\Observable;
 
-final class Repository
+final class Repository implements RepositoryInterface
 {
     /** @var InspectedEntity */
     private $entity;
