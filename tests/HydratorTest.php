@@ -5,6 +5,8 @@ namespace WyriHaximus\React\Tests\SimpleORM;
 use Doctrine\Common\Annotations\AnnotationReader;
 use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\SimpleORM\Hydrator;
+use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
+use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 use WyriHaximus\TestUtilities\TestCase;
 
 /**
@@ -19,17 +21,17 @@ final class HydratorTest extends TestCase
 
         /** @var EntityStub $entity */
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new AnnotationReader()))->getEntity(EntityStub::class),
+            (new EntityInspector(new AnnotationReader()))->getEntity(UserStub::class),
             [
-                'tables' => [
+                'users' => [
                     'id' => 123,
-                    'title' => 'tables.title',
+                    'name' => 'tables.title',
                 ],
             ]
         );
 
         self::assertSame($id, $entity->getId());
-        self::assertSame($title, $entity->getTitle());
+        self::assertSame($title, $entity->getName());
     }
 
     public function testHydrateWithJoins(): void
@@ -39,7 +41,7 @@ final class HydratorTest extends TestCase
 
         /** @var EntityStub $entity */
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new AnnotationReader()))->getEntity(EntityWithJoinStub::class),
+            (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
             [
                 'id' => $id,
                 'title' => $title,

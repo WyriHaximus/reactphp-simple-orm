@@ -11,6 +11,8 @@ use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\ClientInterface;
 use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\SimpleORM\Repository;
+use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
+use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
 /**
  * @internal
@@ -32,24 +34,24 @@ final class EntityInspectorTest extends AsyncTestCase
      */
     public function inspect()
     {
-        $inspectedEntity = $this->entityInspector->getEntity(EntityStub::class);
+        $inspectedEntity = $this->entityInspector->getEntity(UserStub::class);
 
-        self::assertSame(EntityStub::class, $inspectedEntity->getClass());
-        self::assertSame('tables', $inspectedEntity->getTable());
+        self::assertSame(UserStub::class, $inspectedEntity->getClass());
+        self::assertSame('users', $inspectedEntity->getTable());
 
         $fields = $inspectedEntity->getFields();
         self::assertCount(2, $fields);
         self::assertArrayHasKey('id', $fields);
         self::assertSame('int', $fields['id']->getType());
-        self::assertArrayHasKey('title', $fields);
-        self::assertSame('string', $fields['title']->getType());
+        self::assertArrayHasKey('name', $fields);
+        self::assertSame('string', $fields['name']->getType());
     }
     /**
      * @test
      */
     public function inspectWithJoins()
     {
-        $inspectedEntity = $this->entityInspector->getEntity(EntityWithJoinStub::class);
+        $inspectedEntity = $this->entityInspector->getEntity(BlogPostStub::class);
 
         self::assertSame(EntityWithJoinStub::class, $inspectedEntity->getClass());
         self::assertSame('table_with_joins', $inspectedEntity->getTable());

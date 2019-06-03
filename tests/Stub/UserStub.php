@@ -7,7 +7,7 @@ use WyriHaximus\React\SimpleORM\Annotation\Table;
 /**
  * @Table("users")
  */
-class userStub
+class UserStub
 {
     /** @var int */
     protected $id;

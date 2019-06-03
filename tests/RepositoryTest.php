@@ -11,6 +11,8 @@ use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\ClientInterface;
 use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\SimpleORM\Repository;
+use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
+use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
 /**
  * @internal
@@ -34,7 +36,7 @@ final class RepositoryTest extends AsyncTestCase
         $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
             self::assertCount(0, $builder->getParameters());
             $query = $builder->getQuery();
-            self::assertStringContainsString('tables', $query);
+            self::assertStringContainsString('FROM users', $query);
             self::assertStringContainsString('COUNT(*) AS count', $query);
 
             return true;
@@ -45,7 +47,7 @@ final class RepositoryTest extends AsyncTestCase
         ]));
 
         $repository = new Repository(
-            (new EntityInspector(new AnnotationReader()))->getEntity(EntityStub::class),
+            (new EntityInspector(new AnnotationReader()))->getEntity(UserStub::class),
             $this->client->reveal()
         );
 
@@ -74,7 +76,7 @@ final class RepositoryTest extends AsyncTestCase
         ]));
 
         $repository = new Repository(
-            (new EntityInspector(new AnnotationReader()))->getEntity(EntityWithJoinStub::class),
+            (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
             $this->client->reveal()
         );
 
@@ -106,7 +108,7 @@ final class RepositoryTest extends AsyncTestCase
         ]));
 
         $repository = new Repository(
-            (new EntityInspector(new AnnotationReader()))->getEntity(EntityWithJoinStub::class),
+            (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
             $this->client->reveal()
         );
 
@@ -116,7 +118,7 @@ final class RepositoryTest extends AsyncTestCase
         $row = current($rows);
 
         self::assertCount(1, $rows);
-        self::assertInstanceOf(EntityWithJoinStub::class, $row);
+        self::assertInstanceOf(BlogPostStub::class, $row);
         self::assertSame(1, $row->getId());
         self::assertSame(2, $row->getForeignId());
         self::assertSame('table_with_joins.fields', $row->getTitle());
