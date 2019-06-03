@@ -54,7 +54,7 @@ final class Repository
                 $query = $query->limit($perPage)->offset(--$page * $perPage)->orderBy('screenshots___id', true);
 
                 return $query;
-            })($this->getBaseQuery()->select($this->entity->getFields()), $where, $page, $perPage)
+            })($this->getBaseQuery()->select($this->fields), $where, $page, $perPage)
         )->map(function (array $row): array {
             return $this->inflate($row);
         })->map(function (array $row): object {
@@ -92,9 +92,8 @@ final class Repository
     {
         $query = QueryBuilder::create()->from($this->entity->getTable(), $this->entity->getTable());
 
-        /** @var ReflectionProperty $property */
-        foreach ((new ReflectionClass($this->entity))->getProperties() as $property) {
-            $this->fields[$this->entity->getTable() . '___' . $property->getName()] = $this->entity->getTable() . '.' . $property->getName();
+        foreach ($this->entity->getFields() as $field) {
+            $this->fields[$this->entity->getTable() . '___' . $field->getName()] = $this->entity->getTable() . '.' . $field->getName();
         }
 
         foreach ($this->entity->getJoins() as $join) {
@@ -138,7 +137,7 @@ final class Repository
     private function inflate(array $row): array
     {
         $tables = [];
-var_export($this->fields);
+
         foreach ($row as $key => $value) {
             [$table, $field] = \explode('___', $key);
             $tables[$table][$field] = $value;

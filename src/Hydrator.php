@@ -29,7 +29,7 @@ final class Hydrator
                     $join->getEntity(),
                     $data
                 );
-                unset($data[$inspectedEntity->getTable()][$join->getProperty()]);
+                unset($data[$join->getEntity()->getTable()]);
             }
         }
 
