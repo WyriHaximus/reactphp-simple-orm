@@ -38,7 +38,6 @@ final class Client implements ClientInterface
     public function fetch(QueryBuilder $query): Observable
     {
         $query = $query->withGrammar(new PostgreSQL());
-        \var_export([$query->getQuery(), $query->getParameters()]);
 
         return $this->client->executeStatement($query->getQuery(), $query->getParameters());
     }
