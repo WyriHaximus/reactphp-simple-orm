@@ -8,18 +8,18 @@ use WyriHaximus\React\SimpleORM\Annotation\RightJoin;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 
 /**
- * @Table("table_with_joins")
+ * @Table("blog_posts")
  * @InnerJoin(
         entity=UserStub::class,
-        local_key="id",
+        local_key="author_id",
         foreign_key="id",
         property="author"
  * )
  * @LeftJoin(
         entity=CommentStub::class,
         local_key="id",
-        local_cast="BJIGINT",
-        foreign_key="id",
+        local_cast="BIGINT",
+        foreign_key="blog_post_id",
         property="comments"
  * )
  */
@@ -29,28 +29,25 @@ class BlogPostStub
     protected $id;
 
     /** @var int */
-    protected $foreign_id;
+    protected $author_id;
 
     /** @var string */
     protected $title;
 
-    /** @var EntityStub */
-    protected $joined_inner_entity;
+    /** @var string */
+    protected $contents;
 
-    /** @var EntityStub */
-    protected $joined_left_entity;
-
-    /** @var EntityStub */
-    protected $joined_right_entity;
+    /** @var UserStub */
+    protected $author;
 
     public function getId(): int
     {
         return $this->id;
     }
 
-    public function getForeignId(): int
+    public function getAuthor(): UserStub
     {
-        return $this->foreign_id;
+        return $this->author;
     }
 
     public function getTitle(): string
@@ -58,18 +55,8 @@ class BlogPostStub
         return $this->title;
     }
 
-    public function getJoinedInnerEntity(): EntityStub
+    public function getContents(): string
     {
-        return $this->joined_inner_entity;
-    }
-
-    public function getJoinedLeftEntity(): EntityStub
-    {
-        return $this->joined_left_entity;
-    }
-
-    public function getJoinedRightEntity(): EntityStub
-    {
-        return $this->joined_right_entity;
+        return $this->title;
     }
 }

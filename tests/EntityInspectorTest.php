@@ -12,6 +12,7 @@ use WyriHaximus\React\SimpleORM\ClientInterface;
 use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\SimpleORM\Repository;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
+use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
 /**
@@ -53,37 +54,47 @@ final class EntityInspectorTest extends AsyncTestCase
     {
         $inspectedEntity = $this->entityInspector->getEntity(BlogPostStub::class);
 
-        self::assertSame(EntityWithJoinStub::class, $inspectedEntity->getClass());
-        self::assertSame('table_with_joins', $inspectedEntity->getTable());
+        self::assertSame(BlogPostStub::class, $inspectedEntity->getClass());
+        self::assertSame('blog_posts', $inspectedEntity->getTable());
 
         $fields = $inspectedEntity->getFields();
-        self::assertCount(3, $fields);
+        self::assertCount(4, $fields);
 
-        self::assertArrayHasKey('id', $fields);
-        self::assertSame('int', $fields['id']->getType());
-
-        self::assertArrayHasKey('foreign_id', $fields);
-        self::assertSame('int', $fields['foreign_id']->getType());
-
-        self::assertArrayHasKey('title', $fields);
-        self::assertSame('string', $fields['title']->getType());
+        foreach ([
+            'id' => 'int',
+            'author_id' => 'int',
+            'title' => 'string',
+            'contents' => 'string',
+        ] as $key => $type) {
+            self::assertArrayHasKey($key, $fields, $key);
+            self::assertSame($type, $fields[$key]->getType(), $key);
+        }
 
         $joins = $inspectedEntity->getJoins();
-        self::assertCount(3, $joins);
+        self::assertCount(2, $joins);
 
-        self::assertArrayHasKey('joined_inner_entity', $joins);
-        self::assertSame(EntityStub::class, $joins['joined_inner_entity']->getEntity()->getClass());
-        self::assertSame('id', $joins['joined_inner_entity']->getLocalKey());
-        self::assertSame('VARCHAR', $joins['joined_inner_entity']->getLocalCast());
-        self::assertSame('id', $joins['joined_inner_entity']->getForeignKey());
-        self::assertNull($joins['joined_inner_entity']->getForeignCast());
-        self::assertSame('joined_inner_entity', $joins['joined_inner_entity']->getProperty());
+        self::assertArrayHasKey('author', $joins);
+        self::assertSame(UserStub::class, $joins['author']->getEntity()->getClass());
+        self::assertSame('author_id', $joins['author']->getLocalKey());
+        self::assertNull($joins['author']->getLocalCast());
+        self::assertSame('id', $joins['author']->getForeignKey());
+        self::assertNull($joins['author']->getForeignCast());
+        self::assertSame('author', $joins['author']->getProperty());
 
-        self::assertSame(EntityStub::class, $joins['joined_right_entity']->getEntity()->getClass());
-        self::assertSame('id', $joins['joined_right_entity']->getLocalKey());
-        self::assertNull($joins['joined_right_entity']->getLocalCast());
-        self::assertSame('id', $joins['joined_right_entity']->getForeignKey());
-        self::assertSame('VARCHAR', $joins['joined_right_entity']->getForeignCast());
-        self::assertSame('joined_right_entity', $joins['joined_right_entity']->getProperty());
+        self::assertSame(CommentStub::class, $joins['comments']->getEntity()->getClass());
+        self::assertSame('id', $joins['comments']->getLocalKey());
+        self::assertSame('BIGINT', $joins['comments']->getLocalCast());
+        self::assertSame('blog_post_id', $joins['comments']->getForeignKey());
+        self::assertNull($joins['comments']->getForeignCast());
+        self::assertSame('comments', $joins['comments']->getProperty());
+
+        self::assertArrayHasKey('author', $joins['comments']->getEntity()->getJoins());
+        self::assertSame(UserStub::class, $joins['comments']->getEntity()->getJoins()['author']->getEntity()->getClass());
+        self::assertSame('author_id', $joins['comments']->getEntity()->getJoins()['author']->getLocalKey());
+        self::assertNull($joins['comments']->getEntity()->getJoins()['author']->getLocalCast());
+        self::assertSame('id', $joins['comments']->getEntity()->getJoins()['author']->getForeignKey());
+        self::assertNull($joins['comments']->getEntity()->getJoins()['author']->getForeignCast());
+        self::assertSame('author', $joins['comments']->getEntity()->getJoins()['author']->getProperty());
+
     }
 }

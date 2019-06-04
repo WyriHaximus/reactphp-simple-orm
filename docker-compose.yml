@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  migration:
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile-migration
+    env_file:
+      - .env
+    volumes:
+      - .:/opt/migration
+      - ./.docker/wait-for:/bin/wait-for
+    links:
+      - postgres
+    depends_on:
+      - postgres
+
+  postgres:
+    ports:
+      - 5432:5432
+    image: postgres:11.2-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres

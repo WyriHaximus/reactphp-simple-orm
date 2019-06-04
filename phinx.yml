@@ -1,0 +1,17 @@
+paths:
+    migrations: '%%PHINX_CONFIG_DIR%%/etc/db/migrations'
+    seeds: '%%PHINX_CONFIG_DIR%%/etc/db/seeds'
+
+environments:
+    default_migration_table: phinxlog
+    default_database: production
+    production:
+        adapter: pgsql
+        host: '%%PHINX_DB_HOST%%'
+        name: '%%PHINX_DB_DATABASE%%'
+        user: '%%PHINX_DB_USER%%'
+        pass: '%%PHINX_DB_PASSWORD%%'
+        port: 5432
+        charset: utf8
+
+version_order: creation

@@ -4,8 +4,6 @@ namespace WyriHaximus\React\SimpleORM;
 
 use Plasma\SQL\QueryBuilder;
 use React\Promise\PromiseInterface;
-use ReflectionClass;
-use ReflectionProperty;
 use Rx\Observable;
 
 final class Repository implements RepositoryInterface
@@ -25,6 +23,9 @@ final class Repository implements RepositoryInterface
     /** @var string[] */
     private $fields = [];
 
+    /** @var string[] */
+    private $tableAliases = [];
+
     public function __construct(InspectedEntity $entity, ClientInterface $client)
     {
         $this->entity = $entity;
@@ -35,7 +36,7 @@ final class Repository implements RepositoryInterface
     public function count(): PromiseInterface
     {
         return $this->client->fetch(
-            $this->getBaseQuery()->select([
+            QueryBuilder::create()->from($this->entity->getTable())->select([
                 'COUNT(*) AS count',
             ])
         )->take(1)->toPromise()->then(function (array $row): int {
@@ -58,6 +59,8 @@ final class Repository implements RepositoryInterface
         )->map(function (array $row): array {
             return $this->inflate($row);
         })->map(function (array $row): object {
+            return $this->buildTree($row, $this->entity);
+        })->map(function (array $row): object {
             return $this->hydrator->hydrate($this->entity, $row);
         });
     }
@@ -74,6 +77,8 @@ final class Repository implements RepositoryInterface
             })($this->getBaseQuery()->select($this->fields), $where)
         )->map(function (array $row): array {
             return $this->inflate($row);
+        })->map(function (array $row): array {
+            return $this->buildTree($row, $this->entity);
         })->map(function (array $row): object {
             return $this->hydrator->hydrate($this->entity, $row);
         });
@@ -90,13 +95,24 @@ final class Repository implements RepositoryInterface
 
     private function buildBaseQuery(): QueryBuilder
     {
-        $query = QueryBuilder::create()->from($this->entity->getTable(), $this->entity->getTable());
+        $i = 0;
+        $this->tableAliases[spl_object_hash($this->entity)] = 't' . $i++;
+        $query = QueryBuilder::create()->from($this->entity->getTable(), $this->tableAliases[spl_object_hash($this->entity)]);
 
         foreach ($this->entity->getFields() as $field) {
-            $this->fields[$this->entity->getTable() . '___' . $field->getName()] = $this->entity->getTable() . '.' . $field->getName();
+            $this->fields[$this->tableAliases[spl_object_hash($this->entity)] . '___' . $field->getName()] = $this->tableAliases[spl_object_hash($this->entity)]. '.' . $field->getName();
         }
 
-        foreach ($this->entity->getJoins() as $join) {
+        $query = $this->buildJoins($query, $this->entity, $i);
+
+
+        return $query;
+    }
+
+    private function buildJoins(QueryBuilder $query, InspectedEntity $entity, int &$i): QueryBuilder
+    {
+        foreach ($entity->getJoins() as $join) {
+            $this->tableAliases[spl_object_hash($join->getEntity())] = 't' . $i++;
             $joinMethod = 'innerJoin';
             if ($join->getType() === 'left') {
                 $joinMethod = 'leftJoin';
@@ -106,29 +122,32 @@ final class Repository implements RepositoryInterface
             }
 
             $foreignTable = $join->getEntity()->getTable();
-            $onLeftSide = $foreignTable . '.' . $join->getForeignKey();
+            $onLeftSide = $this->tableAliases[spl_object_hash($join->getEntity())] . '.' . $join->getForeignKey();
             if ($join->getForeignCast() !== null) {
                 $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $join->getForeignCast() . ')';
             }
-            $onRightSide = $this->entity->getTable() . '.' . $join->getLocalKey();
+            $onRightSide =
+                $this->tableAliases[spl_object_hash($entity)] . '.' . $join->getLocalKey();
             if ($join->getLocalCast() !== null) {
                 $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $join->getLocalCast() . ')';
             }
             $query = $query->$joinMethod(
                 $foreignTable,
-                $foreignTable
+                $this->tableAliases[spl_object_hash($join->getEntity())]
             )->on(
                 $onLeftSide,
                 $onRightSide
             );
 
             foreach ($join->getEntity()->getFields() as $field) {
-                $this->fields[$foreignTable . '___' . $field->getName()] = $foreignTable . '.' . $field->getName();
+                $this->fields[$this->tableAliases[spl_object_hash($join->getEntity())] . '___' . $field->getName()] = $this->tableAliases[spl_object_hash($join->getEntity())] . '.' . $field->getName();
             }
 
             if ($join->getProperty() !== null) {
-                unset($this->fields[$this->entity->getTable() . '___' . $join->getProperty()]);
+                unset($this->fields[$entity->getTable() . '___' . $join->getProperty()]);
             }
+
+            $query = $this->buildJoins($query, $join->getEntity(), $i);
         }
 
         return $query;
@@ -142,7 +161,17 @@ final class Repository implements RepositoryInterface
             [$table, $field] = \explode('___', $key);
             $tables[$table][$field] = $value;
         }
-
         return $tables;
+    }
+
+    private function buildTree(array $row, InspectedEntity $entity): array
+    {
+        $tree = $row[$this->tableAliases[spl_object_hash($entity)]];
+
+        foreach ($entity->getJoins() as $join) {
+            $tree[$join->getProperty()] = $this->buildTree($row, $join->getEntity());
+        }
+
+        return $tree;
     }
 }

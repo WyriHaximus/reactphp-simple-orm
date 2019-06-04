@@ -59,14 +59,13 @@ final class RepositoryTest extends AsyncTestCase
         $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
             self::assertCount(0, $builder->getParameters());
             $query = $builder->getQuery();
-            self::assertStringContainsString('tables', $query);
-            self::assertStringContainsString('COUNT(*) AS count', $query);
-            self::assertStringContainsString('INNER JOIN', $query);
-            self::assertStringContainsString('tables.id = CAST(table_with_joins.id AS VARCHAR)', $query);
-            self::assertStringContainsString('LEFT JOIN', $query);
-            self::assertStringContainsString('tables.id = CAST(table_with_joins.id AS BJIGINT)', $query);
-            self::assertStringContainsString('RIGHT JOIN', $query);
-            self::assertStringContainsString('CAST(tables.id AS VARCHAR) = table_with_joins.id', $query);
+            self::assertStringContainsString('blog_posts', $query);
+            self::assertStringContainsString('COUNT(blog_posts.id) AS count', $query);
+            self::assertStringContainsString('INNER JOIN users', $query);
+            self::assertStringContainsString('users.id = blog_posts.author_id', $query);
+            self::assertStringContainsString('users.id = comments.author_id', $query);
+            self::assertStringContainsString('LEFT JOIN comments', $query);
+            self::assertStringContainsString('comments.blog_post_id = CAST(blog_posts.id AS BIGINT)', $query);
 
             return true;
         }))->willReturn(observableFromArray([
@@ -88,13 +87,11 @@ final class RepositoryTest extends AsyncTestCase
         $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
             self::assertCount(0, $builder->getParameters());
             $query = $builder->getQuery();
-            self::assertStringContainsString('tables', $query);
+            self::assertStringContainsString('blog_posts', $query);
             self::assertStringContainsString('INNER JOIN', $query);
-            self::assertStringContainsString('tables.id = CAST(table_with_joins.id AS VARCHAR)', $query);
+            self::assertStringContainsString('users.id = blog_posts.author_id', $query);
             self::assertStringContainsString('LEFT JOIN', $query);
-            self::assertStringContainsString('tables.id = CAST(table_with_joins.id AS BJIGINT)', $query);
-            self::assertStringContainsString('RIGHT JOIN', $query);
-            self::assertStringContainsString('CAST(tables.id AS VARCHAR) = table_with_joins.id', $query);
+            self::assertStringContainsString('comments.blog_post_id = CAST(blog_posts.id AS BIGINT)', $query);
 
             return true;
         }))->willReturn(observableFromArray([

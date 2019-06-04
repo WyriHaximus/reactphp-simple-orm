@@ -25,14 +25,14 @@ final class Hydrator
 
         foreach ($inspectedEntity->getJoins() as $join) {
             if ($join->getProperty() !== null) {
-                $data[$inspectedEntity->getTable()][$join->getProperty()] = $this->hydrate(
+                $data[$join->getProperty()] = $this->hydrate(
                     $join->getEntity(),
-                    $data
+                    $data[$join->getProperty()]
                 );
                 unset($data[$join->getEntity()->getTable()]);
             }
         }
 
-        return $this->hydrators[$class]->hydrate($data[$inspectedEntity->getTable()], new $class());
+        return $this->hydrators[$class]->hydrate($data, new $class());
     }
 }

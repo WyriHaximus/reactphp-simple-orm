@@ -22,6 +22,8 @@
     "wyrihaximus/iterator-or-array-to-array": "^1.1"
   },
   "require-dev": {
+    "robmorgan/phinx": "^0.10.7",
+    "vlucas/phpdotenv": "^3.3",
     "wyrihaximus/async-test-utilities": "^1.0"
   },
   "autoload": {

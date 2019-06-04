@@ -1,3 +1,5 @@
+install_db: migrations seeds
+
 all:
 	composer run-script qa-all --timeout=0
 
@@ -30,3 +32,9 @@ unit-coverage:
 
 ci-coverage: init
 	composer ci-coverage
+
+migrations:
+	php ./vendor/bin/phinx migrate
+
+seeds:
+	php ./vendor/bin/phinx seed:run -v
