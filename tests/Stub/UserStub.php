@@ -3,11 +3,12 @@
 namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
 use WyriHaximus\React\SimpleORM\Annotation\Table;
+use WyriHaximus\React\SimpleORM\EntityInterface;
 
 /**
  * @Table("users")
  */
-class UserStub
+class UserStub implements EntityInterface
 {
     /** @var int */
     protected $id;

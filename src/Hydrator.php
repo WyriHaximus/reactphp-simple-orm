@@ -12,7 +12,7 @@ final class Hydrator
     /** @var callable[] */
     private $middleware = [];
 
-    public function hydrate(InspectedEntity $inspectedEntity, array $data): object
+    public function hydrate(InspectedEntity $inspectedEntity, array $data): EntityInterface
     {
         $class = $inspectedEntity->getClass();
         if (!isset($this->hydrators[$class])) {
@@ -24,12 +24,11 @@ final class Hydrator
         }
 
         foreach ($inspectedEntity->getJoins() as $join) {
-            if ($join->getProperty() !== null) {
+            if ($join->getProperty() !== null && is_array($data[$join->getProperty()])) {
                 $data[$join->getProperty()] = $this->hydrate(
                     $join->getEntity(),
                     $data[$join->getProperty()]
                 );
-                unset($data[$join->getEntity()->getTable()]);
             }
         }
 

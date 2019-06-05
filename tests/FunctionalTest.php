@@ -79,7 +79,7 @@ final class FunctionalTest extends AsyncTestCase
     public function blogPostsCount()
     {
         self::assertSame(
-            1,
+            2,
             $this->await(
                 $this->client->getRepository(BlogPostStub::class)->count(),
                 $this->loop
@@ -93,9 +93,25 @@ final class FunctionalTest extends AsyncTestCase
     public function blogPostsCountResultSet()
     {
         self::assertCount(
-            1,
+            2,
             $this->await(
                 $this->client->getRepository(BlogPostStub::class)->fetch()->toArray()->toPromise(),
+                $this->loop
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function firstBlogPostCommentCount()
+    {
+        self::assertCount(
+            2,
+            $this->await(
+                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                    return $blogPost->getComments()->toArray()->toPromise();
+                }),
                 $this->loop
             )
         );

@@ -9,7 +9,7 @@ class CommentsSeed extends AbstractSeed
             [
                 'id' => '1',
                 'author_id' => '1',
-                'blog_post_id' => '1',
+                'blog_post_id' => '2',
                 'contents' => 'abc',
             ],
             [

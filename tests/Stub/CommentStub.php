@@ -4,6 +4,7 @@ namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
+use WyriHaximus\React\SimpleORM\EntityInterface;
 
 /**
  * @Table("comments")
@@ -14,7 +15,7 @@ use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
         property="author"
  * )
  */
-class CommentStub
+class CommentStub implements EntityInterface
 {
     /** @var int */
     protected $id;

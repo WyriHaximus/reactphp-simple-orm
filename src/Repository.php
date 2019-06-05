@@ -5,6 +5,9 @@ namespace WyriHaximus\React\SimpleORM;
 use Plasma\SQL\QueryBuilder;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
+use Rx\Scheduler\ImmediateScheduler;
+use stdClass;
+use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 
 final class Repository implements RepositoryInterface
 {
@@ -79,7 +82,7 @@ final class Repository implements RepositoryInterface
             return $this->inflate($row);
         })->map(function (array $row): array {
             return $this->buildTree($row, $this->entity);
-        })->map(function (array $row): object {
+        })->map(function (array $row): EntityInterface {
             return $this->hydrator->hydrate($this->entity, $row);
         });
     }
@@ -112,14 +115,18 @@ final class Repository implements RepositoryInterface
     private function buildJoins(QueryBuilder $query, InspectedEntity $entity, int &$i): QueryBuilder
     {
         foreach ($entity->getJoins() as $join) {
+            if ($join instanceof InnerJoin === false) {
+                continue;
+            }
+
             $this->tableAliases[spl_object_hash($join->getEntity())] = 't' . $i++;
             $joinMethod = 'innerJoin';
-            if ($join->getType() === 'left') {
-                $joinMethod = 'leftJoin';
-            }
-            if ($join->getType() === 'right') {
-                $joinMethod = 'rightJoin';
-            }
+//            if ($join->getType() === 'left') {
+//                $joinMethod = 'leftJoin';
+//            }
+//            if ($join->getType() === 'right') {
+//                $joinMethod = 'rightJoin';
+//            }
 
             $foreignTable = $join->getEntity()->getTable();
             $onLeftSide = $this->tableAliases[spl_object_hash($join->getEntity())] . '.' . $join->getForeignKey();
@@ -169,7 +176,26 @@ final class Repository implements RepositoryInterface
         $tree = $row[$this->tableAliases[spl_object_hash($entity)]];
 
         foreach ($entity->getJoins() as $join) {
-            $tree[$join->getProperty()] = $this->buildTree($row, $join->getEntity());
+            if ($join instanceof InnerJoin === true) {
+                $tree[$join->getProperty()] = $this->buildTree($row, $join->getEntity());
+
+                continue;
+            }
+
+            $tree[$join->getProperty()] = Observable::defer(
+                function () use ($row, $entity, $join) {
+                    $where = [];
+
+                    $where[] = [
+                        $join->getForeignKey(),
+                        '=',
+                        $row[$this->tableAliases[spl_object_hash($entity)]][$join->getLocalKey()]
+                    ];
+
+                    return $this->client->getRepository($join->getEntity()->getClass())->fetch($where);
+                },
+                new ImmediateScheduler()
+            );
         }
 
         return $tree;
