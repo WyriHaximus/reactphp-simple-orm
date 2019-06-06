@@ -112,7 +112,7 @@ final class RepositoryTest extends AsyncTestCase
         $rows = $this->await($repository->fetch()->toArray()->toPromise());
 
         /** @var EntityWithJoinStub $row */
-        $row = current($rows);
+        $row = \current($rows);
 
         self::assertCount(1, $rows);
         self::assertInstanceOf(BlogPostStub::class, $row);

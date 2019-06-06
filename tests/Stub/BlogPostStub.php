@@ -5,7 +5,6 @@ namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 use Rx\Observable;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
-use WyriHaximus\React\SimpleORM\Annotation\RightJoin;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\EntityInterface;
 

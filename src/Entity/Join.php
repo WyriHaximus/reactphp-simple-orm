@@ -2,7 +2,6 @@
 
 namespace WyriHaximus\React\SimpleORM\Entity;
 
-use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
 use WyriHaximus\React\SimpleORM\InspectedEntity;
 
 final class Join

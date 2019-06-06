@@ -2,15 +2,9 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
-use function ApiClients\Tools\Rx\observableFromArray;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Plasma\SQL\QueryBuilder;
-use Prophecy\Argument;
-use Prophecy\Prophecy\ObjectProphecy;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
-use WyriHaximus\React\SimpleORM\ClientInterface;
 use WyriHaximus\React\SimpleORM\EntityInspector;
-use WyriHaximus\React\SimpleORM\Repository;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
@@ -23,7 +17,7 @@ final class EntityInspectorTest extends AsyncTestCase
     /** @var EntityInspector */
     private $entityInspector;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -33,7 +27,7 @@ final class EntityInspectorTest extends AsyncTestCase
     /**
      * @test
      */
-    public function inspect()
+    public function inspect(): void
     {
         $inspectedEntity = $this->entityInspector->getEntity(UserStub::class);
 
@@ -47,10 +41,11 @@ final class EntityInspectorTest extends AsyncTestCase
         self::assertArrayHasKey('name', $fields);
         self::assertSame('string', $fields['name']->getType());
     }
+
     /**
      * @test
      */
-    public function inspectWithJoins()
+    public function inspectWithJoins(): void
     {
         $inspectedEntity = $this->entityInspector->getEntity(BlogPostStub::class);
 
@@ -95,6 +90,5 @@ final class EntityInspectorTest extends AsyncTestCase
         self::assertSame('id', $joins['comments']->getEntity()->getJoins()['author']->getForeignKey());
         self::assertNull($joins['comments']->getEntity()->getJoins()['author']->getForeignCast());
         self::assertSame('author', $joins['comments']->getEntity()->getJoins()['author']->getProperty());
-
     }
 }

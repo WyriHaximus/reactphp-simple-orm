@@ -37,9 +37,9 @@ final class FunctionalTest extends AsyncTestCase
                 [
                     'host' => 'localhost',
                     'port' => 5432,
-                    'user'     => getenv('PHINX_DB_USER'),
-                    'password' => getenv('PHINX_DB_PASSWORD'),
-                    'database' => getenv('PHINX_DB_DATABASE'),
+                    'user'     => \getenv('PHINX_DB_USER'),
+                    'password' => \getenv('PHINX_DB_PASSWORD'),
+                    'database' => \getenv('PHINX_DB_DATABASE'),
                 ],
                 $this->loop
             )
@@ -49,7 +49,7 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
-    public function usersCount()
+    public function usersCount(): void
     {
         self::assertSame(
             3,
@@ -63,7 +63,7 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
-    public function usersCountResultSet()
+    public function usersCountResultSet(): void
     {
         self::assertCount(
             3,
@@ -77,7 +77,7 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
-    public function blogPostsCount()
+    public function blogPostsCount(): void
     {
         self::assertSame(
             2,
@@ -91,7 +91,7 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
-    public function blogPostsCountResultSet()
+    public function blogPostsCountResultSet(): void
     {
         self::assertCount(
             2,
@@ -105,7 +105,7 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
-    public function firstBlogPostCommentCount()
+    public function firstBlogPostCommentCount(): void
     {
         self::assertCount(
             2,
@@ -121,7 +121,7 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
-    public function firstBlogPostAuthorId()
+    public function firstBlogPostAuthorId(): void
     {
         self::assertSame(
             1,
@@ -137,15 +137,15 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
-    public function firstBlogPostCommentAuthorIds()
+    public function firstBlogPostCommentAuthorIds(): void
     {
         self::assertSame(
             [
                 3,
                 2,
             ],
-            array_values(
-                array_map(
+            \array_values(
+                \array_map(
                     function (CommentStub $comment) {
                         return $comment->getAuthor()->getId();
                     },
@@ -163,7 +163,7 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
-    public function secondBlogPostCommentCount()
+    public function secondBlogPostCommentCount(): void
     {
         self::assertCount(
             1,
@@ -181,7 +181,7 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
-    public function secondBlogPostAuthorId()
+    public function secondBlogPostAuthorId(): void
     {
         self::assertSame(
             2,
@@ -199,14 +199,14 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
-    public function secondBlogPostCommentAuthorIds()
+    public function secondBlogPostCommentAuthorIds(): void
     {
         self::assertSame(
             [
                 1,
             ],
-            array_values(
-                array_map(
+            \array_values(
+                \array_map(
                     function (CommentStub $comment) {
                         return $comment->getAuthor()->getId();
                     },

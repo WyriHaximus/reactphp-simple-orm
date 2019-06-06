@@ -33,7 +33,7 @@ final class Hydrator
         }
 
         foreach ($inspectedEntity->getJoins() as $join) {
-            if ($join->getProperty() !== null && is_array($data[$join->getProperty()])) {
+            if ($join->getProperty() !== null && \is_array($data[$join->getProperty()])) {
                 $data[$join->getProperty()] = $this->hydrate(
                     $join->getEntity(),
                     $data[$join->getProperty()]

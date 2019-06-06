@@ -2,8 +2,8 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
-use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
+use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\EntityInterface;
 
 /**

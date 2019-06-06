@@ -2,19 +2,12 @@
 
 namespace WyriHaximus\React\SimpleORM;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
-use Plasma\SQL\QueryBuilder;
-use React\Promise\PromiseInterface;
 use ReflectionClass;
 use ReflectionProperty;
 use Roave\BetterReflection\BetterReflection;
-use Rx\Observable;
 use function WyriHaximus\iteratorOrArrayToArray;
-use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
-use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
-use WyriHaximus\React\SimpleORM\Annotation\RightJoin;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\Join;
@@ -58,7 +51,7 @@ final class EntityInspector
 
             yield $property->getName() => new Field(
                 $property->getName(),
-                (string)current((new BetterReflection())
+                (string)\current((new BetterReflection())
                     ->classReflector()
                     ->reflect($class->getName())->getProperty($property->getName())->getDocBlockTypes())
             );

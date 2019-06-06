@@ -1,10 +1,10 @@
-install_db: migrations seeds
-
 all:
 	composer run-script qa-all --timeout=0
 
 all-coverage:
 	composer run-script qa-all-coverage --timeout=0
+
+install_db: migrations seeds
 
 ci:
 	composer run-script qa-ci --timeout=0
