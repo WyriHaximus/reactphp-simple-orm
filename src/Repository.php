@@ -6,7 +6,6 @@ use Plasma\SQL\QueryBuilder;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
-use stdClass;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 
 final class Repository implements RepositoryInterface
@@ -61,9 +60,9 @@ final class Repository implements RepositoryInterface
             })($this->getBaseQuery()->select($this->fields), $where, $page, $perPage)
         )->map(function (array $row): array {
             return $this->inflate($row);
-        })->map(function (array $row): object {
+        })->map(function (array $row): array {
             return $this->buildTree($row, $this->entity);
-        })->map(function (array $row): object {
+        })->map(function (array $row): EntityInterface {
             return $this->hydrator->hydrate($this->entity, $row);
         });
     }
@@ -115,7 +114,7 @@ final class Repository implements RepositoryInterface
     private function buildJoins(QueryBuilder $query, InspectedEntity $entity, int &$i): QueryBuilder
     {
         foreach ($entity->getJoins() as $join) {
-            if ($join instanceof InnerJoin === false) {
+            if ($join->getType() !== 'inner') {
                 continue;
             }
 
@@ -176,7 +175,7 @@ final class Repository implements RepositoryInterface
         $tree = $row[$this->tableAliases[spl_object_hash($entity)]];
 
         foreach ($entity->getJoins() as $join) {
-            if ($join instanceof InnerJoin === true) {
+            if ($join->getType() === 'inner') {
                 $tree[$join->getProperty()] = $this->buildTree($row, $join->getEntity());
 
                 continue;

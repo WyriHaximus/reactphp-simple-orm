@@ -9,6 +9,7 @@ use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\SimpleORM\ClientInterface;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
+use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
 /**
@@ -113,6 +114,111 @@ final class FunctionalTest extends AsyncTestCase
                     return $blogPost->getComments()->toArray()->toPromise();
                 }),
                 $this->loop
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function firstBlogPostAuthorId()
+    {
+        self::assertSame(
+            1,
+            $this->await(
+                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                    return $blogPost->getAuthor()->getId();
+                }),
+                $this->loop
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function firstBlogPostCommentAuthorIds()
+    {
+        self::assertSame(
+            [
+                3,
+                2,
+            ],
+            array_values(
+                array_map(
+                    function (CommentStub $comment) {
+                        return $comment->getAuthor()->getId();
+                    },
+                    $this->await(
+                        $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                            return $blogPost->getComments()->toArray()->toPromise();
+                        }),
+                        $this->loop
+                    )
+                )
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function secondBlogPostCommentCount()
+    {
+        self::assertCount(
+            1,
+            $this->await(
+                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
+                    return $blogPost->getId() === 2;
+                })->toPromise()->then(function (BlogPostStub $blogPost) {
+                    return $blogPost->getComments()->toArray()->toPromise();
+                }),
+                $this->loop
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function secondBlogPostAuthorId()
+    {
+        self::assertSame(
+            2,
+            $this->await(
+                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
+                    return $blogPost->getId() === 2;
+                })->toPromise()->then(function (BlogPostStub $blogPost) {
+                    return $blogPost->getAuthor()->getId();
+                }),
+                $this->loop
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function secondBlogPostCommentAuthorIds()
+    {
+        self::assertSame(
+            [
+                1,
+            ],
+            array_values(
+                array_map(
+                    function (CommentStub $comment) {
+                        return $comment->getAuthor()->getId();
+                    },
+                    $this->await(
+                        $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
+                            return $blogPost->getId() === 2;
+                        })->toPromise()->then(function (BlogPostStub $blogPost) {
+                            return $blogPost->getComments()->toArray()->toPromise();
+                        }),
+                        $this->loop
+                    )
+                )
             )
         );
     }

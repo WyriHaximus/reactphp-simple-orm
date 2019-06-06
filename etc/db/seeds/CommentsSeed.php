@@ -7,21 +7,21 @@ class CommentsSeed extends AbstractSeed
     {
         $data = [
             [
-                'id' => '1',
-                'author_id' => '1',
-                'blog_post_id' => '2',
+                'id' => 1,
+                'author_id' => 1,
+                'blog_post_id' => 2,
                 'contents' => 'abc',
             ],
             [
-                'id' => '2',
-                'author_id' => '3',
-                'blog_post_id' => '1',
+                'id' => 2,
+                'author_id' => 3,
+                'blog_post_id' => 1,
                 'contents' => 'def',
             ],
             [
-                'id' => '3',
-                'author_id' => '2',
-                'blog_post_id' => '1',
+                'id' => 3,
+                'author_id' => 2,
+                'blog_post_id' => 1,
                 'contents' => 'ghi',
             ],
         ];

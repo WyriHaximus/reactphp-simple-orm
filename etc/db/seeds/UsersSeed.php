@@ -7,15 +7,15 @@ class UsersSeed extends AbstractSeed
     {
         $data = [
             [
-                'id' => '1',
+                'id' => 1,
                 'name' => 'Deathwing',
             ],
             [
-                'id' => '2',
+                'id' => 2,
                 'name' => 'Gandalf',
             ],
             [
-                'id' => '3',
+                'id' => 3,
                 'name' => 'Floki',
             ],
         ];

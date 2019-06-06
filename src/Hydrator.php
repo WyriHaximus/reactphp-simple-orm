@@ -3,6 +3,7 @@
 namespace WyriHaximus\React\SimpleORM;
 
 use GeneratedHydrator\Configuration;
+use WyriHaximus\React\SimpleORM\Entity\Field;
 
 final class Hydrator
 {
@@ -23,6 +24,14 @@ final class Hydrator
             })($class);
         }
 
+        foreach ($data as $key => $value) {
+            if (!isset($inspectedEntity->getFields()[$key])) {
+                continue;
+            }
+
+            $data[$key] = $this->castValueToCorrectType($inspectedEntity->getFields()[$key], $value);
+        }
+
         foreach ($inspectedEntity->getJoins() as $join) {
             if ($join->getProperty() !== null && is_array($data[$join->getProperty()])) {
                 $data[$join->getProperty()] = $this->hydrate(
@@ -33,5 +42,14 @@ final class Hydrator
         }
 
         return $this->hydrators[$class]->hydrate($data, new $class());
+    }
+
+    private function castValueToCorrectType(Field $field, $value)
+    {
+        if ($field->getType() === 'int') {
+            return (int) $value;
+        }
+
+        return $value;
     }
 }
