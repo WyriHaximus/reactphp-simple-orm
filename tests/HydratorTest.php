@@ -2,6 +2,7 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
+use function ApiClients\Tools\Rx\observableFromArray;
 use Doctrine\Common\Annotations\AnnotationReader;
 use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\SimpleORM\Hydrator;
@@ -19,14 +20,12 @@ final class HydratorTest extends TestCase
         $id = 123;
         $title = 'tables.title';
 
-        /** @var EntityStub $entity */
+        /** @var UserStub $entity */
         $entity = (new Hydrator())->hydrate(
             (new EntityInspector(new AnnotationReader()))->getEntity(UserStub::class),
             [
-                'users' => [
-                    'id' => 123,
-                    'name' => 'tables.title',
-                ],
+                'id' => $id,
+                'name' => $title,
             ]
         );
 
@@ -38,17 +37,26 @@ final class HydratorTest extends TestCase
     {
         $id = 123;
         $title = 'null';
+        $authorId = 1;
+        $authorName = 'llun';
 
-        /** @var EntityStub $entity */
+        /** @var BlogPostStub $entity */
         $entity = (new Hydrator())->hydrate(
             (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
             [
                 'id' => $id,
                 'title' => $title,
+                'author' => [
+                    'id' => $authorId,
+                    'name' => $authorName,
+                ],
+                'comments' => observableFromArray([]),
             ]
         );
 
         self::assertSame($id, $entity->getId());
         self::assertSame($title, $entity->getTitle());
+        self::assertSame($authorId, $entity->getAuthor()->getId());
+        self::assertSame($authorName, $entity->getAuthor()->getName());
     }
 }

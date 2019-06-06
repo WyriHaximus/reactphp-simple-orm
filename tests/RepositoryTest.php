@@ -60,12 +60,12 @@ final class RepositoryTest extends AsyncTestCase
             self::assertCount(0, $builder->getParameters());
             $query = $builder->getQuery();
             self::assertStringContainsString('blog_posts', $query);
-            self::assertStringContainsString('COUNT(blog_posts.id) AS count', $query);
-            self::assertStringContainsString('INNER JOIN users', $query);
-            self::assertStringContainsString('users.id = blog_posts.author_id', $query);
-            self::assertStringContainsString('users.id = comments.author_id', $query);
-            self::assertStringContainsString('LEFT JOIN comments', $query);
-            self::assertStringContainsString('comments.blog_post_id = CAST(blog_posts.id AS BIGINT)', $query);
+            self::assertStringContainsString('COUNT(*) AS count', $query);
+            self::assertStringNotContainsString('INNER JOIN users', $query);
+            self::assertStringNotContainsString('users.id = blog_posts.author_id', $query);
+            self::assertStringNotContainsString('users.id = comments.author_id', $query);
+            self::assertStringNotContainsString('LEFT JOIN comments', $query);
+            self::assertStringNotContainsString('comments.blog_post_id = CAST(blog_posts.id AS BIGINT)', $query);
 
             return true;
         }))->willReturn(observableFromArray([
@@ -89,18 +89,17 @@ final class RepositoryTest extends AsyncTestCase
             $query = $builder->getQuery();
             self::assertStringContainsString('blog_posts', $query);
             self::assertStringContainsString('INNER JOIN', $query);
-            self::assertStringContainsString('users.id = blog_posts.author_id', $query);
-            self::assertStringContainsString('LEFT JOIN', $query);
-            self::assertStringContainsString('comments.blog_post_id = CAST(blog_posts.id AS BIGINT)', $query);
+            self::assertStringContainsString('t1.id = t0.author_id', $query);
+            self::assertStringNotContainsString('LEFT JOIN', $query);
+            self::assertStringNotContainsString('comments.blog_post_id = CAST(blog_posts.id AS BIGINT)', $query);
 
             return true;
         }))->willReturn(observableFromArray([
                 [
-                    'table_with_joins___id' => 1,
-                    'table_with_joins___foreign_id' => 2,
-                    'table_with_joins___title' => 'table_with_joins.fields',
-                    'tables___id' => 3,
-                    'tables___title' => 'tables.title',
+                    't0___id' => 1,
+                    't0___title' => 'blog_post_title',
+                    't1___id' => 3,
+                    't1___name' => 'author_name',
                 ],
         ]));
 
@@ -109,15 +108,13 @@ final class RepositoryTest extends AsyncTestCase
             $this->client->reveal()
         );
 
-        $rows = $this->await($repository->fetch()->toArray()->toPromise());
+        /** @var BlogPostStub $rows */
+        $blogPost = $this->await($repository->fetch()->take(1)->toPromise());
 
-        /** @var EntityWithJoinStub $row */
-        $row = \current($rows);
-
-        self::assertCount(1, $rows);
-        self::assertInstanceOf(BlogPostStub::class, $row);
-        self::assertSame(1, $row->getId());
-        self::assertSame(2, $row->getForeignId());
-        self::assertSame('table_with_joins.fields', $row->getTitle());
+        self::assertInstanceOf(BlogPostStub::class, $blogPost);
+        self::assertSame(1, $blogPost->getId());
+        self::assertSame('blog_post_title', $blogPost->getTitle());
+        self::assertSame(3, $blogPost->getAuthor()->getId());
+        self::assertSame('author_name', $blogPost->getAuthor()->getName());
     }
 }

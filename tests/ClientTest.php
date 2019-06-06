@@ -36,7 +36,7 @@ final class ClientTest extends AsyncTestCase
     {
         $query = QueryBuilder::create()->select()->from('table')->where('id', '=', 1);
 
-        $this->pgClient->executeStatement('SELECT * FROM "table" WHERE "id" = ?', [1])->shouldBeCalled()->willReturn(
+        $this->pgClient->executeStatement('SELECT * FROM "table" WHERE "id" = $1', [1])->shouldBeCalled()->willReturn(
             observableFromArray([
                 [
                     'id' => 1,
