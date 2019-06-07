@@ -45,9 +45,8 @@ install:
   - if [ "$dependencies" = "highest" ]; then composer update --prefer-dist -n; fi;
   - composer show
 
-## Set up database
+## Set up env variables
 before_script:
-  - psql -c 'create database postgres;' -U postgres
   - cp .env.example .env
 
 ## Run the actual test
