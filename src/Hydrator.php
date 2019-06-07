@@ -17,9 +17,14 @@ final class Hydrator
     {
         $class = $inspectedEntity->getClass();
         if (!isset($this->hydrators[$class])) {
-            $this->hydrators[$inspectedEntity->getClass()] = (function ($class) {
+            /**
+             * @psalm-suppress MissingClosureReturnType
+             * @psalm-suppress InvalidPropertyAssignmentValue
+             */
+            $this->hydrators[$inspectedEntity->getClass()] = (function (string $class) {
                 $hydratorClass = (new Configuration($class))->createFactory()->getHydratorClass();
 
+                /** @psalm-suppress InvalidStringClass */
                 return new $hydratorClass();
             })($class);
         }
@@ -33,7 +38,7 @@ final class Hydrator
         }
 
         foreach ($inspectedEntity->getJoins() as $join) {
-            if ($join->getProperty() !== null && \is_array($data[$join->getProperty()])) {
+            if (\is_array($data[$join->getProperty()])) {
                 $data[$join->getProperty()] = $this->hydrate(
                     $join->getEntity(),
                     $data[$join->getProperty()]
@@ -41,9 +46,19 @@ final class Hydrator
             }
         }
 
+        /**
+         * @psalm-suppress PossiblyNullReference
+         * @psalm-suppress InvalidMethodCall
+         */
         return $this->hydrators[$class]->hydrate($data, new $class());
     }
 
+    /**
+     * @param Field $field
+     * @param mixed $value
+     *
+     * @return mixed
+     */
     private function castValueToCorrectType(Field $field, $value)
     {
         if ($field->getType() === 'int') {

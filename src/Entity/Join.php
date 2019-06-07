@@ -15,13 +15,13 @@ final class Join
     /** @var string */
     private $localKey;
 
-    /** @var string */
+    /** @var string|null */
     private $localCast;
 
     /** @var string */
     private $foreignKey;
 
-    /** @var string */
+    /** @var string|null */
     private $foreignCast;
 
     /** @var string */

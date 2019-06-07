@@ -3,11 +3,16 @@
 namespace WyriHaximus\React\Tests\SimpleORM;
 
 use function ApiClients\Tools\Rx\observableFromArray;
+use Doctrine\Common\Annotations\Reader;
 use PgAsync\Client as PgClient;
 use Plasma\SQL\QueryBuilder;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use ReflectionClass;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
+use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\Client;
+use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
 /**
  * @internal
@@ -20,6 +25,11 @@ final class ClientTest extends AsyncTestCase
     private $pgClient;
 
     /**
+     * @var ObjectProphecy
+     */
+    private $annotationReader;
+
+    /**
      * @var Client
      */
     private $client;
@@ -29,7 +39,24 @@ final class ClientTest extends AsyncTestCase
         parent::setUp();
 
         $this->pgClient = $this->prophesize(PgClient::class);
-        $this->client = new Client($this->pgClient->reveal());
+        $this->annotationReader = $this->prophesize(Reader::class);
+        $this->client = new Client($this->pgClient->reveal(), $this->annotationReader->reveal());
+    }
+
+    public function testGetRepository(): void
+    {
+        $this->annotationReader->getClassAnnotation(
+            Argument::type(ReflectionClass::class),
+            Table::class
+        )->shouldBeCalled()->willReturn(new Table(['users']));
+
+        $this->annotationReader->getClassAnnotations(
+            Argument::type(ReflectionClass::class)
+        )->shouldBeCalled()->willReturn([
+            new Table(['users']),
+        ]);
+
+        $this->client->getRepository(UserStub::class);
     }
 
     public function testFetch(): void

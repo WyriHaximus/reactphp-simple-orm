@@ -46,9 +46,12 @@ final class RepositoryTest extends AsyncTestCase
             ],
         ]));
 
+        /** @var ClientInterface $client */
+        $client = $this->client->reveal();
+
         $repository = new Repository(
             (new EntityInspector(new AnnotationReader()))->getEntity(UserStub::class),
-            $this->client->reveal()
+            $client
         );
 
         self::assertSame(123, $this->await($repository->count()));
@@ -74,9 +77,12 @@ final class RepositoryTest extends AsyncTestCase
             ],
         ]));
 
+        /** @var ClientInterface $client */
+        $client = $this->client->reveal();
+
         $repository = new Repository(
             (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
-            $this->client->reveal()
+            $client
         );
 
         self::assertSame(123, $this->await($repository->count()));
@@ -103,9 +109,12 @@ final class RepositoryTest extends AsyncTestCase
                 ],
         ]));
 
+        /** @var ClientInterface $client */
+        $client = $this->client->reveal();
+
         $repository = new Repository(
             (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
-            $this->client->reveal()
+            $client
         );
 
         /** @var BlogPostStub $rows */

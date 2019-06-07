@@ -18,7 +18,11 @@ final class Repository implements RepositoryInterface
     /** @var Hydrator */
     private $hydrator;
 
-    /** @var QueryBuilder */
+    /**
+     * @var QueryBuilder
+     *
+     * @psalm-suppress PropertyNotSetInConstructor
+     */
     private $baseQuery;
 
     /** @var string[] */
@@ -87,6 +91,7 @@ final class Repository implements RepositoryInterface
 
     private function getBaseQuery(): QueryBuilder
     {
+        /** @psalm-suppress DocblockTypeContradiction */
         if ($this->baseQuery === null) {
             $this->baseQuery = $this->buildBaseQuery();
         }
@@ -117,7 +122,7 @@ final class Repository implements RepositoryInterface
             }
 
             $this->tableAliases[\spl_object_hash($join->getEntity())] = 't' . $i++;
-            $joinMethod = 'innerJoin';
+//            $joinMethod = 'innerJoin';
 //            if ($join->getType() === 'left') {
 //                $joinMethod = 'leftJoin';
 //            }
@@ -128,14 +133,17 @@ final class Repository implements RepositoryInterface
             $foreignTable = $join->getEntity()->getTable();
             $onLeftSide = $this->tableAliases[\spl_object_hash($join->getEntity())] . '.' . $join->getForeignKey();
             if ($join->getForeignCast() !== null) {
+                /** @psalm-suppress PossiblyNullOperand */
                 $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $join->getForeignCast() . ')';
             }
             $onRightSide =
                 $this->tableAliases[\spl_object_hash($entity)] . '.' . $join->getLocalKey();
             if ($join->getLocalCast() !== null) {
+                /** @psalm-suppress PossiblyNullOperand */
                 $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $join->getLocalCast() . ')';
             }
-            $query = $query->$joinMethod(
+//            $query = $query->$joinMethod(
+            $query = $query->innerJoin(
                 $foreignTable,
                 $this->tableAliases[\spl_object_hash($join->getEntity())]
             )->on(
@@ -147,9 +155,7 @@ final class Repository implements RepositoryInterface
                 $this->fields[$this->tableAliases[\spl_object_hash($join->getEntity())] . '___' . $field->getName()] = $this->tableAliases[\spl_object_hash($join->getEntity())] . '.' . $field->getName();
             }
 
-            if ($join->getProperty() !== null) {
-                unset($this->fields[$entity->getTable() . '___' . $join->getProperty()]);
-            }
+            unset($this->fields[$entity->getTable() . '___' . $join->getProperty()]);
 
             $query = $this->buildJoins($query, $join->getEntity(), $i);
         }

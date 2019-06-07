@@ -29,10 +29,16 @@ final class EntityInspector
     {
         if (!isset($this->entities[$entity])) {
             $class = new ReflectionClass($entity);
+            $tableAnnotation = $this->annotationReader->getClassAnnotation($class, Table::class);
+
+            if ($tableAnnotation instanceof Table === false) {
+                throw new \RuntimeException('Missing Table annotation on entity: ' . $entity);
+            }
+
             $joins = iteratorOrArrayToArray($this->getJoins($class));
             $this->entities[$entity] = new InspectedEntity(
                 $entity,
-                $this->annotationReader->getClassAnnotation($class, Table::class)->getTable(),
+                $tableAnnotation->getTable(),
                 iteratorOrArrayToArray($this->getFields($class, $joins)),
                 $joins
             );
@@ -49,6 +55,7 @@ final class EntityInspector
                 continue;
             }
 
+            /** @psalm-suppress PossiblyNullReference */
             yield $property->getName() => new Field(
                 $property->getName(),
                 (string)\current((new BetterReflection())

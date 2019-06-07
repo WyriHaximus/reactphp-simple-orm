@@ -7,6 +7,7 @@ use Doctrine\Common\Annotations\Annotation\Target;
 /**
  * @Annotation
  * @Target("CLASS")
+ * @psalm-suppress PropertyNotSetInConstructor
  */
 final class RightJoin implements JoinInterface
 {
@@ -30,6 +31,7 @@ final class RightJoin implements JoinInterface
 
     public function __construct(array $table)
     {
+        /** @psalm-suppress RawObjectIteration */
         foreach ($this as $name => $value) {
             if (isset($table[$name])) {
                 $this->$name = $table[$name];
