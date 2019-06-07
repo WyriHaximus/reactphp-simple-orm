@@ -48,6 +48,7 @@ install:
 ## Set up env variables
 before_script:
   - cp .env.example .env
+  - make install_db
 
 ## Run the actual test
 script:
