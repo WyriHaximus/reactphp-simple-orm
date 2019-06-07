@@ -47,7 +47,7 @@ install:
 
 ## Set up env variables
 before_script:
-  - cp .env.example .env
+  - cp .env.travis .env
   - export $(cat .env | tr -d '\r' | xargs) && make install_db
 
 ## Run the actual test
