@@ -21,4 +21,4 @@ services:
     image: postgres:11.2-alpine
     restart: always
     environment:
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD:
