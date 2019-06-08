@@ -16,6 +16,7 @@
     "ocramius/generated-hydrator": "^3.0",
     "plasma/core": "^0.2.1 || dev-master",
     "plasma/sql-common": "dev-master",
+    "react/dns": "^0.4.17",
     "roave/better-reflection": "^3.5",
     "voryx/pgasync": "^2.0",
     "wyrihaximus/doctrine-annotation-autoloader": "^1.0",
