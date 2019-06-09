@@ -10,6 +10,13 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
 
 /**
  * @Table("blog_posts")
+ * @LeftJoin(
+        entity=CommentStub::class,
+        local_key="id",
+        local_cast="BIGINT",
+        foreign_key="blog_post_id",
+        property="comments"
+ * )
  * @InnerJoin(
         entity=UserStub::class,
         local_key="author_id",
@@ -21,13 +28,6 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
         local_key="publisher_id",
         foreign_key="id",
         property="publisher"
- * )
- * @LeftJoin(
-        entity=CommentStub::class,
-        local_key="id",
-        local_cast="BIGINT",
-        foreign_key="blog_post_id",
-        property="comments"
  * )
  */
 class BlogPostStub implements EntityInterface

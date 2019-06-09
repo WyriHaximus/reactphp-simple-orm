@@ -30,11 +30,9 @@ final class Hydrator
         }
 
         foreach ($data as $key => $value) {
-            if (!isset($inspectedEntity->getFields()[$key])) {
-                continue;
+            if (isset($inspectedEntity->getFields()[$key])) {
+                $data[$key] = $this->castValueToCorrectType($inspectedEntity->getFields()[$key], $value);
             }
-
-            $data[$key] = $this->castValueToCorrectType($inspectedEntity->getFields()[$key], $value);
         }
 
         foreach ($inspectedEntity->getJoins() as $join) {
