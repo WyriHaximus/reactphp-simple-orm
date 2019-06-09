@@ -16,6 +16,12 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
         foreign_key="id",
         property="author"
  * )
+ * @InnerJoin(
+        entity=UserStub::class,
+        local_key="publisher_id",
+        foreign_key="id",
+        property="publisher"
+ * )
  * @LeftJoin(
         entity=CommentStub::class,
         local_key="id",
@@ -32,6 +38,9 @@ class BlogPostStub implements EntityInterface
     /** @var int */
     protected $author_id;
 
+    /** @var int */
+    protected $publisher_id;
+
     /** @var string */
     protected $title;
 
@@ -40,6 +49,9 @@ class BlogPostStub implements EntityInterface
 
     /** @var UserStub */
     protected $author;
+
+    /** @var UserStub */
+    protected $publisher;
 
     /** @var Observable */
     protected $comments;
@@ -52,6 +64,11 @@ class BlogPostStub implements EntityInterface
     public function getAuthor(): UserStub
     {
         return $this->author;
+    }
+
+    public function getPublisher(): UserStub
+    {
+        return $this->publisher;
     }
 
     public function getTitle(): string

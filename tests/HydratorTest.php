@@ -39,6 +39,8 @@ final class HydratorTest extends TestCase
         $title = 'null';
         $authorId = 1;
         $authorName = 'llun';
+        $publisherId = 2;
+        $publisherName = 'dasdsadas';
 
         /** @var BlogPostStub $entity */
         $entity = (new Hydrator())->hydrate(
@@ -50,6 +52,10 @@ final class HydratorTest extends TestCase
                     'id' => $authorId,
                     'name' => $authorName,
                 ],
+                'publisher' => [
+                    'id' => $publisherId,
+                    'name' => $publisherName,
+                ],
                 'comments' => observableFromArray([]),
             ]
         );
@@ -58,5 +64,7 @@ final class HydratorTest extends TestCase
         self::assertSame($title, $entity->getTitle());
         self::assertSame($authorId, $entity->getAuthor()->getId());
         self::assertSame($authorName, $entity->getAuthor()->getName());
+        self::assertSame($publisherId, $entity->getPublisher()->getId());
+        self::assertSame($publisherName, $entity->getPublisher()->getName());
     }
 }

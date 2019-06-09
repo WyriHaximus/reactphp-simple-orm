@@ -65,15 +65,15 @@ final class RepositoryTest extends AsyncTestCase
             self::assertStringContainsString('blog_posts', $query);
             self::assertStringContainsString('COUNT(*) AS count', $query);
             self::assertStringNotContainsString('INNER JOIN users', $query);
-            self::assertStringNotContainsString('users.id = blog_posts.author_id', $query);
-            self::assertStringNotContainsString('users.id = comments.author_id', $query);
             self::assertStringNotContainsString('LEFT JOIN comments', $query);
-            self::assertStringNotContainsString('comments.blog_post_id = CAST(blog_posts.id AS BIGINT)', $query);
 
             return true;
         }))->willReturn(observableFromArray([
             [
                 'count' => '123',
+            ],
+            [
+                'count' => '456',
             ],
         ]));
 
@@ -94,10 +94,11 @@ final class RepositoryTest extends AsyncTestCase
             self::assertCount(0, $builder->getParameters());
             $query = $builder->getQuery();
             self::assertStringContainsString('blog_posts', $query);
+            self::assertStringContainsString('users', $query);
             self::assertStringContainsString('INNER JOIN', $query);
             self::assertStringContainsString('t1.id = t0.author_id', $query);
-            self::assertStringNotContainsString('LEFT JOIN', $query);
-            self::assertStringNotContainsString('comments.blog_post_id = CAST(blog_posts.id AS BIGINT)', $query);
+            self::assertStringContainsString('t2.id = t0.publisher_id', $query);
+            self::assertStringNotContainsString('LEFT JOIN comments AS', $query);
 
             return true;
         }))->willReturn(observableFromArray([
@@ -106,6 +107,8 @@ final class RepositoryTest extends AsyncTestCase
                     't0___title' => 'blog_post_title',
                     't1___id' => 3,
                     't1___name' => 'author_name',
+                    't2___id' => 2,
+                    't2___name' => 'publisher_name',
                 ],
         ]));
 
@@ -117,7 +120,6 @@ final class RepositoryTest extends AsyncTestCase
             $client
         );
 
-        /** @var BlogPostStub $rows */
         $blogPost = $this->await($repository->fetch()->take(1)->toPromise());
 
         self::assertInstanceOf(BlogPostStub::class, $blogPost);
@@ -125,5 +127,7 @@ final class RepositoryTest extends AsyncTestCase
         self::assertSame('blog_post_title', $blogPost->getTitle());
         self::assertSame(3, $blogPost->getAuthor()->getId());
         self::assertSame('author_name', $blogPost->getAuthor()->getName());
+        self::assertSame(2, $blogPost->getPublisher()->getId());
+        self::assertSame('publisher_name', $blogPost->getPublisher()->getName());
     }
 }

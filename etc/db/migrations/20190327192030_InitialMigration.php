@@ -16,6 +16,9 @@ class InitialMigration extends AbstractMigration
             ->addColumn('author_id', 'integer', [
                 'limit' => 20,
             ])
+            ->addColumn('publisher_id', 'integer', [
+                'limit' => 20,
+            ])
             ->addColumn('title', 'string', [
                 'limit' => 256,
             ])

@@ -102,11 +102,12 @@ final class Repository implements RepositoryInterface
     private function buildBaseQuery(): QueryBuilder
     {
         $i = 0;
-        $this->tableAliases[\spl_object_hash($this->entity)] = 't' . $i++;
-        $query = QueryBuilder::create()->from($this->entity->getTable(), $this->tableAliases[\spl_object_hash($this->entity)]);
+        $tableKey = \spl_object_hash($this->entity) . '___root';
+        $this->tableAliases[$tableKey] = 't' . $i++;
+        $query = QueryBuilder::create()->from($this->entity->getTable(), $this->tableAliases[$tableKey]);
 
         foreach ($this->entity->getFields() as $field) {
-            $this->fields[$this->tableAliases[\spl_object_hash($this->entity)] . '___' . $field->getName()] = $this->tableAliases[\spl_object_hash($this->entity)]. '.' . $field->getName();
+            $this->fields[$this->tableAliases[$tableKey] . '___' . $field->getName()] = $this->tableAliases[$tableKey]. '.' . $field->getName();
         }
 
         $query = $this->buildJoins($query, $this->entity, $i);
@@ -121,7 +122,8 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
-            $this->tableAliases[\spl_object_hash($join->getEntity())] = 't' . $i++;
+            $tableKey = \spl_object_hash($join->getEntity()) . '___' . $join->getProperty();
+            $this->tableAliases[$tableKey] = 't' . $i++;
 //            $joinMethod = 'innerJoin';
 //            if ($join->getType() === 'left') {
 //                $joinMethod = 'leftJoin';
@@ -131,13 +133,13 @@ final class Repository implements RepositoryInterface
 //            }
 
             $foreignTable = $join->getEntity()->getTable();
-            $onLeftSide = $this->tableAliases[\spl_object_hash($join->getEntity())] . '.' . $join->getForeignKey();
+            $onLeftSide = $this->tableAliases[$tableKey] . '.' . $join->getForeignKey();
             if ($join->getForeignCast() !== null) {
                 /** @psalm-suppress PossiblyNullOperand */
                 $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $join->getForeignCast() . ')';
             }
             $onRightSide =
-                $this->tableAliases[\spl_object_hash($entity)] . '.' . $join->getLocalKey();
+                $this->tableAliases[\spl_object_hash($entity) . '___root'] . '.' . $join->getLocalKey();
             if ($join->getLocalCast() !== null) {
                 /** @psalm-suppress PossiblyNullOperand */
                 $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $join->getLocalCast() . ')';
@@ -145,14 +147,14 @@ final class Repository implements RepositoryInterface
 //            $query = $query->$joinMethod(
             $query = $query->innerJoin(
                 $foreignTable,
-                $this->tableAliases[\spl_object_hash($join->getEntity())]
+                $this->tableAliases[$tableKey]
             )->on(
                 $onLeftSide,
                 $onRightSide
             );
 
             foreach ($join->getEntity()->getFields() as $field) {
-                $this->fields[$this->tableAliases[\spl_object_hash($join->getEntity())] . '___' . $field->getName()] = $this->tableAliases[\spl_object_hash($join->getEntity())] . '.' . $field->getName();
+                $this->fields[$this->tableAliases[$tableKey] . '___' . $field->getName()] = $this->tableAliases[$tableKey] . '.' . $field->getName();
             }
 
             unset($this->fields[$entity->getTable() . '___' . $join->getProperty()]);
@@ -175,25 +177,26 @@ final class Repository implements RepositoryInterface
         return $tables;
     }
 
-    private function buildTree(array $row, InspectedEntity $entity): array
+    private function buildTree(array $row, InspectedEntity $entity, string $tableKeySuffix = 'root'): array
     {
-        $tree = $row[$this->tableAliases[\spl_object_hash($entity)]];
+        $tableKey = \spl_object_hash($entity) . '___' . $tableKeySuffix;
+        $tree = $row[$this->tableAliases[$tableKey]];
 
         foreach ($entity->getJoins() as $join) {
             if ($join->getType() === 'inner') {
-                $tree[$join->getProperty()] = $this->buildTree($row, $join->getEntity());
+                $tree[$join->getProperty()] = $this->buildTree($row, $join->getEntity(), $join->getProperty());
 
                 continue;
             }
 
             $tree[$join->getProperty()] = Observable::defer(
-                function () use ($row, $entity, $join) {
+                function () use ($row, $join, $tableKey) {
                     $where = [];
 
                     $where[] = [
                         $join->getForeignKey(),
                         '=',
-                        $row[$this->tableAliases[\spl_object_hash($entity)]][$join->getLocalKey()],
+                        $row[$this->tableAliases[$tableKey]][$join->getLocalKey()],
                     ];
 
                     return $this->client->getRepository($join->getEntity()->getClass())->fetch($where);
