@@ -91,13 +91,18 @@ final class RepositoryTest extends AsyncTestCase
     public function testFetchWithJoins(): void
     {
         $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
-            self::assertCount(0, $builder->getParameters());
+            self::assertCount(1, $builder->getParameters());
+            self::assertSame([1], $builder->getParameters());
             $query = $builder->getQuery();
             self::assertStringContainsString('blog_posts', $query);
             self::assertStringContainsString('users', $query);
             self::assertStringContainsString('INNER JOIN', $query);
             self::assertStringContainsString('t1.id = t0.author_id', $query);
             self::assertStringContainsString('t2.id = t0.publisher_id', $query);
+            self::assertStringContainsString('WHERE', $query);
+            self::assertStringContainsString('blog_posts.id = ?', $query);
+            self::assertStringContainsString('ORDER BY', $query);
+            self::assertStringContainsString('blog_posts.id DESC', $query);
             self::assertStringNotContainsString('LEFT JOIN comments AS', $query);
 
             return true;
@@ -120,7 +125,11 @@ final class RepositoryTest extends AsyncTestCase
             $client
         );
 
-        $blogPost = $this->await($repository->fetch()->take(1)->toPromise());
+        $blogPost = $this->await($repository->fetch([
+            ['blog_posts.id', '=', 1,],
+        ], [
+            ['blog_posts.id', true,],
+        ])->take(1)->toPromise());
 
         self::assertInstanceOf(BlogPostStub::class, $blogPost);
         self::assertSame(1, $blogPost->getId());

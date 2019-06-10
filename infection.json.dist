@@ -15,6 +15,11 @@
                  "WyriHaximus\\React\\SimpleORM\\Repository::page"
              ]
          },
+         "Foreach_": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Annotation\\RightJoin::__construct"
+             ]
+         },
          "Decrement": {
              "ignore": [
                  "WyriHaximus\\React\\SimpleORM\\Repository::page"

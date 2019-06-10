@@ -9,8 +9,6 @@ use Rx\Scheduler\ImmediateScheduler;
 
 final class Repository implements RepositoryInterface
 {
-    public const DEFAULT_PER_PAGE = 50;
-
     /** @var InspectedEntity */
     private $entity;
 
@@ -51,44 +49,21 @@ final class Repository implements RepositoryInterface
         });
     }
 
-    public function page(int $page, array $where = [], array $order = [], int $perPage = self::DEFAULT_PER_PAGE): Observable
+    public function page(int $page, array $where = [], array $order = [], int $perPage = RepositoryInterface::DEFAULT_PER_PAGE): Observable
     {
-        return $this->client->fetch(
-            (function (QueryBuilder $query, array $where, int $page, int $perPage): QueryBuilder {
-                foreach ($where as $constraint) {
-                    $query = $query->where(...$constraint);
-                }
+        $query = $this->buildSelectQuery($where, $order);
+        $query = $query->limit($perPage)->offset(--$page * $perPage);
 
-                $query = $query->limit($perPage)->offset(--$page * $perPage)->orderBy('screenshots___id', true);
-
-                return $query;
-            })($this->getBaseQuery()->select($this->fields), $where, $page, $perPage)
-        )->map(function (array $row): array {
-            return $this->inflate($row);
-        })->map(function (array $row): array {
-            return $this->buildTree($row, $this->entity);
-        })->map(function (array $row): EntityInterface {
-            return $this->hydrator->hydrate($this->entity, $row);
-        });
+        return $this->fetchAndHydrate(
+            $query
+        );
     }
 
-    public function fetch(array $where = []): Observable
+    public function fetch(array $where = [], array $order = []): Observable
     {
-        return $this->client->fetch(
-            (function (QueryBuilder $query, array $where): QueryBuilder {
-                foreach ($where as $constraint) {
-                    $query = $query->where(...$constraint);
-                }
-
-                return $query;
-            })($this->getBaseQuery()->select($this->fields), $where)
-        )->map(function (array $row): array {
-            return $this->inflate($row);
-        })->map(function (array $row): array {
-            return $this->buildTree($row, $this->entity);
-        })->map(function (array $row): EntityInterface {
-            return $this->hydrator->hydrate($this->entity, $row);
-        });
+        return $this->fetchAndHydrate(
+            $this->buildSelectQuery($where, $order)
+        );
     }
 
     private function getBaseQuery(): QueryBuilder
@@ -208,5 +183,35 @@ final class Repository implements RepositoryInterface
         }
 
         return $tree;
+    }
+
+    private function buildSelectQuery(array $where = [], array $order = []): QueryBuilder
+    {
+        $query = $this->getBaseQuery();
+
+        $query = $query->select($this->fields);
+
+        foreach ($where as $constraint) {
+            $query = $query->where(...$constraint);
+        }
+
+        foreach ($order as $by) {
+            $query = $query->orderBy(...$by);
+        }
+
+        return $query;
+    }
+
+    private function fetchAndHydrate(QueryBuilder $query): Observable
+    {
+        return $this->client->fetch(
+            $query
+        )->map(function (array $row): array {
+            return $this->inflate($row);
+        })->map(function (array $row): array {
+            return $this->buildTree($row, $this->entity);
+        })->map(function (array $row): EntityInterface {
+            return $this->hydrator->hydrate($this->entity, $row);
+        });
     }
 }
