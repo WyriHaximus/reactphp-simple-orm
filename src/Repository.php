@@ -9,6 +9,8 @@ use Rx\Scheduler\ImmediateScheduler;
 
 final class Repository implements RepositoryInterface
 {
+    public const DEFAULT_PER_PAGE = 50;
+
     /** @var InspectedEntity */
     private $entity;
 
@@ -49,7 +51,7 @@ final class Repository implements RepositoryInterface
         });
     }
 
-    public function page(int $page, array $where = [], array $order = [], int $perPage = 50): Observable
+    public function page(int $page, array $where = [], array $order = [], int $perPage = self::DEFAULT_PER_PAGE): Observable
     {
         return $this->client->fetch(
             (function (QueryBuilder $query, array $where, int $page, int $perPage): QueryBuilder {
