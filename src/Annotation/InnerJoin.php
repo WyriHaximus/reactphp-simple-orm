@@ -7,8 +7,9 @@ use Doctrine\Common\Annotations\Annotation\Target;
 /**
  * @Annotation
  * @Target("CLASS")
+ * @psalm-suppress PropertyNotSetInConstructor
  */
-final class InnerJoin
+final class InnerJoin implements JoinInterface
 {
     /** @var string */
     private $entity;
@@ -30,6 +31,7 @@ final class InnerJoin
 
     public function __construct(array $table)
     {
+        /** @psalm-suppress RawObjectIteration */
         foreach ($this as $name => $value) {
             if (isset($table[$name])) {
                 $this->$name = $table[$name];
@@ -40,6 +42,11 @@ final class InnerJoin
     public function getEntity(): string
     {
         return $this->entity;
+    }
+
+    public function getType(): string
+    {
+        return 'inner';
     }
 
     public function getLocalKey(): string
