@@ -2,50 +2,46 @@
 
 namespace WyriHaximus\React\SimpleORM;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\Reader;
 use Plasma\SQL\QueryBuilder;
 use React\Promise\PromiseInterface;
-use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
-use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
-use WyriHaximus\React\SimpleORM\Annotation\RightJoin;
-use WyriHaximus\React\SimpleORM\Annotation\Table;
+use Rx\Observable;
+use Rx\Scheduler\ImmediateScheduler;
 
-final class Repository
+final class Repository implements RepositoryInterface
 {
+    /** @var InspectedEntity */
+    private $entity;
+
     /** @var ClientInterface */
     private $client;
 
     /** @var Hydrator */
     private $hydrator;
 
-    /** @var QueryBuilder */
+    /**
+     * @var QueryBuilder
+     *
+     * @psalm-suppress PropertyNotSetInConstructor
+     */
     private $baseQuery;
 
-    /** @var string */
-    private $table;
+    /** @var string[] */
+    private $fields = [];
 
-    /** @var Reader */
-    private $annotationReader;
+    /** @var string[] */
+    private $tableAliases = [];
 
-    /**
-     * @var string
-     */
-    private $entity;
-
-    public function __construct(ClientInterface $client, string $entity)
+    public function __construct(InspectedEntity $entity, ClientInterface $client)
     {
-        $this->client = $client;
         $this->entity = $entity;
+        $this->client = $client;
         $this->hydrator = new Hydrator();
-        $this->annotationReader = new AnnotationReader();
-        $this->table = $this->annotationReader->getClassAnnotation(new \ReflectionClass($entity), Table::class)->getTable();
     }
 
     public function count(): PromiseInterface
     {
         return $this->client->fetch(
-            $this->getBaseQuery()->select([
+            QueryBuilder::create()->from($this->entity->getTable())->select([
                 'COUNT(*) AS count',
             ])
         )->take(1)->toPromise()->then(function (array $row): int {
@@ -53,53 +49,162 @@ final class Repository
         });
     }
 
+    public function page(int $page, array $where = [], array $order = [], int $perPage = RepositoryInterface::DEFAULT_PER_PAGE): Observable
+    {
+        $query = $this->buildSelectQuery($where, $order);
+        $query = $query->limit($perPage)->offset(--$page * $perPage);
+
+        return $this->fetchAndHydrate(
+            $query
+        );
+    }
+
+    public function fetch(array $where = [], array $order = []): Observable
+    {
+        return $this->fetchAndHydrate(
+            $this->buildSelectQuery($where, $order)
+        );
+    }
+
+    private function buildSelectQuery(array $where = [], array $order = []): QueryBuilder
+    {
+        $query = $this->getBaseQuery();
+
+        $query = $query->select($this->fields);
+
+        foreach ($where as $constraint) {
+            $query = $query->where(...$constraint);
+        }
+
+        foreach ($order as $by) {
+            $query = $query->orderBy(...$by);
+        }
+
+        return $query;
+    }
+
     private function getBaseQuery(): QueryBuilder
     {
+        /** @psalm-suppress DocblockTypeContradiction */
         if ($this->baseQuery === null) {
             $this->baseQuery = $this->buildBaseQuery();
         }
 
-        return $this->baseQuery;
+        return clone $this->baseQuery;
     }
 
     private function buildBaseQuery(): QueryBuilder
     {
-        $query = QueryBuilder::create()->from($this->table, $this->table);
+        $i = 0;
+        $tableKey = \spl_object_hash($this->entity) . '___root';
+        $this->tableAliases[$tableKey] = 't' . $i++;
+        $query = QueryBuilder::create()->from($this->entity->getTable(), $this->tableAliases[$tableKey]);
 
-        $annotations = $this->annotationReader->getClassAnnotations(new \ReflectionClass($this->entity));
+        foreach ($this->entity->getFields() as $field) {
+            $this->fields[$this->tableAliases[$tableKey] . '___' . $field->getName()] = $this->tableAliases[$tableKey]. '.' . $field->getName();
+        }
 
-        /** @var InnerJoin|null $annotation */
-        foreach ($annotations as $annotation) {
-            if ($annotation instanceof InnerJoin === false && $annotation instanceof LeftJoin === false  && $annotation instanceof RightJoin === false) {
+        $query = $this->buildJoins($query, $this->entity, $i);
+
+        return $query;
+    }
+
+    private function buildJoins(QueryBuilder $query, InspectedEntity $entity, int &$i): QueryBuilder
+    {
+        foreach ($entity->getJoins() as $join) {
+            if ($join->getType() !== 'inner') {
                 continue;
             }
 
-            $joinMethod = 'innerJoin';
-            if ($annotation instanceof LeftJoin) {
-                $joinMethod = 'leftJoin';
+            $tableKey = \spl_object_hash($join->getEntity()) . '___' . $join->getProperty();
+            $this->tableAliases[$tableKey] = 't' . $i++;
+
+            $foreignTable = $join->getEntity()->getTable();
+            $onLeftSide = $this->tableAliases[$tableKey] . '.' . $join->getForeignKey();
+            if ($join->getForeignCast() !== null) {
+                /** @psalm-suppress PossiblyNullOperand */
+                $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $join->getForeignCast() . ')';
             }
-            if ($annotation instanceof RightJoin) {
-                $joinMethod = 'rightJoin';
+            $onRightSide =
+                $this->tableAliases[\spl_object_hash($entity) . '___root'] . '.' . $join->getLocalKey();
+            if ($join->getLocalCast() !== null) {
+                /** @psalm-suppress PossiblyNullOperand */
+                $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $join->getLocalCast() . ')';
             }
 
-            $foreignTable = $this->annotationReader->getClassAnnotation(new \ReflectionClass($annotation->getEntity()), Table::class)->getTable();
-            $onLeftSide = $foreignTable . '.' . $annotation->getForeignKey();
-            if ($annotation->getForeignCast() !== null) {
-                $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $annotation->getForeignCast() . ')';
-            }
-            $onRightSide = $this->table . '.' . $annotation->getLocalKey();
-            if ($annotation->getLocalCast() !== null) {
-                $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $annotation->getLocalCast() . ')';
-            }
-            $query = $query->$joinMethod(
+            $query = $query->innerJoin(
                 $foreignTable,
-                $foreignTable
+                $this->tableAliases[$tableKey]
             )->on(
                 $onLeftSide,
                 $onRightSide
             );
+
+            foreach ($join->getEntity()->getFields() as $field) {
+                $this->fields[$this->tableAliases[$tableKey] . '___' . $field->getName()] = $this->tableAliases[$tableKey] . '.' . $field->getName();
+            }
+
+            unset($this->fields[$entity->getTable() . '___' . $join->getProperty()]);
+
+            $query = $this->buildJoins($query, $join->getEntity(), $i);
         }
 
         return $query;
+    }
+
+    private function fetchAndHydrate(QueryBuilder $query): Observable
+    {
+        return $this->client->fetch(
+            $query
+        )->map(function (array $row): array {
+            return $this->inflate($row);
+        })->map(function (array $row): array {
+            return $this->buildTree($row, $this->entity);
+        })->map(function (array $row): EntityInterface {
+            return $this->hydrator->hydrate($this->entity, $row);
+        });
+    }
+
+    private function inflate(array $row): array
+    {
+        $tables = [];
+
+        foreach ($row as $key => $value) {
+            [$table, $field] = \explode('___', $key);
+            $tables[$table][$field] = $value;
+        }
+
+        return $tables;
+    }
+
+    private function buildTree(array $row, InspectedEntity $entity, string $tableKeySuffix = 'root'): array
+    {
+        $tableKey = \spl_object_hash($entity) . '___' . $tableKeySuffix;
+        $tree = $row[$this->tableAliases[$tableKey]];
+
+        foreach ($entity->getJoins() as $join) {
+            if ($join->getType() === 'inner') {
+                $tree[$join->getProperty()] = $this->buildTree($row, $join->getEntity(), $join->getProperty());
+
+                continue;
+            }
+
+            $tree[$join->getProperty()] = Observable::defer(
+                function () use ($row, $join, $tableKey) {
+                    $where = [];
+
+                    $where[] = [
+                        $join->getForeignKey(),
+                        '=',
+                        $row[$this->tableAliases[$tableKey]][$join->getLocalKey()],
+                    ];
+
+                    return $this->client->getRepository($join->getEntity()->getClass())->fetch($where);
+                },
+                new ImmediateScheduler()
+            );
+        }
+
+        return $tree;
     }
 }
