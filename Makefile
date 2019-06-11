@@ -4,6 +4,8 @@ all:
 all-coverage:
 	composer run-script qa-all-coverage --timeout=0
 
+install_db: migrations seeds
+
 ci:
 	composer run-script qa-ci --timeout=0
 
@@ -22,11 +24,23 @@ cs:
 cs-fix:
 	composer cs-fix
 
+infection:
+	composer infection
+
 unit:
 	composer run-script unit --timeout=0
+
+stan:
+	composer run-script stan --timeout=0
 
 unit-coverage:
 	composer run-script unit-coverage --timeout=0
 
 ci-coverage: init
 	composer ci-coverage
+
+migrations:
+	php ./vendor/bin/phinx migrate
+
+seeds:
+	php ./vendor/bin/phinx seed:run -v
