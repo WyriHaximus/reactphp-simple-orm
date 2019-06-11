@@ -14,13 +14,24 @@
     "api-clients/rx": "^2.2",
     "doctrine/annotations": "^1.6",
     "ocramius/generated-hydrator": "^3.0",
-    "plasma/core": "^0.2.1|dev-master",
+    "plasma/core": "^0.2.1 || dev-master",
     "plasma/sql-common": "dev-master",
+    "react/dns": "^0.4.17",
+    "roave/better-reflection": "^3.5",
     "voryx/pgasync": "^2.0",
-    "wyrihaximus/doctrine-annotation-autoloader": "^1.0"
+    "wyrihaximus/doctrine-annotation-autoloader": "^1.0",
+    "wyrihaximus/iterator-or-array-to-array": "^1.1"
   },
   "require-dev": {
+    "robmorgan/phinx": "^0.10.7",
+    "vlucas/phpdotenv": "^3.3",
     "wyrihaximus/async-test-utilities": "^1.0"
+  },
+  "config": {
+    "platform": {
+      "php": "7.3"
+    },
+    "sort-packages": true
   },
   "autoload": {
     "psr-4": {
@@ -32,14 +43,16 @@
       "WyriHaximus\\React\\Tests\\SimpleORM\\": "tests/"
     }
   },
-  "config": {
-    "sort-packages": true,
-    "platform": {
-      "php": "7.3"
-    }
-  },
   "scripts": {
-    "ensure-installed": "composer install --ansi -n -q",
+    "post-install-cmd": [
+      "composer normalize"
+    ],
+    "post-update-cmd": [
+      "composer normalize"
+    ],
+    "ci-coverage": [
+      "if [ -f ./build/logs/clover.xml ]; then wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --format=php-clover ./build/logs/clover.xml; fi"
+    ],
     "cs": [
       "@ensure-installed",
       "php-cs-fixer fix --config=.php_cs --ansi --dry-run --diff --verbose --allow-risky=yes --show-progress=estimating"
@@ -48,38 +61,44 @@
       "@ensure-installed",
       "php-cs-fixer fix --config=.php_cs --ansi --verbose --allow-risky=yes --show-progress=estimating"
     ],
-    "unit": [
+    "ensure-installed": "composer install --ansi -n -q",
+    "infection": [
       "@ensure-installed",
-      "phpunit --colors=always -c phpunit.xml.dist"
-    ],
-    "unit-coverage": [
-      "@ensure-installed",
-      "phpunit --colors=always -c phpunit.xml.dist --coverage-text --coverage-html covHtml --coverage-clover ./build/logs/clover.xml"
+      "infection --ansi --min-msi=100 --min-covered-msi=100 --threads=32"
     ],
     "lint-php": [
       "@ensure-installed",
       "parallel-lint --exclude vendor ."
     ],
+    "psalm": [
+      "@ensure-installed",
+      "psalm --threads=32"
+    ],
     "qa-all": [
+      "composer validate --ansi",
+      "composer normalize --ansi",
       "@lint-php",
       "@cs",
-      "@unit"
+      "@stan",
+      "@psalm",
+      "@unit",
+      "@infection"
     ],
-    "qa-all-coverage": [
+    "qa-all-extended": [
+      "composer validate --ansi",
+      "composer normalize --ansi",
       "@lint-php",
       "@cs",
-      "@unit-coverage"
-    ],
-    "qa-windows": [
-      "@lint-php",
-      "@cs",
-      "@unit"
+      "@stan",
+      "@psalm",
+      "@unit-coverage",
+      "@infection"
     ],
     "qa-ci": [
       "@unit"
     ],
     "qa-ci-extended": [
-      "@qa-all-coverage"
+      "@qa-all-extended"
     ],
     "qa-ci-windows": [
       "@qa-windows"
@@ -87,8 +106,17 @@
     "qa-contrib": [
       "@qa-all"
     ],
-    "ci-coverage": [
-      "if [ -f ./build/logs/clover.xml ]; then wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --format=php-clover ./build/logs/clover.xml; fi"
+    "stan": [
+      "@ensure-installed",
+      "phpstan analyse src tests --level max --ansi -c phpstan.neon"
+    ],
+    "unit": [
+      "@ensure-installed",
+      "phpunit --colors=always -c phpunit.xml.dist"
+    ],
+    "unit-coverage": [
+      "@ensure-installed",
+      "phpunit --colors=always -c phpunit.xml.dist --coverage-text --coverage-html covHtml --coverage-clover ./build/logs/clover.xml"
     ]
   }
 }
