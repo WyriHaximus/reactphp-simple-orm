@@ -4,4 +4,8 @@ namespace WyriHaximus\React\SimpleORM;
 
 interface EntityInterface
 {
+    /**
+     * @return mixed
+     */
+    public function getId();
 }
