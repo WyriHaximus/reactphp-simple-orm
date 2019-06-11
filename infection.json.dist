@@ -1,0 +1,45 @@
+{
+    "timeout": 120,
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "logs": {
+        "text": "infection-log.txt"
+    },
+     "mutators": {
+         "@default": true,
+         "Multiplication": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Repository::page"
+             ]
+         },
+         "Foreach_": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Annotation\\RightJoin::__construct"
+             ]
+         },
+         "Decrement": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Repository::page"
+             ]
+         },
+         "DecrementInteger": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Repository::page"
+             ]
+         },
+         "IncrementInteger": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Repository::count",
+                 "WyriHaximus\\React\\SimpleORM\\Repository::page"
+             ]
+         },
+         "OneZeroInteger": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Repository::count"
+             ]
+         }
+     }
+}
