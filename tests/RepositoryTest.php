@@ -105,9 +105,9 @@ final class RepositoryTest extends AsyncTestCase
             self::assertStringContainsString('t1.id = t0.author_id', $query);
             self::assertStringContainsString('t2.id = t0.publisher_id', $query);
             self::assertStringContainsString('WHERE', $query);
-            self::assertStringContainsString('blog_posts.id = ?', $query);
+            self::assertStringContainsString('t0.id = ?', $query);
             self::assertStringContainsString('ORDER BY', $query);
-            self::assertStringContainsString('blog_posts.id DESC', $query);
+            self::assertStringContainsString('t0.id DESC', $query);
 
             // Assert the LEFT JOIN isn't happening
             self::assertStringNotContainsString('LEFT JOIN comments AS', $query);
@@ -137,9 +137,9 @@ final class RepositoryTest extends AsyncTestCase
 
         /** @var BlogPostStub $blogPost */
         $blogPost = $this->await($repository->fetch([
-            ['blog_posts.id', '=', 1,],
+            ['id', '=', 1,],
         ], [
-            ['blog_posts.id', true,],
+            ['id', true,],
         ])->take(1)->toPromise());
 
         self::assertSame(1, $blogPost->getId());
@@ -174,9 +174,9 @@ final class RepositoryTest extends AsyncTestCase
             self::assertStringContainsString('t1.id = t0.author_id', $query);
             self::assertStringContainsString('t2.id = t0.publisher_id', $query);
             self::assertStringContainsString('WHERE', $query);
-            self::assertStringContainsString('blog_posts.id = ?', $query);
+            self::assertStringContainsString('t0.id = ?', $query);
             self::assertStringContainsString('ORDER BY', $query);
-            self::assertStringContainsString('blog_posts.id DESC', $query);
+            self::assertStringContainsString('t0.id DESC', $query);
 
             // Assert the LEFT JOIN isn't happening
             self::assertStringNotContainsString('LEFT JOIN comments AS', $query);
@@ -210,7 +210,7 @@ final class RepositoryTest extends AsyncTestCase
             self::assertStringContainsString('INNER JOIN users', $query);
             self::assertStringContainsString('t1.id = t0.author_id', $query);
             self::assertStringContainsString('WHERE', $query);
-            self::assertStringContainsString('blog_post_id = ?', $query);
+            self::assertStringContainsString('t0.blog_post_id = ?', $query);
 
             return true;
         }))->shouldBeCalled()->willReturn(observableFromArray([
@@ -251,9 +251,9 @@ final class RepositoryTest extends AsyncTestCase
 
         /** @var BlogPostStub $blogPost */
         $blogPost = $this->await($repository->fetch([
-            ['blog_posts.id', '=', 1,],
+            ['id', '=', 1,],
         ], [
-            ['blog_posts.id', true,],
+            ['id', true,],
         ])->take(1)->toPromise());
 
         self::assertSame(1, $blogPost->getId());

@@ -73,10 +73,12 @@ final class Repository implements RepositoryInterface
         $query = $query->select($this->fields);
 
         foreach ($where as $constraint) {
+            $constraint[0] = $this->translateFieldName($constraint[0]);
             $query = $query->where(...$constraint);
         }
 
         foreach ($order as $by) {
+            $by[0] = $this->translateFieldName($by[0]);
             $query = $query->orderBy(...$by);
         }
 
@@ -206,5 +208,10 @@ final class Repository implements RepositoryInterface
         }
 
         return $tree;
+    }
+
+    private function translateFieldName(string $name): string
+    {
+        return 't0.' . $name;
     }
 }
