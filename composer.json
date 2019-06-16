@@ -64,7 +64,7 @@
     "ensure-installed": "composer install --ansi -n -q",
     "infection": [
       "@ensure-installed",
-      "infection --ansi --min-msi=100 --min-covered-msi=100 --threads=32"
+      "infection --ansi --min-msi=100 --min-covered-msi=100 --threads=4 --log-verbosity=all"
     ],
     "lint-php": [
       "@ensure-installed",
