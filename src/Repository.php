@@ -3,6 +3,7 @@
 namespace WyriHaximus\React\SimpleORM;
 
 use Plasma\SQL\QueryBuilder;
+use Plasma\SQL\QueryExpressions\Fragment;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
@@ -40,7 +41,7 @@ final class Repository implements RepositoryInterface
 
     public function count(): PromiseInterface
     {
-        return $this->client->fetch(
+        return $this->client->query(
             QueryBuilder::create()->from($this->entity->getTable())->select([
                 'COUNT(*) AS count',
             ])
@@ -64,6 +65,17 @@ final class Repository implements RepositoryInterface
         return $this->fetchAndHydrate(
             $this->buildSelectQuery($where, $order)
         );
+    }
+
+    public function create(array $fields): PromiseInterface
+    {
+        $fields['id'] = new Fragment('DEFAULT');
+
+        return $this->client->query(
+            QueryBuilder::create()->insert($fields)->into($this->entity->getTable())->returning()
+        )->toPromise()->then(function (array $row): EntityInterface {
+            return $this->hydrator->hydrate($this->entity, $row);
+        });
     }
 
     private function buildSelectQuery(array $where = [], array $order = []): QueryBuilder
@@ -156,7 +168,7 @@ final class Repository implements RepositoryInterface
 
     private function fetchAndHydrate(QueryBuilder $query): Observable
     {
-        return $this->client->fetch(
+        return $this->client->query(
             $query
         )->map(function (array $row): array {
             return $this->inflate($row);

@@ -9,5 +9,5 @@ interface ClientInterface
 {
     public function getRepository(string $entity): RepositoryInterface;
 
-    public function fetch(QueryBuilder $query): Observable;
+    public function query(QueryBuilder $query): Observable;
 }
