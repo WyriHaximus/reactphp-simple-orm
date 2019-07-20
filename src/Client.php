@@ -35,7 +35,7 @@ final class Client implements ClientInterface
         return $this->repositories[$entity];
     }
 
-    public function fetch(QueryBuilder $query): Observable
+    public function query(QueryBuilder $query): Observable
     {
         $query = $query->withGrammar(new PostgreSQL());
 

@@ -222,4 +222,23 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
     }
+
+    /**
+     * @test
+     */
+    public function createUser(): void
+    {
+        $name = 'Commander Fuzzy paws';
+
+        $fields = [
+            'name' => $name,
+        ];
+
+        $user = $this->await(
+            $this->client->getRepository(UserStub::class)->create($fields),
+            $this->loop
+        );
+
+        self::assertSame($name, $user->getName());
+    }
 }
