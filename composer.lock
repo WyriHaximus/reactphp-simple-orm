@@ -660,12 +660,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PlasmaPHP/core.git",
-                "reference": "ce9b1a206e3777f3cf884eec5eee686a073ddfb2"
+                "reference": "b8132ec009ca00cfce57f0a5b04ec1b378dfe219"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PlasmaPHP/core/zipball/ce9b1a206e3777f3cf884eec5eee686a073ddfb2",
-                "reference": "ce9b1a206e3777f3cf884eec5eee686a073ddfb2",
+                "url": "https://api.github.com/repos/PlasmaPHP/core/zipball/b8132ec009ca00cfce57f0a5b04ec1b378dfe219",
+                "reference": "b8132ec009ca00cfce57f0a5b04ec1b378dfe219",
                 "shasum": ""
             },
             "require": {
@@ -674,8 +674,7 @@
                 "evenement/evenement": "^3.0|^2.0",
                 "php": ">=7.1",
                 "react/promise": "^2.7",
-                "react/promise-stream": "^1.1",
-                "react/stream": "^1.0"
+                "react/promise-stream": "^1.1"
             },
             "require-dev": {
                 "clue/block-react": "^1.3",
@@ -699,7 +698,7 @@
                 }
             ],
             "description": "Core component of Plasma.",
-            "time": "2019-04-17T16:59:52+00:00"
+            "time": "2019-06-21T06:22:38+00:00"
         },
         {
             "name": "plasma/sql-common",
@@ -707,12 +706,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PlasmaPHP/sql-common.git",
-                "reference": "f9363983bd3c427440b7e72206f83639a339c274"
+                "reference": "0d9d74bf80f3f9f3845eba14ff2f425306e964d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PlasmaPHP/sql-common/zipball/f9363983bd3c427440b7e72206f83639a339c274",
-                "reference": "f9363983bd3c427440b7e72206f83639a339c274",
+                "url": "https://api.github.com/repos/PlasmaPHP/sql-common/zipball/0d9d74bf80f3f9f3845eba14ff2f425306e964d3",
+                "reference": "0d9d74bf80f3f9f3845eba14ff2f425306e964d3",
                 "shasum": ""
             },
             "require": {
@@ -739,7 +738,7 @@
                 }
             ],
             "description": "Generic SQL commons and abstractions for Plasma.",
-            "time": "2019-05-30T15:12:46+00:00"
+            "time": "2019-06-09T20:43:56+00:00"
         },
         {
             "name": "react/cache",
@@ -1025,22 +1024,22 @@
         },
         {
             "name": "react/socket",
-            "version": "v1.2.1",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket.git",
-                "reference": "4d49bd3d6ca0257ada8645dd0f8a2f1885e290b3"
+                "reference": "10f0629ec83ea0fa22597f348623f554227e3ca0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/4d49bd3d6ca0257ada8645dd0f8a2f1885e290b3",
-                "reference": "4d49bd3d6ca0257ada8645dd0f8a2f1885e290b3",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/10f0629ec83ea0fa22597f348623f554227e3ca0",
+                "reference": "10f0629ec83ea0fa22597f348623f554227e3ca0",
                 "shasum": ""
             },
             "require": {
                 "evenement/evenement": "^3.0 || ^2.0 || ^1.0",
                 "php": ">=5.3.0",
-                "react/dns": "^0.4.13",
+                "react/dns": "^1.0 || ^0.4.13",
                 "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3.5",
                 "react/promise": "^2.6.0 || ^1.2.1",
                 "react/promise-timer": "^1.4.0",
@@ -1068,7 +1067,7 @@
                 "reactphp",
                 "stream"
             ],
-            "time": "2019-06-03T09:04:16+00:00"
+            "time": "2019-07-10T10:11:14+00:00"
         },
         {
             "name": "react/stream",
@@ -1400,16 +1399,16 @@
         },
         {
             "name": "voryx/pgasync",
-            "version": "2.0.2",
+            "version": "2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voryx/PgAsync.git",
-                "reference": "4afc0dfec317bcafe58bf4ba1ea34c0899070708"
+                "reference": "eefc2abd2dceaa766854d11c5b3e4714a64925af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voryx/PgAsync/zipball/4afc0dfec317bcafe58bf4ba1ea34c0899070708",
-                "reference": "4afc0dfec317bcafe58bf4ba1ea34c0899070708",
+                "url": "https://api.github.com/repos/voryx/PgAsync/zipball/eefc2abd2dceaa766854d11c5b3e4714a64925af",
+                "reference": "eefc2abd2dceaa766854d11c5b3e4714a64925af",
                 "shasum": ""
             },
             "require": {
@@ -1419,7 +1418,8 @@
                 "voryx/event-loop": "^3.0 || ^2.0.2"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.7"
+                "phpunit/phpunit": "^5.7",
+                "react/dns": "^1.0"
             },
             "type": "library",
             "autoload": {
@@ -1454,7 +1454,7 @@
                 "reactive",
                 "rx.php"
             ],
-            "time": "2018-11-23T05:00:39+00:00"
+            "time": "2019-07-14T21:21:37+00:00"
         },
         {
             "name": "webmozart/assert",
@@ -5383,8 +5383,8 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
-                    "role": "lead"
+                    "role": "lead",
+                    "email": "sebastian@phpunit.de"
                 }
             ],
             "description": "The PHP Unit Testing framework.",
@@ -5690,20 +5690,20 @@
             "authors": [
                 {
                     "name": "Woody Gilk",
+                    "role": "Developer",
                     "email": "woody.gilk@gmail.com",
-                    "homepage": "http://shadowhand.me",
-                    "role": "Developer"
+                    "homepage": "http://shadowhand.me"
                 },
                 {
                     "name": "Rob Morgan",
+                    "role": "Lead Developer",
                     "email": "robbym@gmail.com",
-                    "homepage": "https://robmorgan.id.au",
-                    "role": "Lead Developer"
+                    "homepage": "https://robmorgan.id.au"
                 },
                 {
                     "name": "Richard Quadling",
-                    "email": "rquadling@gmail.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "rquadling@gmail.com"
                 },
                 {
                     "name": "CakePHP Community",
