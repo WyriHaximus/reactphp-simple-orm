@@ -10,13 +10,13 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
  */
 class UserStub implements EntityInterface
 {
-    /** @var int */
+    /** @var string */
     protected $id;
 
     /** @var string */
     protected $name;
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }

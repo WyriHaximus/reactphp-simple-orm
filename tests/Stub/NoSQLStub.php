@@ -6,7 +6,8 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
 
 class NoSQLStub implements EntityInterface
 {
-    public function getId(): void
+    public function getId(): string
     {
+        return '';
     }
 }

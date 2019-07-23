@@ -32,13 +32,13 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
  */
 class BlogPostStub implements EntityInterface
 {
-    /** @var int */
+    /** @var string */
     protected $id;
 
-    /** @var int */
+    /** @var string */
     protected $author_id;
 
-    /** @var int */
+    /** @var string */
     protected $publisher_id;
 
     /** @var string */
@@ -56,7 +56,10 @@ class BlogPostStub implements EntityInterface
     /** @var Observable */
     protected $comments;
 
-    public function getId(): int
+    /** @var int */
+    protected $views;
+
+    public function getId(): string
     {
         return $this->id;
     }
@@ -84,5 +87,10 @@ class BlogPostStub implements EntityInterface
     public function getComments(): Observable
     {
         return $this->comments;
+    }
+
+    public function getViews(): int
+    {
+        return $this->views;
     }
 }

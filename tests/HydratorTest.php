@@ -17,7 +17,7 @@ final class HydratorTest extends TestCase
 {
     public function testHydrate(): void
     {
-        $id = 123;
+        $id = '03450173-fef3-42c0-83c4-dfcfa4a474ee';
         $title = 'tables.title';
 
         /** @var UserStub $entity */
@@ -35,11 +35,11 @@ final class HydratorTest extends TestCase
 
     public function testHydrateWithJoins(): void
     {
-        $id = 123;
+        $id = '6bda4f06-4b7e-4cd5-b779-66a1b76187f9';
         $title = 'null';
-        $authorId = 1;
+        $authorId = 'dfc857d2-3564-4ed5-8a66-859158122169';
         $authorName = 'llun';
-        $publisherId = 2;
+        $publisherId = 'a3fc1993-0930-4a9d-a2ad-3bf3a15ecee0';
         $publisherName = 'dasdsadas';
 
         /** @var BlogPostStub $entity */
