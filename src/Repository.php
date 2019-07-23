@@ -3,7 +3,7 @@
 namespace WyriHaximus\React\SimpleORM;
 
 use Plasma\SQL\QueryBuilder;
-use Plasma\SQL\QueryExpressions\Fragment;
+use Ramsey\Uuid\Uuid;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
@@ -69,7 +69,7 @@ final class Repository implements RepositoryInterface
 
     public function create(array $fields): PromiseInterface
     {
-        $fields['id'] = new Fragment('DEFAULT');
+        $fields['id'] = Uuid::getFactory()->uuid4();
 
         return $this->client->query(
             QueryBuilder::create()->insert($fields)->into($this->entity->getTable())->returning()
