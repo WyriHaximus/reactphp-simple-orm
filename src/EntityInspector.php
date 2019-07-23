@@ -28,6 +28,7 @@ final class EntityInspector
     public function getEntity(string $entity): InspectedEntity
     {
         if (!isset($this->entities[$entity])) {
+            /** @psalm-suppress ArgumentTypeCoercion */
             $class = new ReflectionClass($entity);
             $tableAnnotation = $this->annotationReader->getClassAnnotation($class, Table::class);
 
