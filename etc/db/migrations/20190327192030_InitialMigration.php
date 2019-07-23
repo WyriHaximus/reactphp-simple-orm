@@ -6,37 +6,25 @@ class InitialMigration extends AbstractMigration
 {
     public function up(): void
     {
-        $this->table('users')
-            ->addColumn('name', 'string', [
-                'limit' => 256,
-            ])
+        $this->table('users', ['id' => false, 'primary_key' => ['id']])
+            ->addColumn('id', 'uuid')
+            ->addColumn('name', 'string')
             ->create();
 
-        $this->table('blog_posts')
-            ->addColumn('author_id', 'integer', [
-                'limit' => 20,
-            ])
-            ->addColumn('publisher_id', 'integer', [
-                'limit' => 20,
-            ])
-            ->addColumn('title', 'string', [
-                'limit' => 256,
-            ])
-            ->addColumn('contents', 'string', [
-                'limit' => 256,
-            ])
+        $this->table('blog_posts', ['id' => false, 'primary_key' => ['id']])
+            ->addColumn('id', 'uuid')
+            ->addColumn('author_id', 'uuid')
+            ->addColumn('publisher_id', 'uuid')
+            ->addColumn('title', 'string')
+            ->addColumn('contents', 'string')
+            ->addColumn('views', 'integer')
             ->create();
 
-        $this->table('comments')
-            ->addColumn('author_id', 'integer', [
-                'limit' => 20,
-            ])
-            ->addColumn('blog_post_id', 'integer', [
-                'limit' => 20,
-            ])
-            ->addColumn('contents', 'string', [
-                'limit' => 256,
-            ])
+        $this->table('comments', ['id' => false, 'primary_key' => ['id']])
+            ->addColumn('id', 'uuid')
+            ->addColumn('author_id', 'uuid')
+            ->addColumn('blog_post_id', 'uuid')
+            ->addColumn('contents', 'string')
             ->create();
     }
 

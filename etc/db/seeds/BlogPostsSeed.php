@@ -7,18 +7,20 @@ class BlogPostsSeed extends AbstractSeed
     {
         $data = [
             [
-                'id' => 1,
-                'author_id' => 1,
-                'publisher_id' => 1,
+                'id' => '53ab5832-9a90-4e6e-988b-06b8b5fed763',
+                'author_id' => 'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
+                'publisher_id' => 'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
                 'title' => 'Cats!',
                 'contents' => 'qliwuhe uofq2hep fuoq2pho fp2uhu pu2p 2qpoh weh uwqhfu wqif',
+                'views' => 133,
             ],
             [
-                'id' => 2,
-                'author_id' => 2,
-                'publisher_id' => 2,
+                'id' => '090fa83b-5c5a-4042-9f05-58d9ab649a1a',
+                'author_id' => '15f25357-4b3d-4d4d-b6a5-2ceb93864b77',
+                'publisher_id' => '15f25357-4b3d-4d4d-b6a5-2ceb93864b77',
                 'title' => 'Moar Cats!',
                 'contents' => 'qlqweofu b02qw yu9   dqiwuhe uofq2hep fuoq2pho fp2uhu pu2p 2qpoh weh uwqhfu wqif',
+                'views' => 133,
             ],
         ];
 

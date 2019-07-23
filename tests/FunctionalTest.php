@@ -124,7 +124,7 @@ final class FunctionalTest extends AsyncTestCase
     public function firstBlogPostAuthorId(): void
     {
         self::assertSame(
-            1,
+            'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
             $this->await(
                 $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(function (BlogPostStub $blogPost) {
                     return $blogPost->getAuthor()->getId();
@@ -141,8 +141,8 @@ final class FunctionalTest extends AsyncTestCase
     {
         self::assertSame(
             [
-                3,
-                2,
+                '2fa0d077-d374-4409-b1ef-9687c6729158',
+                '15f25357-4b3d-4d4d-b6a5-2ceb93864b77',
             ],
             \array_values(
                 \array_map(
@@ -169,7 +169,7 @@ final class FunctionalTest extends AsyncTestCase
             1,
             $this->await(
                 $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
-                    return $blogPost->getId() === 2;
+                    return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
                 })->toPromise()->then(function (BlogPostStub $blogPost) {
                     return $blogPost->getComments()->toArray()->toPromise();
                 }),
@@ -184,10 +184,10 @@ final class FunctionalTest extends AsyncTestCase
     public function secondBlogPostAuthorId(): void
     {
         self::assertSame(
-            2,
+            '15f25357-4b3d-4d4d-b6a5-2ceb93864b77',
             $this->await(
                 $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
-                    return $blogPost->getId() === 2;
+                    return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
                 })->toPromise()->then(function (BlogPostStub $blogPost) {
                     return $blogPost->getAuthor()->getId();
                 }),
@@ -203,7 +203,7 @@ final class FunctionalTest extends AsyncTestCase
     {
         self::assertSame(
             [
-                1,
+                'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
             ],
             \array_values(
                 \array_map(
@@ -212,7 +212,7 @@ final class FunctionalTest extends AsyncTestCase
                     },
                     $this->await(
                         $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
-                            return $blogPost->getId() === 2;
+                            return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
                         })->toPromise()->then(function (BlogPostStub $blogPost) {
                             return $blogPost->getComments()->toArray()->toPromise();
                         }),

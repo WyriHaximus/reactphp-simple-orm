@@ -17,22 +17,22 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
  */
 class CommentStub implements EntityInterface
 {
-    /** @var int */
+    /** @var string */
     protected $id;
 
-    /** @var int */
+    /** @var string */
     protected $author_id;
 
     /** @var UserStub */
     protected $author;
 
-    /** @var int */
+    /** @var string */
     protected $blog_post_id;
 
     /** @var string */
     protected $contents;
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }
