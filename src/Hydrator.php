@@ -4,6 +4,7 @@ namespace WyriHaximus\React\SimpleORM;
 
 use GeneratedHydrator\Configuration;
 use WyriHaximus\React\SimpleORM\Entity\Field;
+use Zend\Hydrator\HydratorInterface;
 
 final class Hydrator
 {
@@ -46,6 +47,15 @@ final class Hydrator
          * @psalm-suppress InvalidMethodCall
          */
         return $this->hydrators[$class]->hydrate($data, new $class());
+    }
+
+    public function extract(InspectedEntity $inspectedEntity, EntityInterface $entity): array
+    {
+        $class = $inspectedEntity->getClass();
+        /** @var HydratorInterface $hydrator */
+        $hydrator = $this->hydrators[$class];
+
+        return $hydrator->extract($entity);
     }
 
     /**

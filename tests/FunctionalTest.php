@@ -245,4 +245,24 @@ final class FunctionalTest extends AsyncTestCase
 
         self::assertSame($name, $user->getName());
     }
+
+    /**
+     * @test
+     */
+    public function increaseViews(): void
+    {
+        $repository = $this->client->getRepository(BlogPostStub::class);
+
+        self::assertSame(
+            167,
+            $this->await(
+                $repository->fetch()->takeLast(1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                    return $blogPost->withViews($blogPost->getViews() + 1);
+                })->then(function (BlogPostStub $blogPost) use ($repository) {
+                    return $repository->update($blogPost);
+                }),
+                $this->loop
+            )->getViews()
+        );
+    }
 }

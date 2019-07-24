@@ -16,4 +16,6 @@ interface RepositoryInterface
     public function fetch(array $where = [], array $order = []): Observable;
 
     public function create(array $fields): PromiseInterface;
+
+    public function update(EntityInterface $entity): PromiseInterface;
 }
