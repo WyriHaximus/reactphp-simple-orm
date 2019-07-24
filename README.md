@@ -9,4 +9,3 @@ Goals:
 * No query builder (yet)
 * RxPHP based
 * Simple reading data into entities
-* Phase two creating and updating data
