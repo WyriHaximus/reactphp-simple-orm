@@ -31,6 +31,10 @@ final class FunctionalTest extends AsyncTestCase
     {
         parent::setUp();
 
+        \exec('PHINX_DB_HOST=localhost php ./vendor/bin/phinx rollback');
+        \exec('PHINX_DB_HOST=localhost php ./vendor/bin/phinx migrate');
+        \exec('PHINX_DB_HOST=localhost php ./vendor/bin/phinx seed:run -v');
+
         $this->loop = Factory::create();
         $this->client = new Client(
             new PgClient(
