@@ -15,25 +15,14 @@
                  "WyriHaximus\\React\\SimpleORM\\Repository::page"
              ]
          },
-         "Foreach_": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Annotation\\RightJoin::__construct"
-             ]
-         },
          "Decrement": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::page"
-             ]
-         },
-         "DecrementInteger": {
              "ignore": [
                  "WyriHaximus\\React\\SimpleORM\\Repository::page"
              ]
          },
          "IncrementInteger": {
              "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::count",
-                 "WyriHaximus\\React\\SimpleORM\\Repository::page"
+                 "WyriHaximus\\React\\SimpleORM\\Repository::count"
              ]
          },
          "OneZeroInteger": {
