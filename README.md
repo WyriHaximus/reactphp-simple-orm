@@ -1,12 +1,11 @@
 # reactphp-simple-orm
 
-EXPERIMENTAL: Package to see how feasible a simple ORM in ReactPHP is
+EXPERIMENTAL: Opinionated package to see how feasible a simple ORM in ReactPHP is
 
 Goals:
 * Entities
-* Reading
+* CRUD
 * No transactions
 * No query builder (yet)
 * RxPHP based
 * Simple reading data into entities
-* Phase two creating and updating data

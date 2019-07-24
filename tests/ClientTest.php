@@ -72,7 +72,7 @@ final class ClientTest extends AsyncTestCase
             ])
         );
 
-        $rows = $this->await($this->client->fetch($query)->toArray()->toPromise());
+        $rows = $this->await($this->client->query($query)->toArray()->toPromise());
 
         self::assertCount(1, $rows);
     }

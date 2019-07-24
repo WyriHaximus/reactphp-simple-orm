@@ -4,7 +4,7 @@ use Phinx\Migration\AbstractMigration;
 
 class InitialMigration extends AbstractMigration
 {
-    public function up(): void
+    public function change(): void
     {
         $this->table('users', ['id' => false, 'primary_key' => ['id']])
             ->addColumn('id', 'uuid')
@@ -26,11 +26,5 @@ class InitialMigration extends AbstractMigration
             ->addColumn('blog_post_id', 'uuid')
             ->addColumn('contents', 'string')
             ->create();
-    }
-
-    public function down(): void
-    {
-        $this->table('users')->drop()->save();
-        $this->table('comments')->drop()->save();
     }
 }

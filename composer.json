@@ -13,9 +13,11 @@
     "php": "^7.3",
     "api-clients/rx": "^2.2",
     "doctrine/annotations": "^1.6",
+    "moontoast/math": "^1.1",
     "ocramius/generated-hydrator": "^3.0",
     "plasma/core": "^0.2.1 || dev-master",
     "plasma/sql-common": "dev-master",
+    "ramsey/uuid": "^3.8",
     "react/dns": "^0.4.17 || ^1.0.0",
     "roave/better-reflection": "^3.5",
     "voryx/pgasync": "^2.0",
@@ -54,24 +56,18 @@
       "if [ -f ./build/logs/clover.xml ]; then wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --format=php-clover ./build/logs/clover.xml; fi"
     ],
     "cs": [
-      "@ensure-installed",
       "php-cs-fixer fix --config=.php_cs --ansi --dry-run --diff --verbose --allow-risky=yes --show-progress=estimating"
     ],
     "cs-fix": [
-      "@ensure-installed",
       "php-cs-fixer fix --config=.php_cs --ansi --verbose --allow-risky=yes --show-progress=estimating"
     ],
-    "ensure-installed": "composer install --ansi -n -q",
     "infection": [
-      "@ensure-installed",
       "infection --ansi --min-msi=100 --min-covered-msi=100 --threads=4 --log-verbosity=all"
     ],
     "lint-php": [
-      "@ensure-installed",
       "parallel-lint --exclude vendor ."
     ],
     "psalm": [
-      "@ensure-installed",
       "psalm --threads=32"
     ],
     "qa-all": [
@@ -107,15 +103,12 @@
       "@qa-all"
     ],
     "stan": [
-      "@ensure-installed",
       "phpstan analyse src tests --level max --ansi -c phpstan.neon"
     ],
     "unit": [
-      "@ensure-installed",
       "phpunit --colors=always -c phpunit.xml.dist"
     ],
     "unit-coverage": [
-      "@ensure-installed",
       "phpunit --colors=always -c phpunit.xml.dist --coverage-text --coverage-html covHtml --coverage-clover ./build/logs/clover.xml"
     ]
   }

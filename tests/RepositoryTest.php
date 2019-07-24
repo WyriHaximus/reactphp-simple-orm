@@ -34,7 +34,7 @@ final class RepositoryTest extends AsyncTestCase
 
     public function testCount(): void
     {
-        $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
+        $this->client->query(Argument::that(function (QueryBuilder $builder) {
             self::assertCount(0, $builder->getParameters());
             $query = $builder->getQuery();
             self::assertStringContainsString('FROM users', $query);
@@ -62,7 +62,7 @@ final class RepositoryTest extends AsyncTestCase
     {
         $this->client->getRepository(CommentStub::class)->shouldNotBeCalled();
 
-        $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
+        $this->client->query(Argument::that(function (QueryBuilder $builder) {
             self::assertCount(0, $builder->getParameters());
             $query = $builder->getQuery();
             self::assertStringContainsString('blog_posts', $query);
@@ -95,7 +95,7 @@ final class RepositoryTest extends AsyncTestCase
     {
         $this->client->getRepository(CommentStub::class)->shouldNotBeCalled();
 
-        $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
+        $this->client->query(Argument::that(function (QueryBuilder $builder) {
             self::assertCount(1, $builder->getParameters());
             self::assertSame(['98ce9eaf-b38b-4a51-93ed-131ffac4051e'], $builder->getParameters());
             $query = $builder->getQuery();
@@ -161,7 +161,7 @@ final class RepositoryTest extends AsyncTestCase
             new Repository((new EntityInspector(new AnnotationReader()))->getEntity(CommentStub::class), $client)
         );
 
-        $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
+        $this->client->query(Argument::that(function (QueryBuilder $builder) {
             self::assertCount(1, $builder->getParameters());
             self::assertSame(['99d00028-28d6-4194-b377-a0039b278c4d'], $builder->getParameters());
             $query = $builder->getQuery();
@@ -198,7 +198,7 @@ final class RepositoryTest extends AsyncTestCase
                 ],
         ]));
 
-        $this->client->fetch(Argument::that(function (QueryBuilder $builder) {
+        $this->client->query(Argument::that(function (QueryBuilder $builder) {
             self::assertCount(1, $builder->getParameters());
             self::assertSame(['99d00028-28d6-4194-b377-a0039b278c4d'], $builder->getParameters());
             $query = $builder->getQuery();
