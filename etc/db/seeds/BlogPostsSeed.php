@@ -20,7 +20,7 @@ class BlogPostsSeed extends AbstractSeed
                 'publisher_id' => '15f25357-4b3d-4d4d-b6a5-2ceb93864b77',
                 'title' => 'Moar Cats!',
                 'contents' => 'qlqweofu b02qw yu9   dqiwuhe uofq2hep fuoq2pho fp2uhu pu2p 2qpoh weh uwqhfu wqif',
-                'views' => 133,
+                'views' => 166,
             ],
         ];
 

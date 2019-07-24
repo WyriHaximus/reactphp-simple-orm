@@ -78,6 +78,29 @@ final class Repository implements RepositoryInterface
         });
     }
 
+    public function update(EntityInterface $entity): PromiseInterface
+    {
+        $fields = $this->hydrator->extract($this->entity, $entity);
+        foreach ($fields as $key => $value) {
+            if (\is_scalar($value)) {
+                continue;
+            }
+
+            unset($fields[$key]);
+        }
+
+        return $this->client->query(
+            QueryBuilder::create()->
+                update($fields)->
+                into($this->entity->getTable())->
+                where('id', '=', $entity->getId())
+        )->toPromise()->then(function () use ($entity) {
+            return $this->fetch([
+                ['id', '=', $entity->getId()],
+            ])->take(1)->toPromise();
+        });
+    }
+
     private function buildSelectQuery(array $where = [], array $order = []): QueryBuilder
     {
         $query = $this->getBaseQuery();

@@ -93,4 +93,12 @@ class BlogPostStub implements EntityInterface
     {
         return $this->views;
     }
+
+    public function withViews(int $views): self
+    {
+        $clone = clone $this;
+        $clone->views = $views;
+
+        return $clone;
+    }
 }
