@@ -59,6 +59,12 @@ class BlogPostStub implements EntityInterface
     /** @var int */
     protected $views;
 
+    /** @var \DateTimeImmutable */
+    protected $created;
+
+    /** @var \DateTimeImmutable */
+    protected $modified;
+
     public function getId(): string
     {
         return $this->id;
@@ -100,5 +106,15 @@ class BlogPostStub implements EntityInterface
         $clone->views = $views;
 
         return $clone;
+    }
+
+    public function getCreated(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable($this->created);
+    }
+
+    public function getModified(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable($this->modified);
     }
 }
