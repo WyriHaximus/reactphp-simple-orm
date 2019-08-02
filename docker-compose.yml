@@ -9,7 +9,6 @@ services:
       - .env
     volumes:
       - .:/opt/migration
-      - ./.docker/wait-for:/bin/wait-for
     links:
       - postgres
     depends_on:

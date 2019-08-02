@@ -1,5 +1,5 @@
-FROM wyrihaximusnet/php:7.3-zts-alpine3.9-dev AS migration
+FROM wyrihaximusnet/php:7.3-zts-alpine3.10-dev AS migration
 
 WORKDIR /opt/migration
-ENTRYPOINT ["/bin/wait-for", "postgres:5432", "-t", "600", "--"]
+ENTRYPOINT ["wait-for", "postgres:5432", "-t", "600", "--"]
 CMD ["make", "install_db"]
