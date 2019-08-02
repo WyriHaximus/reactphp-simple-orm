@@ -54,7 +54,7 @@ final class EntityInspectorTest extends AsyncTestCase
         self::assertSame('blog_posts', $inspectedEntity->getTable());
 
         $fields = $inspectedEntity->getFields();
-        self::assertCount(6, $fields);
+        self::assertCount(8, $fields);
 
         foreach ([
             'id' => 'string',
@@ -62,6 +62,8 @@ final class EntityInspectorTest extends AsyncTestCase
             'title' => 'string',
             'contents' => 'string',
             'views' => 'int',
+            'created' => '\DateTimeImmutable',
+            'modified' => '\DateTimeImmutable',
         ] as $key => $type) {
             self::assertArrayHasKey($key, $fields, $key);
             self::assertSame($type, $fields[$key]->getType(), $key);

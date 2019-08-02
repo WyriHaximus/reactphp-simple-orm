@@ -251,18 +251,34 @@ final class FunctionalTest extends AsyncTestCase
      */
     public function increaseViews(): void
     {
+        \sleep(3);
+
         $repository = $this->client->getRepository(BlogPostStub::class);
 
-        self::assertSame(
-            167,
-            $this->await(
-                $repository->fetch()->takeLast(1)->toPromise()->then(function (BlogPostStub $blogPost) {
-                    return $blogPost->withViews($blogPost->getViews() + 1);
-                })->then(function (BlogPostStub $blogPost) use ($repository) {
-                    return $repository->update($blogPost);
-                }),
-                $this->loop
-            )->getViews()
+        /** @var BlogPostStub $originalBlogPost */
+        $originalBlogPost = null;
+
+        /** @var int $timestamp */
+        $timestamp = null;
+
+        /** @var BlogPostStub $updatedBlogPost */
+        $updatedBlogPost = $this->await(
+            $repository->fetch()->takeLast(1)->toPromise()->then(function (BlogPostStub $blogPost) use (&$originalBlogPost, &$timestamp) {
+                self::waitUntilTheNextSecond();
+
+                $originalBlogPost = $blogPost;
+                $timestamp = \time();
+
+                return $blogPost->withViews($blogPost->getViews() + 1);
+            })->then(function (BlogPostStub $blogPost) use ($repository) {
+                return $repository->update($blogPost);
+            }),
+            $this->loop
         );
+
+        self::assertSame(167, $updatedBlogPost->getViews());
+        self::assertSame($originalBlogPost->getCreated()->format('U'), $updatedBlogPost->getCreated()->format('U'));
+        self::assertGreaterThan($originalBlogPost->getModified(), $updatedBlogPost->getModified());
+        self::assertSame($timestamp, (int)$updatedBlogPost->getModified()->format('U'));
     }
 }

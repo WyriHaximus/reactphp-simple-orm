@@ -10,6 +10,8 @@ use Rx\Scheduler\ImmediateScheduler;
 
 final class Repository implements RepositoryInterface
 {
+    private const SINGLE = 1;
+
     /** @var InspectedEntity */
     private $entity;
 
@@ -45,7 +47,7 @@ final class Repository implements RepositoryInterface
             QueryBuilder::create()->from($this->entity->getTable())->select([
                 'COUNT(*) AS count',
             ])
-        )->take(1)->toPromise()->then(function (array $row): int {
+        )->take(self::SINGLE)->toPromise()->then(function (array $row): int {
             return (int)$row['count'];
         });
     }
@@ -69,7 +71,11 @@ final class Repository implements RepositoryInterface
 
     public function create(array $fields): PromiseInterface
     {
-        $fields['id'] = Uuid::getFactory()->uuid4();
+        $fields['id'] = Uuid::getFactory()->uuid4()->toString();
+        $fields['created'] = new \DateTimeImmutable();
+        $fields['modified'] = new \DateTimeImmutable();
+
+        $fields = $this->prepareFields($fields);
 
         return $this->client->query(
             QueryBuilder::create()->insert($fields)->into($this->entity->getTable())->returning()
@@ -81,13 +87,9 @@ final class Repository implements RepositoryInterface
     public function update(EntityInterface $entity): PromiseInterface
     {
         $fields = $this->hydrator->extract($this->entity, $entity);
-        foreach ($fields as $key => $value) {
-            if (\is_scalar($value)) {
-                continue;
-            }
+        $fields['modified'] = new \DateTimeImmutable();
 
-            unset($fields[$key]);
-        }
+        $fields = $this->prepareFields($fields);
 
         return $this->client->query(
             QueryBuilder::create()->
@@ -97,7 +99,7 @@ final class Repository implements RepositoryInterface
         )->toPromise()->then(function () use ($entity) {
             return $this->fetch([
                 ['id', '=', $entity->getId()],
-            ])->take(1)->toPromise();
+            ])->take(self::SINGLE)->toPromise();
         });
     }
 
@@ -248,5 +250,22 @@ final class Repository implements RepositoryInterface
     private function translateFieldName(string $name): string
     {
         return 't0.' . $name;
+    }
+
+    private function prepareFields(array $fields): array
+    {
+        foreach ($fields as $key => $value) {
+            if ($value instanceof \DateTimeInterface) {
+                $fields[$key] = $value = $value->format('Y-m-d H:i:s');
+            }
+
+            if (\is_scalar($value)) {
+                continue;
+            }
+
+            unset($fields[$key]);
+        }
+
+        return $fields;
     }
 }

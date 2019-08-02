@@ -13,6 +13,8 @@ class BlogPostsSeed extends AbstractSeed
                 'title' => 'Cats!',
                 'contents' => 'qliwuhe uofq2hep fuoq2pho fp2uhu pu2p 2qpoh weh uwqhfu wqif',
                 'views' => 133,
+                'created' => (new DateTimeImmutable())->format('Y-m-d H:i:s'),
+                'modified' => (new DateTimeImmutable())->format('Y-m-d H:i:s'),
             ],
             [
                 'id' => '090fa83b-5c5a-4042-9f05-58d9ab649a1a',
@@ -21,6 +23,8 @@ class BlogPostsSeed extends AbstractSeed
                 'title' => 'Moar Cats!',
                 'contents' => 'qlqweofu b02qw yu9   dqiwuhe uofq2hep fuoq2pho fp2uhu pu2p 2qpoh weh uwqhfu wqif',
                 'views' => 166,
+                'created' => (new DateTimeImmutable())->format('Y-m-d H:i:s'),
+                'modified' => (new DateTimeImmutable())->format('Y-m-d H:i:s'),
             ],
         ];
 
