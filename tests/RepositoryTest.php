@@ -218,31 +218,55 @@ final class RepositoryTest extends AsyncTestCase
         }))->shouldBeCalled()->willReturn(observableFromArray([
                 [
                     't0___id' => '99d00028-28d6-4194-b377-a0039b278c4d',
-                    't0___title' => 'blog_post_title',
+                    't0___blog_post_id' => '99d00028-28d6-4194-b377-a0039b278c4d',
                     't0___contents' => 'comment contents',
                     't1___id' => 'd45e8a1b-b962-4c1b-a7e7-c867fa06ffa7',
                     't1___name' => 'author_name',
+                    't2___id' => '99d00028-28d6-4194-b377-a0039b278c4d',
+                    't2___title' => 'blog_post_title',
+                    't3___id' => '3fbf8eec-8a3f-4b01-ba9a-355f6650644b',
+                    't3___name' => 'author_name',
+                    't4___id' => 'd45e8a1b-b962-4c1b-a7e7-c867fa06ffa7',
+                    't4___name' => 'publisher_name',
                 ],
                 [
                     't0___id' => 'fa41900d-4f62-4037-9eb3-8cfb4b90eeef',
-                    't0___title' => 'blog_post_title',
+                    't0___blog_post_id' => '99d00028-28d6-4194-b377-a0039b278c4d',
                     't0___contents' => 'comment contents',
                     't1___id' => '0da49bee-ab27-4b24-a949-7b71a0b0449a',
                     't1___name' => 'author_name',
+                    't2___id' => '99d00028-28d6-4194-b377-a0039b278c4d',
+                    't2___title' => 'blog_post_title',
+                    't3___id' => '3fbf8eec-8a3f-4b01-ba9a-355f6650644b',
+                    't3___name' => 'author_name',
+                    't4___id' => 'd45e8a1b-b962-4c1b-a7e7-c867fa06ffa7',
+                    't4___name' => 'publisher_name',
                 ],
                 [
                     't0___id' => '83f451cb-4b20-41b5-a8be-637af0bf1284',
-                    't0___title' => 'blog_post_title',
+                    't0___blog_post_id' => '99d00028-28d6-4194-b377-a0039b278c4d',
                     't0___contents' => 'comment contents',
                     't1___id' => '3fbf8eec-8a3f-4b01-ba9a-355f6650644b',
                     't1___name' => 'author_name',
+                    't2___id' => '99d00028-28d6-4194-b377-a0039b278c4d',
+                    't2___title' => 'blog_post_title',
+                    't3___id' => '3fbf8eec-8a3f-4b01-ba9a-355f6650644b',
+                    't3___name' => 'author_name',
+                    't4___id' => 'd45e8a1b-b962-4c1b-a7e7-c867fa06ffa7',
+                    't4___name' => 'publisher_name',
                 ],
                 [
                     't0___id' => '590d4a9d-afb2-4860-a746-b0a086554064',
-                    't0___title' => 'blog_post_title',
+                    't0___blog_post_id' => '99d00028-28d6-4194-b377-a0039b278c4d',
                     't0___contents' => 'comment contents',
                     't1___id' => '0da49bee-ab27-4b24-a949-7b71a0b0449a',
                     't1___name' => 'author_name',
+                    't2___id' => '99d00028-28d6-4194-b377-a0039b278c4d',
+                    't2___title' => 'blog_post_title',
+                    't3___id' => '3fbf8eec-8a3f-4b01-ba9a-355f6650644b',
+                    't3___name' => 'author_name',
+                    't4___id' => 'd45e8a1b-b962-4c1b-a7e7-c867fa06ffa7',
+                    't4___name' => 'publisher_name',
                 ],
         ]));
 
@@ -270,14 +294,22 @@ final class RepositoryTest extends AsyncTestCase
 
         self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[0]->getId());
         self::assertSame('d45e8a1b-b962-4c1b-a7e7-c867fa06ffa7', $comments[0]->getAuthor()->getId());
+        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[0]->getBlogPost()->getId());
+        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[0]->getBlogPost()->getAuthor()->getId());
 
         self::assertSame('fa41900d-4f62-4037-9eb3-8cfb4b90eeef', $comments[1]->getId());
         self::assertSame('0da49bee-ab27-4b24-a949-7b71a0b0449a', $comments[1]->getAuthor()->getId());
+        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[1]->getBlogPost()->getId());
+        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[1]->getBlogPost()->getAuthor()->getId());
 
         self::assertSame('83f451cb-4b20-41b5-a8be-637af0bf1284', $comments[2]->getId());
         self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[2]->getAuthor()->getId());
+        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[2]->getBlogPost()->getId());
+        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[2]->getBlogPost()->getAuthor()->getId());
 
         self::assertSame('590d4a9d-afb2-4860-a746-b0a086554064', $comments[3]->getId());
         self::assertSame('0da49bee-ab27-4b24-a949-7b71a0b0449a', $comments[3]->getAuthor()->getId());
+        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[3]->getBlogPost()->getId());
+        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[3]->getBlogPost()->getAuthor()->getId());
     }
 }
