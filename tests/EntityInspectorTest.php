@@ -89,6 +89,7 @@ final class EntityInspectorTest extends AsyncTestCase
 
         self::assertArrayHasKey('author', $joins['comments']->getEntity()->getJoins());
         self::assertSame(UserStub::class, $joins['comments']->getEntity()->getJoins()['author']->getEntity()->getClass());
+        self::assertCount(2, $joins['comments']->getEntity()->getJoins()['author']->getEntity()->getFields());
         self::assertSame('author_id', $joins['comments']->getEntity()->getJoins()['author']->getLocalKey());
         self::assertNull($joins['comments']->getEntity()->getJoins()['author']->getLocalCast());
         self::assertSame('id', $joins['comments']->getEntity()->getJoins()['author']->getForeignKey());

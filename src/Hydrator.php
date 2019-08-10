@@ -11,7 +11,7 @@ final class Hydrator
     /** @var string[] */
     private $hydrators = [];
 
-    public function hydrate(InspectedEntity $inspectedEntity, array $data): EntityInterface
+    public function hydrate(InspectedEntityInterface $inspectedEntity, array $data): EntityInterface
     {
         $class = $inspectedEntity->getClass();
         if (!isset($this->hydrators[$class])) {
@@ -49,7 +49,7 @@ final class Hydrator
         return $this->hydrators[$class]->hydrate($data, new $class());
     }
 
-    public function extract(InspectedEntity $inspectedEntity, EntityInterface $entity): array
+    public function extract(InspectedEntityInterface $inspectedEntity, EntityInterface $entity): array
     {
         $class = $inspectedEntity->getClass();
         /** @var HydratorInterface $hydrator */

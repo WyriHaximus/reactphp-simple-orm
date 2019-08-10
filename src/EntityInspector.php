@@ -17,7 +17,7 @@ final class EntityInspector
     /** @var Reader */
     private $annotationReader;
 
-    /** @var InspectedEntity[] */
+    /** @var InspectedEntityInterface[] */
     private $entities = [];
 
     public function __construct(Reader $annotationReader)
@@ -25,7 +25,7 @@ final class EntityInspector
         $this->annotationReader = $annotationReader;
     }
 
-    public function getEntity(string $entity): InspectedEntity
+    public function getEntity(string $entity): InspectedEntityInterface
     {
         if (!isset($this->entities[$entity])) {
             /** @psalm-suppress ArgumentTypeCoercion */
@@ -77,7 +77,7 @@ final class EntityInspector
             }
 
             yield $annotation->getProperty() => new Join(
-                $this->getEntity($annotation->getEntity()),
+                new LazyInspectedEntity($this, $annotation->getEntity()),
                 $annotation->getType(),
                 $annotation->getLocalKey(),
                 $annotation->getLocalCast(),

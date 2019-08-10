@@ -2,11 +2,11 @@
 
 namespace WyriHaximus\React\SimpleORM\Entity;
 
-use WyriHaximus\React\SimpleORM\InspectedEntity;
+use WyriHaximus\React\SimpleORM\InspectedEntityInterface;
 
 final class Join
 {
-    /** @var InspectedEntity */
+    /** @var InspectedEntityInterface */
     private $entity;
 
     /** @var string */
@@ -27,7 +27,7 @@ final class Join
     /** @var string */
     private $property;
 
-    public function __construct(InspectedEntity $entity, string $type, string $localKey, ?string $localCast, string $foreignKey, ?string $foreignCast, string $property)
+    public function __construct(InspectedEntityInterface $entity, string $type, string $localKey, ?string $localCast, string $foreignKey, ?string $foreignCast, string $property)
     {
         $this->entity = $entity;
         $this->type = $type;
@@ -38,7 +38,7 @@ final class Join
         $this->property = $property;
     }
 
-    public function getEntity(): InspectedEntity
+    public function getEntity(): InspectedEntityInterface
     {
         return $this->entity;
     }
