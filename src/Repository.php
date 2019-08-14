@@ -4,6 +4,7 @@ namespace WyriHaximus\React\SimpleORM;
 
 use Plasma\SQL\QueryBuilder;
 use Ramsey\Uuid\Uuid;
+use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
@@ -155,6 +156,10 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
+            if ($join->getType() === 'inner' && $entity->getClass() === $join->getEntity()->getClass()) {
+                continue;
+            }
+
             $tableKey = \spl_object_hash($join->getEntity()) . '___' . $join->getProperty();
             if (!isset($this->tableAliases[$tableKey])) {
                 $this->tableAliases[$tableKey] = 't' . $i++;
@@ -225,8 +230,36 @@ final class Repository implements RepositoryInterface
         $tree = $row[$this->tableAliases[$tableKey]];
 
         foreach ($entity->getJoins() as $join) {
-            if ($join->getType() === 'inner') {
+            if ($join->getType() === 'inner' && $entity->getClass() !== $join->getEntity()->getClass()) {
                 $tree[$join->getProperty()] = $this->buildTree($row, $join->getEntity(), $join->getProperty());
+
+                continue;
+            }
+
+            if ($join->getType() === 'inner' && $entity->getClass() === $join->getEntity()->getClass()) {
+                $tree[$join->getProperty()] = new Promise(function (callable $resolve, callable $reject) use ($row, $join, $tableKey): void {
+                    if ($row[$this->tableAliases[$tableKey]][$join->getLocalKey()] === null) {
+                        $resolve(null);
+
+                        return;
+                    }
+
+                    $where = [];
+
+                    $where[] = [
+                            $join->getForeignKey(),
+                            '=',
+                            $row[$this->tableAliases[$tableKey]][$join->getLocalKey()],
+                        ];
+
+                    $this->client
+                             ->getRepository($join->getEntity()
+                             ->getClass())
+                             ->fetch($where)
+                             ->take(1)
+                             ->toPromise()
+                             ->then($resolve, $reject);
+                });
 
                 continue;
             }

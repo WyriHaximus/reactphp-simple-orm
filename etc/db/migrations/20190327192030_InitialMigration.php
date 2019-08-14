@@ -15,6 +15,8 @@ class InitialMigration extends AbstractMigration
 
         $this->table('blog_posts', ['id' => false, 'primary_key' => ['id']])
             ->addColumn('id', 'uuid')
+            ->addColumn('previous_blog_post_id', 'uuid', ['null' => true])
+            ->addColumn('next_blog_post_id', 'uuid', ['null' => true])
             ->addColumn('author_id', 'uuid')
             ->addColumn('publisher_id', 'uuid')
             ->addColumn('title', 'string')

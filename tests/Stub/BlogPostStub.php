@@ -2,6 +2,7 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
+use React\Promise\PromiseInterface;
 use Rx\Observable;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
@@ -29,11 +30,35 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
         foreign_key="id",
         property="publisher"
  * )
+ * @InnerJoin(
+        entity=BlogPostStub::class,
+        local_key="previous_blog_post_id",
+        foreign_key="id",
+        property="previous_blog_post"
+ * )
+ * @InnerJoin(
+        entity=BlogPostStub::class,
+        local_key="next_blog_post_id",
+        foreign_key="id",
+        property="next_blog_post"
+ * )
  */
 class BlogPostStub implements EntityInterface
 {
     /** @var string */
     protected $id;
+
+    /** @var string|null */
+    protected $previous_blog_post_id;
+
+    /** @var PromiseInterface */
+    protected $previous_blog_post;
+
+    /** @var string|null */
+    protected $next_blog_post_id;
+
+    /** @var PromiseInterface */
+    protected $next_blog_post;
 
     /** @var string */
     protected $author_id;
@@ -68,6 +93,16 @@ class BlogPostStub implements EntityInterface
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function getPreviousBlogPost(): PromiseInterface
+    {
+        return $this->previous_blog_post;
+    }
+
+    public function getNextBlogPost(): PromiseInterface
+    {
+        return $this->next_blog_post;
     }
 
     public function getAuthor(): UserStub
