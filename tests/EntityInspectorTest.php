@@ -54,10 +54,12 @@ final class EntityInspectorTest extends AsyncTestCase
         self::assertSame('blog_posts', $inspectedEntity->getTable());
 
         $fields = $inspectedEntity->getFields();
-        self::assertCount(8, $fields);
+        self::assertCount(10, $fields);
 
         foreach ([
             'id' => 'string',
+            'previous_blog_post_id' => 'string',
+            'next_blog_post_id' => 'string',
             'author_id' => 'string',
             'title' => 'string',
             'contents' => 'string',
@@ -70,7 +72,7 @@ final class EntityInspectorTest extends AsyncTestCase
         }
 
         $joins = $inspectedEntity->getJoins();
-        self::assertCount(3, $joins);
+        self::assertCount(5, $joins);
 
         self::assertArrayHasKey('author', $joins);
         self::assertSame(UserStub::class, $joins['author']->getEntity()->getClass());

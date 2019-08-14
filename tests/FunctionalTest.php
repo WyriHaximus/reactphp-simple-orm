@@ -230,6 +230,44 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
+    public function secondBlogPostPreviousBlogPostAuthorId(): void
+    {
+        self::assertSame(
+            'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
+            $this->await(
+                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
+                    return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
+                })->toPromise()->then(function (BlogPostStub $blogPost) {
+                    return $blogPost->getPreviousBlogPost();
+                })->then(function (BlogPostStub $blogPost) {
+                    return $blogPost->getAuthor()->getId();
+                }),
+                $this->loop
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function secondBlogPostNextBlogPostResolvesToNull(): void
+    {
+        self::assertSame(
+            null,
+            $this->await(
+                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
+                    return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
+                })->toPromise()->then(function (BlogPostStub $blogPost) {
+                    return $blogPost->getNextBlogPost();
+                }),
+                $this->loop
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
     public function createUser(): void
     {
         $name = 'Commander Fuzzy paws';

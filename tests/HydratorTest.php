@@ -4,6 +4,7 @@ namespace WyriHaximus\React\Tests\SimpleORM;
 
 use function ApiClients\Tools\Rx\observableFromArray;
 use Doctrine\Common\Annotations\AnnotationReader;
+use function React\Promise\resolve;
 use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\SimpleORM\Hydrator;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
@@ -47,6 +48,8 @@ final class HydratorTest extends TestCase
             (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
             [
                 'id' => $id,
+                'previous_blog_post' => resolve(null),
+                'next_blog_post' => resolve(null),
                 'title' => $title,
                 'author' => [
                     'id' => $authorId,
