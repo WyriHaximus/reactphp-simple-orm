@@ -165,27 +165,35 @@ final class Repository implements RepositoryInterface
                 $this->tableAliases[$tableKey] = 't' . $i++;
             }
 
-            $foreignTable = $join->getEntity()->getTable();
-            $onLeftSide = $this->tableAliases[$tableKey] . '.' . $join->getForeignKey();
-            if ($join->getForeignCast() !== null) {
-                /** @psalm-suppress PossiblyNullOperand */
-                $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $join->getForeignCast() . ')';
-            }
-
-            $onRightSide =
-                $this->tableAliases[\spl_object_hash($entity) . '___' . $rootProperty] . '.' . $join->getLocalKey();
-            if ($join->getLocalCast() !== null) {
-                /** @psalm-suppress PossiblyNullOperand */
-                $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $join->getLocalCast() . ')';
-            }
-
             $query = $query->innerJoin(
-                $foreignTable,
+                $join->getEntity()->getTable(),
                 $this->tableAliases[$tableKey]
-            )->on(
-                $onLeftSide,
-                $onRightSide
             );
+
+            foreach ($join->getClause() as $clause) {
+                $onLeftSide = $this->tableAliases[$tableKey] . '.' . $clause->getForeignKey();
+                if ($clause->getForeignFunction() !== null) {
+                    /** @psalm-suppress PossiblyNullOperand */
+                    $onLeftSide = $clause->getForeignFunction() . '(' . $onLeftSide . ')';
+                }
+                if ($clause->getForeignCast() !== null) {
+                    /** @psalm-suppress PossiblyNullOperand */
+                    $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $clause->getForeignCast() . ')';
+                }
+
+                $onRightSide =
+                    $this->tableAliases[\spl_object_hash($entity) . '___' . $rootProperty] . '.' . $clause->getLocalKey();
+                if ($clause->getLocalFunction() !== null) {
+                    /** @psalm-suppress PossiblyNullOperand */
+                    $onRightSide = $clause->getLocalFunction() . '(' . $onRightSide . ')';
+                }
+                if ($clause->getLocalCast() !== null) {
+                    /** @psalm-suppress PossiblyNullOperand */
+                    $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $clause->getLocalCast() . ')';
+                }
+
+                $query = $query->on($onLeftSide, $onRightSide);
+            }
 
             foreach ($join->getEntity()->getFields() as $field) {
                 $this->fields[$this->tableAliases[$tableKey] . '___' . $field->getName()] = $this->tableAliases[$tableKey] . '.' . $field->getName();
@@ -238,19 +246,23 @@ final class Repository implements RepositoryInterface
 
             if ($join->getType() === 'inner' && $entity->getClass() === $join->getEntity()->getClass()) {
                 $tree[$join->getProperty()] = new Promise(function (callable $resolve, callable $reject) use ($row, $join, $tableKey): void {
-                    if ($row[$this->tableAliases[$tableKey]][$join->getLocalKey()] === null) {
-                        $resolve(null);
+                    foreach ($join->getClause() as $clause) {
+                        if ($row[$this->tableAliases[$tableKey]][$clause->getLocalKey()] === null) {
+                            $resolve(null);
 
-                        return;
+                            return;
+                        }
                     }
 
                     $where = [];
 
-                    $where[] = [
-                            $join->getForeignKey(),
+                    foreach ($join->getClause() as $clause) {
+                        $where[] = [
+                            $clause->getForeignKey(),
                             '=',
-                            $row[$this->tableAliases[$tableKey]][$join->getLocalKey()],
+                            $row[$this->tableAliases[$tableKey]][$clause->getLocalKey()],
                         ];
+                    }
 
                     $this->client
                              ->getRepository($join->getEntity()
@@ -268,11 +280,13 @@ final class Repository implements RepositoryInterface
                 function () use ($row, $join, $tableKey) {
                     $where = [];
 
-                    $where[] = [
-                        $join->getForeignKey(),
-                        '=',
-                        $row[$this->tableAliases[$tableKey]][$join->getLocalKey()],
-                    ];
+                    foreach ($join->getClause() as $clause) {
+                        $where[] = [
+                            $clause->getForeignKey(),
+                            '=',
+                            $row[$this->tableAliases[$tableKey]][$clause->getLocalKey()],
+                        ];
+                    }
 
                     return $this->client->getRepository($join->getEntity()->getClass())->fetch($where);
                 },

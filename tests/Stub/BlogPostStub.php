@@ -4,6 +4,7 @@ namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
 use React\Promise\PromiseInterface;
 use Rx\Observable;
+use WyriHaximus\React\SimpleORM\Annotation\Clause;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
@@ -13,33 +14,53 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
  * @Table("blog_posts")
  * @LeftJoin(
         entity=CommentStub::class,
-        local_key="id",
-        local_cast="BIGINT",
-        foreign_key="blog_post_id",
+        clause={
+            @Clause(
+                local_key="id",
+                local_cast="BIGINT",
+                foreign_key="blog_post_id",
+            )
+        },
         property="comments"
  * )
  * @InnerJoin(
         entity=UserStub::class,
-        local_key="author_id",
-        foreign_key="id",
+        clause={
+            @Clause(
+                local_key="author_id",
+                foreign_key="id",
+            )
+        },
         property="author"
  * )
  * @InnerJoin(
         entity=UserStub::class,
-        local_key="publisher_id",
-        foreign_key="id",
+        clause={
+            @Clause(
+                local_key="publisher_id",
+                foreign_key="id",
+            )
+        },
         property="publisher"
  * )
  * @InnerJoin(
         entity=BlogPostStub::class,
-        local_key="previous_blog_post_id",
-        foreign_key="id",
+        clause={
+            @Clause(
+                local_key="previous_blog_post_id",
+                foreign_key="id",
+           )
+        },
         property="previous_blog_post"
  * )
  * @InnerJoin(
         entity=BlogPostStub::class,
-        local_key="next_blog_post_id",
-        foreign_key="id",
+        clause={
+            @Clause(
+                local_key="next_blog_post_id",
+                foreign_key="id",
+            )
+        },
         property="next_blog_post"
  * )
  */

@@ -79,11 +79,8 @@ final class EntityInspector
             yield $annotation->getProperty() => new Join(
                 new LazyInspectedEntity($this, $annotation->getEntity()),
                 $annotation->getType(),
-                $annotation->getLocalKey(),
-                $annotation->getLocalCast(),
-                $annotation->getForeignKey(),
-                $annotation->getForeignCast(),
-                $annotation->getProperty()
+                $annotation->getProperty(),
+                ...$annotation->getClause()
             );
         }
     }

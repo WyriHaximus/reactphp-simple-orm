@@ -2,6 +2,7 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
+use WyriHaximus\React\SimpleORM\Annotation\Clause;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\EntityInterface;
@@ -10,14 +11,22 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
  * @Table("comments")
  * @InnerJoin(
         entity=UserStub::class,
-        local_key="author_id",
-        foreign_key="id",
+        clause={
+            @Clause(
+                local_key="author_id",
+                foreign_key="id",
+            )
+        },
         property="author"
  * )
  * @InnerJoin(
         entity=BlogPostStub::class,
-        local_key="blog_post_id",
-        foreign_key="id",
+        clause={
+            @Clause(
+                local_key="blog_post_id",
+                foreign_key="id",
+            )
+        },
         property="blog_post"
  * )
  */

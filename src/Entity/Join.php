@@ -2,6 +2,7 @@
 
 namespace WyriHaximus\React\SimpleORM\Entity;
 
+use WyriHaximus\React\SimpleORM\Annotation\Clause;
 use WyriHaximus\React\SimpleORM\InspectedEntityInterface;
 
 final class Join
@@ -13,29 +14,17 @@ final class Join
     private $type;
 
     /** @var string */
-    private $localKey;
-
-    /** @var string|null */
-    private $localCast;
-
-    /** @var string */
-    private $foreignKey;
-
-    /** @var string|null */
-    private $foreignCast;
-
-    /** @var string */
     private $property;
 
-    public function __construct(InspectedEntityInterface $entity, string $type, string $localKey, ?string $localCast, string $foreignKey, ?string $foreignCast, string $property)
+    /** @var Clause[] */
+    private $clause;
+
+    public function __construct(InspectedEntityInterface $entity, string $type, string $property, Clause ...$clause)
     {
         $this->entity = $entity;
         $this->type = $type;
-        $this->localKey = $localKey;
-        $this->localCast = $localCast;
-        $this->foreignKey = $foreignKey;
-        $this->foreignCast = $foreignCast;
         $this->property = $property;
+        $this->clause = $clause;
     }
 
     public function getEntity(): InspectedEntityInterface
@@ -48,28 +37,16 @@ final class Join
         return $this->type;
     }
 
-    public function getLocalKey(): string
-    {
-        return $this->localKey;
-    }
-
-    public function getLocalCast(): ?string
-    {
-        return $this->localCast;
-    }
-
-    public function getForeignKey(): string
-    {
-        return $this->foreignKey;
-    }
-
-    public function getForeignCast(): ?string
-    {
-        return $this->foreignCast;
-    }
-
     public function getProperty(): string
     {
         return $this->property;
+    }
+
+    /**
+     * @return Clause[]
+     */
+    public function getClause(): array
+    {
+        return $this->clause;
     }
 }
