@@ -14,17 +14,8 @@ final class LeftJoin implements JoinInterface
     /** @var string */
     private $entity;
 
-    /** @var string */
-    private $local_key;
-
-    /** @var string */
-    private $local_cast;
-
-    /** @var string */
-    private $foreign_key;
-
-    /** @var string */
-    private $foreign_cast;
+    /** @var Clause[] */
+    private $clause;
 
     /** @var string */
     private $property;
@@ -49,28 +40,16 @@ final class LeftJoin implements JoinInterface
         return 'left';
     }
 
-    public function getLocalKey(): string
+    /**
+     * @return Clause[]
+     */
+    public function getClause(): array
     {
-        return $this->local_key;
-    }
-
-    public function getForeignKey(): string
-    {
-        return $this->foreign_key;
+        return $this->clause;
     }
 
     public function getProperty(): string
     {
         return $this->property;
-    }
-
-    public function getLocalCast(): ?string
-    {
-        return $this->local_cast;
-    }
-
-    public function getForeignCast(): ?string
-    {
-        return $this->foreign_cast;
     }
 }

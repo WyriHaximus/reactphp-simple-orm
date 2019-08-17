@@ -8,13 +8,10 @@ interface JoinInterface
 
     public function getType(): string;
 
-    public function getLocalKey(): string;
-
-    public function getForeignKey(): string;
-
     public function getProperty(): string;
 
-    public function getLocalCast(): ?string;
-
-    public function getForeignCast(): ?string;
+    /**
+     * @return Clause[]
+     */
+    public function getClause(): array;
 }
