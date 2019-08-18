@@ -80,6 +80,7 @@ final class EntityInspector
                 new LazyInspectedEntity($this, $annotation->getEntity()),
                 $annotation->getType(),
                 $annotation->getProperty(),
+                $annotation->getLazy(),
                 ...$annotation->getClause()
             );
         }

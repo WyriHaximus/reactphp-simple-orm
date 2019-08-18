@@ -21,7 +21,8 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
                 foreign_key="blog_post_id",
             )
         },
-        property="comments"
+        property="comments",
+        lazy=LeftJoin::IS_LAZY
  * )
  * @InnerJoin(
         entity=UserStub::class,
@@ -31,7 +32,8 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
                 foreign_key="id",
             )
         },
-        property="author"
+        property="author",
+        lazy=InnerJoin::IS_NOT_LAZY
  * )
  * @InnerJoin(
         entity=UserStub::class,
@@ -41,7 +43,8 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
                 foreign_key="id",
             )
         },
-        property="publisher"
+        property="publisher",
+        lazy=InnerJoin::IS_NOT_LAZY
  * )
  * @InnerJoin(
         entity=BlogPostStub::class,
@@ -51,7 +54,8 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
                 foreign_key="id",
            )
         },
-        property="previous_blog_post"
+        property="previous_blog_post",
+        lazy=InnerJoin::IS_LAZY
  * )
  * @InnerJoin(
         entity=BlogPostStub::class,
@@ -61,7 +65,8 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
                 foreign_key="id",
             )
         },
-        property="next_blog_post"
+        property="next_blog_post",
+       lazy=InnerJoin::IS_NOT_LAZY
  * )
  */
 class BlogPostStub implements EntityInterface

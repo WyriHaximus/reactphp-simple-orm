@@ -8,6 +8,7 @@ use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
+use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
 
 final class Repository implements RepositoryInterface
 {
@@ -156,6 +157,10 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
+            if ($join->getLazy() === JoinInterface::IS_LAZY) {
+                continue;
+            }
+
             if ($join->getType() === 'inner' && $entity->getClass() === $join->getEntity()->getClass()) {
                 continue;
             }
@@ -238,13 +243,13 @@ final class Repository implements RepositoryInterface
         $tree = $row[$this->tableAliases[$tableKey]];
 
         foreach ($entity->getJoins() as $join) {
-            if ($join->getType() === 'inner' && $entity->getClass() !== $join->getEntity()->getClass()) {
+            if ($join->getType() === 'inner' && $entity->getClass() !== $join->getEntity()->getClass() && $join->getLazy() === false) {
                 $tree[$join->getProperty()] = $this->buildTree($row, $join->getEntity(), $join->getProperty());
 
                 continue;
             }
 
-            if ($join->getType() === 'inner' && $entity->getClass() === $join->getEntity()->getClass()) {
+            if ($join->getType() === 'inner' && ($join->getLazy() === JoinInterface::IS_LAZY || $entity->getClass() === $join->getEntity()->getClass())) {
                 $tree[$join->getProperty()] = new Promise(function (callable $resolve, callable $reject) use ($row, $join, $tableKey): void {
                     foreach ($join->getClause() as $clause) {
                         if ($row[$this->tableAliases[$tableKey]][$clause->getLocalKey()] === null) {

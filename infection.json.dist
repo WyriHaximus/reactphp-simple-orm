@@ -22,12 +22,18 @@
          },
          "IncrementInteger": {
              "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::count"
+                 "WyriHaximus\\React\\SimpleORM\\Repository::count",
+                 "WyriHaximus\\React\\SimpleORM\\Repository::buildTree"
              ]
          },
          "OneZeroInteger": {
              "ignore": [
                  "WyriHaximus\\React\\SimpleORM\\Repository::count"
+             ]
+         },
+         "Foreach_": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Repository::buildTree"
              ]
          }
      }

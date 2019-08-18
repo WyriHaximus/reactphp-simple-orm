@@ -20,6 +20,9 @@ final class InnerJoin implements JoinInterface
     /** @var string */
     private $property;
 
+    /** @var bool */
+    private $lazy = self::IS_NOT_LAZY;
+
     public function __construct(array $table)
     {
         /** @psalm-suppress RawObjectIteration */
@@ -38,6 +41,11 @@ final class InnerJoin implements JoinInterface
     public function getType(): string
     {
         return 'inner';
+    }
+
+    public function getLazy(): bool
+    {
+        return $this->lazy;
     }
 
     /**
