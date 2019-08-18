@@ -16,14 +16,18 @@ final class Join
     /** @var string */
     private $property;
 
+    /** @var bool */
+    private $lazy;
+
     /** @var Clause[] */
     private $clause;
 
-    public function __construct(InspectedEntityInterface $entity, string $type, string $property, Clause ...$clause)
+    public function __construct(InspectedEntityInterface $entity, string $type, string $property, bool $lazy, Clause ...$clause)
     {
         $this->entity = $entity;
         $this->type = $type;
         $this->property = $property;
+        $this->lazy = $lazy;
         $this->clause = $clause;
     }
 
@@ -40,6 +44,11 @@ final class Join
     public function getProperty(): string
     {
         return $this->property;
+    }
+
+    public function getLazy(): bool
+    {
+        return $this->lazy;
     }
 
     /**

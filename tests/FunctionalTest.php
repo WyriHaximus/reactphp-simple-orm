@@ -167,6 +167,38 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
+    public function firstBlogPostNextBlogPostResolvesToBlogPost(): void
+    {
+        self::assertInstanceOf(
+            BlogPostStub::class,
+            $this->await(
+                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                    return $blogPost->getNextBlogPost();
+                }),
+                $this->loop
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function firstBlogPostPreviousBlogPostResolvesToNull(): void
+    {
+        self::assertSame(
+            null,
+            $this->await(
+                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                    return $blogPost->getPreviousBlogPost();
+                }),
+                $this->loop
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
     public function secondBlogPostCommentCount(): void
     {
         self::assertCount(
