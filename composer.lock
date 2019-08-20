@@ -1561,13 +1561,13 @@
             "authors": [
                 {
                     "name": "Matt Bonneau",
-                    "email": "matt@bonneau.net",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "matt@bonneau.net"
                 },
                 {
                     "name": "David Dan",
-                    "email": "davidwdan@gmail.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "davidwdan@gmail.com"
                 }
             ],
             "description": "Global static wrapper for react event-loop",
@@ -1582,16 +1582,16 @@
         },
         {
             "name": "voryx/pgasync",
-            "version": "2.0.3",
+            "version": "2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voryx/PgAsync.git",
-                "reference": "eefc2abd2dceaa766854d11c5b3e4714a64925af"
+                "reference": "61658fed8c897c3c9ba218847851c3b6afa224a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voryx/PgAsync/zipball/eefc2abd2dceaa766854d11c5b3e4714a64925af",
-                "reference": "eefc2abd2dceaa766854d11c5b3e4714a64925af",
+                "url": "https://api.github.com/repos/voryx/PgAsync/zipball/61658fed8c897c3c9ba218847851c3b6afa224a5",
+                "reference": "61658fed8c897c3c9ba218847851c3b6afa224a5",
                 "shasum": ""
             },
             "require": {
@@ -1637,7 +1637,7 @@
                 "reactive",
                 "rx.php"
             ],
-            "time": "2019-07-14T21:21:37+00:00"
+            "time": "2019-08-19T20:34:34+00:00"
         },
         {
             "name": "webmozart/assert",
