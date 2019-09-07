@@ -3,6 +3,7 @@
 namespace WyriHaximus\React\SimpleORM;
 
 use Plasma\SQL\QueryBuilder;
+use Plasma\SQL\QueryExpressions\Fragment;
 use Ramsey\Uuid\Uuid;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
@@ -73,7 +74,8 @@ final class Repository implements RepositoryInterface
 
     public function create(array $fields): PromiseInterface
     {
-        $fields['id'] = Uuid::getFactory()->uuid4()->toString();
+        $id = Uuid::getFactory()->uuid4()->toString();
+        $fields['id'] = $id;
         $fields['created'] = new \DateTimeImmutable();
         $fields['modified'] = new \DateTimeImmutable();
 
@@ -81,8 +83,14 @@ final class Repository implements RepositoryInterface
 
         return $this->client->query(
             QueryBuilder::create()->insert($fields)->into($this->entity->getTable())->returning()
-        )->toPromise()->then(function (array $row): EntityInterface {
-            return $this->hydrator->hydrate($this->entity, $row);
+        )->toPromise()->then(function (array $row) use ($id): PromiseInterface {
+            return $this->fetch([
+                [
+                    'id',
+                    '=',
+                    $id,
+                ],
+            ])->take(1)->toPromise();
         });
     }
 
@@ -95,9 +103,9 @@ final class Repository implements RepositoryInterface
 
         return $this->client->query(
             QueryBuilder::create()->
-                update($fields)->
-                into($this->entity->getTable())->
-                where('id', '=', $entity->getId())
+            update($fields)->
+            into($this->entity->getTable())->
+            where('id', '=', $entity->getId())
         )->toPromise()->then(function () use ($entity) {
             return $this->fetch([
                 ['id', '=', $entity->getId()],
@@ -112,7 +120,7 @@ final class Repository implements RepositoryInterface
         $query = $query->select($this->fields);
 
         foreach ($where as $constraint) {
-            $constraint[0] = $this->translateFieldName($constraint[0]);
+            $constraint[0] = $this->translateFieldName((string)$constraint[0]);
             $query = $query->where(...$constraint);
         }
 
@@ -262,20 +270,30 @@ final class Repository implements RepositoryInterface
                     $where = [];
 
                     foreach ($join->getClause() as $clause) {
+                        $onLeftSide = $clause->getForeignKey();
+                        if ($clause->getForeignFunction() !== null) {
+                            /** @psalm-suppress PossiblyNullOperand */
+                            $onLeftSide = new Fragment($clause->getForeignFunction() . '(' . $onLeftSide . ')');
+                        }
+                        if ($clause->getForeignCast() !== null) {
+                            /** @psalm-suppress PossiblyNullOperand */
+                            $onLeftSide = new Fragment('CAST(' . (string)$onLeftSide . ' AS ' . $clause->getForeignCast() . ')');
+                        }
+
                         $where[] = [
-                            $clause->getForeignKey(),
+                            $onLeftSide,
                             '=',
                             $row[$this->tableAliases[$tableKey]][$clause->getLocalKey()],
                         ];
                     }
 
                     $this->client
-                             ->getRepository($join->getEntity()
-                             ->getClass())
-                             ->fetch($where)
-                             ->take(1)
-                             ->toPromise()
-                             ->then($resolve, $reject);
+                        ->getRepository($join->getEntity()
+                            ->getClass())
+                        ->fetch($where)
+                        ->take(1)
+                        ->toPromise()
+                        ->then($resolve, $reject);
                 });
 
                 continue;
@@ -304,7 +322,12 @@ final class Repository implements RepositoryInterface
 
     private function translateFieldName(string $name): string
     {
-        return 't0.' . $name;
+        $pos = \strpos($name, '(');
+        if ($pos === false) {
+            return 't0.' . $name;
+        }
+
+        return \substr($name, 0, $pos + 1) . 't0.' . \substr($name, $pos + 1);
     }
 
     private function prepareFields(array $fields): array

@@ -27,6 +27,7 @@ final class HydratorTest extends TestCase
             [
                 'id' => $id,
                 'name' => $title,
+                'zelf' => resolve(true),
             ]
         );
 
@@ -54,10 +55,12 @@ final class HydratorTest extends TestCase
                 'author' => [
                     'id' => $authorId,
                     'name' => $authorName,
+                    'zelf' => resolve(true),
                 ],
                 'publisher' => [
                     'id' => $publisherId,
                     'name' => $publisherName,
+                    'zelf' => resolve(true),
                 ],
                 'comments' => observableFromArray([]),
             ]

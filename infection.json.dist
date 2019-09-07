@@ -20,20 +20,43 @@
                  "WyriHaximus\\React\\SimpleORM\\Repository::page"
              ]
          },
+         "DecrementInteger": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Repository::translateFieldName"
+             ]
+         },
          "IncrementInteger": {
              "ignore": [
                  "WyriHaximus\\React\\SimpleORM\\Repository::count",
-                 "WyriHaximus\\React\\SimpleORM\\Repository::buildTree"
+                 "WyriHaximus\\React\\SimpleORM\\Repository::buildTree",
+                 "WyriHaximus\\React\\SimpleORM\\Repository::translateFieldName"
              ]
          },
          "OneZeroInteger": {
              "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::count"
+                 "WyriHaximus\\React\\SimpleORM\\Repository::count",
+                 "WyriHaximus\\React\\SimpleORM\\Repository::translateFieldName"
              ]
          },
          "Foreach_": {
              "ignore": [
                  "WyriHaximus\\React\\SimpleORM\\Repository::buildTree"
+             ]
+         },
+         "CastString": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Repository::buildTree"
+             ]
+         },
+         "Plus": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Repository::translateFieldName"
+             ]
+         },
+         "NotIdentical": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Repository::buildTree",
+                 "WyriHaximus\\React\\SimpleORM\\Repository::buildJoins"
              ]
          }
      }
