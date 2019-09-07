@@ -351,4 +351,26 @@ final class FunctionalTest extends AsyncTestCase
         self::assertGreaterThan($originalBlogPost->getModified(), $updatedBlogPost->getModified());
         self::assertSame($timestamp, (int)$updatedBlogPost->getModified()->format('U'));
     }
+
+    /**
+     * @test
+     */
+    public function userSelf(): void
+    {
+        $repository = $this->client->getRepository(UserStub::class);
+
+        /** @var string|null $userId */
+        $userId = null;
+
+        /** @var UserStub|null $self */
+        $self = $this->await($repository->fetch()->take(1)->toPromise()->then(function (UserStub $user) use (&$userId) {
+            $userId = $user->getId();
+
+            return $user->getZelf();
+        }), $this->loop);
+
+        self::assertNotNull($userId);
+        self::assertNotNull($self);
+        self::assertSame($userId, $self->getId());
+    }
 }
