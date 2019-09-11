@@ -60,16 +60,17 @@ final class Repository implements RepositoryInterface
         $query = $this->buildSelectQuery($where, $order);
         $query = $query->limit($perPage)->offset(--$page * $perPage);
 
-        return $this->fetchAndHydrate(
-            $query
-        );
+        return $this->fetchAndHydrate($query);
     }
 
-    public function fetch(array $where = [], array $order = []): Observable
+    public function fetch(array $where = [], array $order = [], int $limit = 0): Observable
     {
-        return $this->fetchAndHydrate(
-            $this->buildSelectQuery($where, $order)
-        );
+        $query = $this->buildSelectQuery($where, $order);
+        if ($limit > 0) {
+            $query = $query->limit($limit);
+        }
+
+        return $this->fetchAndHydrate($query);
     }
 
     public function create(array $fields): PromiseInterface

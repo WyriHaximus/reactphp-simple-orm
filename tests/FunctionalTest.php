@@ -141,6 +141,22 @@ final class FunctionalTest extends AsyncTestCase
     /**
      * @test
      */
+    public function firstBlogPostAuthorIdUsingLimit(): void
+    {
+        self::assertSame(
+            'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
+            $this->await(
+                $this->client->getRepository(BlogPostStub::class)->fetch([], [], 1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                    return $blogPost->getAuthor()->getId();
+                }),
+                $this->loop
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
     public function firstBlogPostCommentAuthorIds(): void
     {
         self::assertSame(

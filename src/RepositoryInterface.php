@@ -13,7 +13,7 @@ interface RepositoryInterface
 
     public function page(int $page, array $where = [], array $order = [], int $perPage = self::DEFAULT_PER_PAGE): Observable;
 
-    public function fetch(array $where = [], array $order = []): Observable;
+    public function fetch(array $where = [], array $order = [], int $limit = 0): Observable;
 
     public function create(array $fields): PromiseInterface;
 
