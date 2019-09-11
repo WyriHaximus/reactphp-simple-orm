@@ -11,6 +11,7 @@ use WyriHaximus\React\SimpleORM\ClientInterface;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
+use function Safe\sleep;
 
 /**
  * @internal
@@ -131,6 +132,22 @@ final class FunctionalTest extends AsyncTestCase
             'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
             $this->await(
                 $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                    return $blogPost->getAuthor()->getId();
+                }),
+                $this->loop
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function firstBlogPostAuthorIdUsingLimit(): void
+    {
+        self::assertSame(
+            'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
+            $this->await(
+                $this->client->getRepository(BlogPostStub::class)->fetch([], [], 1)->toPromise()->then(function (BlogPostStub $blogPost) {
                     return $blogPost->getAuthor()->getId();
                 }),
                 $this->loop
@@ -321,7 +338,7 @@ final class FunctionalTest extends AsyncTestCase
      */
     public function increaseViews(): void
     {
-        \sleep(3);
+        sleep(3);
 
         $repository = $this->client->getRepository(BlogPostStub::class);
 

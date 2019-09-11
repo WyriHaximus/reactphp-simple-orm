@@ -29,12 +29,15 @@ final class Clause
     /** @var string|null */
     private $foreign_function;
 
-    public function __construct(array $table)
+    /**
+     * @param array[] $clause
+     */
+    public function __construct(array $clause)
     {
         /** @psalm-suppress RawObjectIteration */
         foreach ($this as $name => $value) {
-            if (isset($table[$name])) {
-                $this->$name = $table[$name];
+            if (array_key_exists($name, $clause)) {
+                $this->$name = $clause[$name];
             }
         }
     }

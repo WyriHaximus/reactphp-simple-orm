@@ -23,12 +23,15 @@ final class LeftJoin implements JoinInterface
     /** @var bool */
     private $lazy = self::IS_NOT_LAZY;
 
-    public function __construct(array $table)
+    /**
+     * @param array[] $leftJoin
+     */
+    public function __construct(array $leftJoin)
     {
         /** @psalm-suppress RawObjectIteration */
         foreach ($this as $name => $value) {
-            if (isset($table[$name])) {
-                $this->$name = $table[$name];
+            if (array_key_exists($name, $leftJoin)) {
+                $this->$name = $leftJoin[$name];
             }
         }
     }

@@ -28,7 +28,7 @@ final class Client implements ClientInterface
 
     public function getRepository(string $entity): RepositoryInterface
     {
-        if (!isset($this->repositories[$entity])) {
+        if (!array_key_exists($entity, $this->repositories)) {
             $this->repositories[$entity] = new Repository($this->entityInspector->getEntity($entity), $this);
         }
 
