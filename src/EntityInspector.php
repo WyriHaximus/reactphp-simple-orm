@@ -27,7 +27,7 @@ final class EntityInspector
 
     public function getEntity(string $entity): InspectedEntityInterface
     {
-        if (!isset($this->entities[$entity])) {
+        if (!array_key_exists($entity, $this->entities)) {
             /** @psalm-suppress ArgumentTypeCoercion */
             $class = new ReflectionClass($entity);
             $tableAnnotation = $this->annotationReader->getClassAnnotation($class, Table::class);
@@ -48,11 +48,17 @@ final class EntityInspector
         return $this->entities[$entity];
     }
 
+    /**
+     * @param ReflectionClass $class
+     * @param Join[] $joins
+     *
+     * @return iterable
+     */
     private function getFields(ReflectionClass $class, array $joins): iterable
     {
         /** @var ReflectionProperty $property */
         foreach ($class->getProperties() as $property) {
-            if (isset($joins[$property->getName()])) {
+            if (array_key_exists($property->getName(), $joins)) {
                 continue;
             }
 

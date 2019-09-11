@@ -11,10 +11,16 @@ final class Hydrator
     /** @var string[] */
     private $hydrators = [];
 
+    /**
+     * @param InspectedEntityInterface $inspectedEntity
+     * @param mixed[] $data
+     *
+     * @return EntityInterface
+     */
     public function hydrate(InspectedEntityInterface $inspectedEntity, array $data): EntityInterface
     {
         $class = $inspectedEntity->getClass();
-        if (!isset($this->hydrators[$class])) {
+        if (!array_key_exists($class, $this->hydrators)) {
             /**
              * @psalm-suppress MissingClosureReturnType
              * @psalm-suppress InvalidPropertyAssignmentValue
@@ -28,7 +34,7 @@ final class Hydrator
         }
 
         foreach ($data as $key => $value) {
-            if (isset($inspectedEntity->getFields()[$key])) {
+            if (array_key_exists($key, $inspectedEntity->getFields())) {
                 $data[$key] = $this->castValueToCorrectType($inspectedEntity->getFields()[$key], $value);
             }
         }
@@ -49,6 +55,12 @@ final class Hydrator
         return $this->hydrators[$class]->hydrate($data, new $class());
     }
 
+    /**
+     * @param InspectedEntityInterface $inspectedEntity
+     * @param EntityInterface $entity
+     *
+     * @return mixed[]
+     */
     public function extract(InspectedEntityInterface $inspectedEntity, EntityInterface $entity): array
     {
         $class = $inspectedEntity->getClass();

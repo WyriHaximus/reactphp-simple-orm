@@ -22,6 +22,13 @@ final class Join
     /** @var Clause[] */
     private $clause;
 
+    /**
+     * @param InspectedEntityInterface $entity
+     * @param string $type
+     * @param string $property
+     * @param bool $lazy
+     * @param array<int, Clause> $clause
+     */
     public function __construct(InspectedEntityInterface $entity, string $type, string $property, bool $lazy, Clause ...$clause)
     {
         $this->entity = $entity;

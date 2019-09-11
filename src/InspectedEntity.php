@@ -19,6 +19,13 @@ final class InspectedEntity implements InspectedEntityInterface
     /** @var Join[] */
     private $joins = [];
 
+    /**
+     * InspectedEntity constructor.
+     * @param string $class
+     * @param string $table
+     * @param Field[] $fields
+     * @param Join[] $joins
+     */
     public function __construct(string $class, string $table, array $fields, array $joins)
     {
         $this->class = $class;

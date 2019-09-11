@@ -58,6 +58,11 @@
                  "WyriHaximus\\React\\SimpleORM\\Repository::buildTree",
                  "WyriHaximus\\React\\SimpleORM\\Repository::buildJoins"
              ]
+         },
+         "Continue_": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Repository::buildJoins"
+             ]
          }
      }
 }

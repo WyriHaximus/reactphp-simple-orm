@@ -11,6 +11,7 @@ use WyriHaximus\React\SimpleORM\ClientInterface;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
+use function Safe\sleep;
 
 /**
  * @internal
@@ -337,7 +338,7 @@ final class FunctionalTest extends AsyncTestCase
      */
     public function increaseViews(): void
     {
-        \sleep(3);
+        sleep(3);
 
         $repository = $this->client->getRepository(BlogPostStub::class);
 

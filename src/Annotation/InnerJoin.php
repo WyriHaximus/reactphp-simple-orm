@@ -23,12 +23,15 @@ final class InnerJoin implements JoinInterface
     /** @var bool */
     private $lazy = self::IS_NOT_LAZY;
 
-    public function __construct(array $table)
+    /**
+     * @param array[] $innerJoin
+     */
+    public function __construct(array $innerJoin)
     {
         /** @psalm-suppress RawObjectIteration */
         foreach ($this as $name => $value) {
-            if (isset($table[$name])) {
-                $this->$name = $table[$name];
+            if (array_key_exists($name, $innerJoin)) {
+                $this->$name = $innerJoin[$name];
             }
         }
     }

@@ -10,6 +10,7 @@ use React\Promise\PromiseInterface;
 use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
 use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
+use function Safe\substr;
 
 final class Repository implements RepositoryInterface
 {
@@ -114,6 +115,12 @@ final class Repository implements RepositoryInterface
         });
     }
 
+    /**
+     * @param mixed[] $where
+     * @param mixed[] $order
+     *
+     * @return QueryBuilder
+     */
     private function buildSelectQuery(array $where = [], array $order = []): QueryBuilder
     {
         $query = $this->getBaseQuery();
@@ -175,7 +182,7 @@ final class Repository implements RepositoryInterface
             }
 
             $tableKey = \spl_object_hash($join->getEntity()) . '___' . $join->getProperty();
-            if (!isset($this->tableAliases[$tableKey])) {
+            if (!array_key_exists($tableKey, $this->tableAliases)) {
                 $this->tableAliases[$tableKey] = 't' . $i++;
             }
 
@@ -234,6 +241,11 @@ final class Repository implements RepositoryInterface
         });
     }
 
+    /**
+     * @param mixed[] $row
+     *
+     * @return mixed[]
+     */
     private function inflate(array $row): array
     {
         $tables = [];
@@ -246,6 +258,13 @@ final class Repository implements RepositoryInterface
         return $tables;
     }
 
+    /**
+     * @param mixed[] $row
+     * @param InspectedEntityInterface $entity
+     * @param string $tableKeySuffix
+     *
+     * @return mixed[]
+     */
     private function buildTree(array $row, InspectedEntityInterface $entity, string $tableKeySuffix = 'root'): array
     {
         $tableKey = \spl_object_hash($entity) . '___' . $tableKeySuffix;
@@ -291,8 +310,7 @@ final class Repository implements RepositoryInterface
                     $this->client
                         ->getRepository($join->getEntity()
                             ->getClass())
-                        ->fetch($where)
-                        ->take(1)
+                        ->fetch($where, [], self::SINGLE)
                         ->toPromise()
                         ->then($resolve, $reject);
                 });
@@ -328,9 +346,14 @@ final class Repository implements RepositoryInterface
             return 't0.' . $name;
         }
 
-        return \substr($name, 0, $pos + 1) . 't0.' . \substr($name, $pos + 1);
+        return substr($name, 0, $pos + 1) . 't0.' . substr($name, $pos + 1);
     }
 
+    /**
+     * @param mixed[] $fields
+     *
+     * @return mixed[]
+     */
     private function prepareFields(array $fields): array
     {
         foreach ($fields as $key => $value) {

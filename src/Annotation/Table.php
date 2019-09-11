@@ -13,6 +13,9 @@ final class Table
     /** @var string */
     private $table;
 
+    /**
+     * @param string[] $table
+     */
     public function __construct(array $table)
     {
         $this->table = \current($table);
