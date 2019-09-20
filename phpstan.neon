@@ -2,7 +2,6 @@ parameters:
 	ignoreErrors:
 		- '#Class WyriHaximus\\React\\Tests\\SimpleORM\\Stub\\[a-zA-Z0-9_]+ is neither abstract nor final.#'
 		- '#Cannot call method getDocBlockTypes() on Roave\\BetterReflection\\Reflection\\ReflectionProperty|null.#'
-		- '#Constructor in WyriHaximus\\React\\SimpleORM\\Client has parameter \$annotationReader with default value.#'
 		- '#Argument of an invalid type WyriHaximus\\React\\SimpleORM\\Annotation\\[a-zA-Z0-9_]+ supplied for foreach, only iterables are supported.#'
 		- '#Variable property access on \$this\(WyriHaximus\\React\\SimpleORM\\Annotation\\[a-zA-Z0-9_]+\).#'
 	classesAllowedToBeExtended:

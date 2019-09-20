@@ -8,6 +8,9 @@ use PgAsync\Client as PgClient;
 use Plasma\SQL\Grammar\PostgreSQL;
 use Plasma\SQL\QueryBuilder;
 use Rx\Observable;
+use WyriHaximus\React\SimpleORM\Middleware\ExecuteQueryMiddleware;
+use WyriHaximus\React\SimpleORM\Middleware\GrammarMiddleware;
+use function ApiClients\Tools\Rx\unwrapObservableFromPromise;
 
 final class Client implements ClientInterface
 {
@@ -20,10 +23,37 @@ final class Client implements ClientInterface
     /** @var Repository[] */
     private $repositories = [];
 
-    public function __construct(PgClient $client, ?Reader $annotationReader = null)
+    /** @var MiddlewareRunner */
+    private $middlewareRunner;
+
+    /**
+     * @param array<int, MiddlewareInterface> $middleware
+     */
+    public static function create(PgClient $client, MiddlewareInterface ...$middleware): self
+    {
+        return new self($client, new AnnotationReader(), ...$middleware);
+    }
+
+    /**
+     * @param array<int, MiddlewareInterface> $middleware
+     */
+    public static function createWithAnnotationReader(PgClient $client, Reader $annotationReader, MiddlewareInterface ...$middleware): self
+    {
+        return new self($client, $annotationReader, ...$middleware);
+    }
+
+    /**
+     * @param array<int, MiddlewareInterface> $middleware
+     */
+    private function __construct(PgClient $client, Reader $annotationReader, MiddlewareInterface ...$middleware)
     {
         $this->client = $client;
-        $this->entityInspector = new EntityInspector($annotationReader ?? new AnnotationReader());
+        $this->entityInspector = new EntityInspector($annotationReader);
+
+        $middleware[] = new GrammarMiddleware(new PostgreSQL());
+        $middleware[] = new ExecuteQueryMiddleware($this->client);
+
+        $this->middlewareRunner = new MiddlewareRunner(...$middleware);
     }
 
     public function getRepository(string $entity): RepositoryInterface
@@ -37,8 +67,6 @@ final class Client implements ClientInterface
 
     public function query(QueryBuilder $query): Observable
     {
-        $query = $query->withGrammar(new PostgreSQL());
-
-        return $this->client->executeStatement($query->getQuery(), $query->getParameters());
+        return unwrapObservableFromPromise($this->middlewareRunner->query($query));
     }
 }

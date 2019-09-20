@@ -8,6 +8,7 @@ use React\EventLoop\LoopInterface;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\SimpleORM\ClientInterface;
+use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
@@ -28,6 +29,9 @@ final class FunctionalTest extends AsyncTestCase
      */
     private $client;
 
+    /** @var QueryCountMiddleware */
+    private $counter;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -36,8 +40,10 @@ final class FunctionalTest extends AsyncTestCase
         \exec('PHINX_DB_HOST=localhost php ./vendor/bin/phinx migrate');
         \exec('PHINX_DB_HOST=localhost php ./vendor/bin/phinx seed:run -v');
 
+        $this->counter = new QueryCountMiddleware();
+
         $this->loop = Factory::create();
-        $this->client = new Client(
+        $this->client = Client::create(
             new PgClient(
                 [
                     'host' => 'localhost',
@@ -47,7 +53,8 @@ final class FunctionalTest extends AsyncTestCase
                     'database' => \getenv('PHINX_DB_DATABASE'),
                 ],
                 $this->loop
-            )
+            ),
+            $this->counter
         );
     }
 
@@ -63,6 +70,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(1, $this->counter->getCount());
     }
 
     /**
@@ -77,6 +86,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(1, $this->counter->getCount());
     }
 
     /**
@@ -91,6 +102,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(1, $this->counter->getCount());
     }
 
     /**
@@ -105,6 +118,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(1, $this->counter->getCount());
     }
 
     /**
@@ -121,6 +136,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(2, $this->counter->getCount());
     }
 
     /**
@@ -137,6 +154,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(1, $this->counter->getCount());
     }
 
     /**
@@ -153,6 +172,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(1, $this->counter->getCount());
     }
 
     /**
@@ -179,6 +200,8 @@ final class FunctionalTest extends AsyncTestCase
                 )
             )
         );
+
+        self::assertSame(2, $this->counter->getCount());
     }
 
     /**
@@ -195,6 +218,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(2, $this->counter->getCount());
     }
 
     /**
@@ -211,6 +236,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(1, $this->counter->getCount());
     }
 
     /**
@@ -229,6 +256,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(2, $this->counter->getCount());
     }
 
     /**
@@ -247,6 +276,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(1, $this->counter->getCount());
     }
 
     /**
@@ -274,6 +305,8 @@ final class FunctionalTest extends AsyncTestCase
                 )
             )
         );
+
+        self::assertSame(2, $this->counter->getCount());
     }
 
     /**
@@ -294,6 +327,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(2, $this->counter->getCount());
     }
 
     /**
@@ -312,6 +347,8 @@ final class FunctionalTest extends AsyncTestCase
                 $this->loop
             )
         );
+
+        self::assertSame(1, $this->counter->getCount());
     }
 
     /**
@@ -331,6 +368,7 @@ final class FunctionalTest extends AsyncTestCase
         );
 
         self::assertSame($name, $user->getName());
+        self::assertSame(2, $this->counter->getCount());
     }
 
     /**
@@ -367,6 +405,7 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame($originalBlogPost->getCreated()->format('U'), $updatedBlogPost->getCreated()->format('U'));
         self::assertGreaterThan($originalBlogPost->getModified(), $updatedBlogPost->getModified());
         self::assertSame($timestamp, (int)$updatedBlogPost->getModified()->format('U'));
+        self::assertSame(3, $this->counter->getCount());
     }
 
     /**
@@ -389,5 +428,6 @@ final class FunctionalTest extends AsyncTestCase
         self::assertNotNull($userId);
         self::assertNotNull($self);
         self::assertSame($userId, $self->getId());
+        self::assertSame(2, $this->counter->getCount());
     }
 }
