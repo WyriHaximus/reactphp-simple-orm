@@ -5,6 +5,7 @@ namespace WyriHaximus\React\SimpleORM;
 use Plasma\SQL\QueryBuilder;
 use Plasma\SQL\QueryExpressions\Fragment;
 use Ramsey\Uuid\Uuid;
+use React\Promise\LazyPromise;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
@@ -278,41 +279,43 @@ final class Repository implements RepositoryInterface
             }
 
             if ($join->getType() === 'inner' && ($join->getLazy() === JoinInterface::IS_LAZY || $entity->getClass() === $join->getEntity()->getClass())) {
-                $tree[$join->getProperty()] = new Promise(function (callable $resolve, callable $reject) use ($row, $join, $tableKey): void {
-                    foreach ($join->getClause() as $clause) {
-                        if ($row[$this->tableAliases[$tableKey]][$clause->getLocalKey()] === null) {
-                            $resolve(null);
+                $tree[$join->getProperty()] = new LazyPromise(function () use ($row, $join, $tableKey): PromiseInterface {
+                    return new Promise(function (callable $resolve, callable $reject) use ($row, $join, $tableKey): void {
+                        foreach ($join->getClause() as $clause) {
+                            if ($row[$this->tableAliases[$tableKey]][$clause->getLocalKey()] === null) {
+                                $resolve(null);
 
-                            return;
-                        }
-                    }
-
-                    $where = [];
-
-                    foreach ($join->getClause() as $clause) {
-                        $onLeftSide = $clause->getForeignKey();
-                        if ($clause->getForeignFunction() !== null) {
-                            /** @psalm-suppress PossiblyNullOperand */
-                            $onLeftSide = new Fragment($clause->getForeignFunction() . '(' . $onLeftSide . ')');
-                        }
-                        if ($clause->getForeignCast() !== null) {
-                            /** @psalm-suppress PossiblyNullOperand */
-                            $onLeftSide = new Fragment('CAST(' . (string)$onLeftSide . ' AS ' . $clause->getForeignCast() . ')');
+                                return;
+                            }
                         }
 
-                        $where[] = [
-                            $onLeftSide,
-                            '=',
-                            $row[$this->tableAliases[$tableKey]][$clause->getLocalKey()],
-                        ];
-                    }
+                        $where = [];
 
-                    $this->client
-                        ->getRepository($join->getEntity()
+                        foreach ($join->getClause() as $clause) {
+                            $onLeftSide = $clause->getForeignKey();
+                            if ($clause->getForeignFunction() !== null) {
+                                /** @psalm-suppress PossiblyNullOperand */
+                                $onLeftSide = new Fragment($clause->getForeignFunction() . '(' . $onLeftSide . ')');
+                            }
+                            if ($clause->getForeignCast() !== null) {
+                                /** @psalm-suppress PossiblyNullOperand */
+                                $onLeftSide = new Fragment('CAST(' . (string)$onLeftSide . ' AS ' . $clause->getForeignCast() . ')');
+                            }
+
+                            $where[] = [
+                                $onLeftSide,
+                                '=',
+                                $row[$this->tableAliases[$tableKey]][$clause->getLocalKey()],
+                            ];
+                        }
+
+                        $this->client
+                            ->getRepository($join->getEntity()
                             ->getClass())
-                        ->fetch($where, [], self::SINGLE)
-                        ->toPromise()
-                        ->then($resolve, $reject);
+                            ->fetch($where, [], self::SINGLE)
+                            ->toPromise()
+                            ->then($resolve, $reject);
+                        });
                 });
 
                 continue;

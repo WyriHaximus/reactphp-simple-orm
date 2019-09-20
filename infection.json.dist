@@ -27,6 +27,7 @@
          },
          "IncrementInteger": {
              "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Repository::create",
                  "WyriHaximus\\React\\SimpleORM\\Repository::count",
                  "WyriHaximus\\React\\SimpleORM\\Repository::buildTree",
                  "WyriHaximus\\React\\SimpleORM\\Repository::translateFieldName"

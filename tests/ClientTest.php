@@ -40,7 +40,7 @@ final class ClientTest extends AsyncTestCase
 
         $this->pgClient = $this->prophesize(PgClient::class);
         $this->annotationReader = $this->prophesize(Reader::class);
-        $this->client = new Client($this->pgClient->reveal(), $this->annotationReader->reveal());
+        $this->client = Client::createWithAnnotationReader($this->pgClient->reveal(), $this->annotationReader->reveal());
     }
 
     public function testGetRepository(): void
