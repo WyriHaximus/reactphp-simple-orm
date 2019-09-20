@@ -309,7 +309,7 @@ final class Repository implements RepositoryInterface
 
                     $this->client
                         ->getRepository($join->getEntity()
-                            ->getClass())
+                        ->getClass())
                         ->fetch($where, [], self::SINGLE)
                         ->toPromise()
                         ->then($resolve, $reject);
