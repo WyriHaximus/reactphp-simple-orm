@@ -7,10 +7,12 @@ use Doctrine\Common\Annotations\Reader;
 use PgAsync\Client as PgClient;
 use Plasma\SQL\Grammar\PostgreSQL;
 use Plasma\SQL\QueryBuilder;
+use React\Promise\PromiseInterface;
 use Rx\Observable;
 use WyriHaximus\React\SimpleORM\Middleware\ExecuteQueryMiddleware;
 use WyriHaximus\React\SimpleORM\Middleware\GrammarMiddleware;
 use function ApiClients\Tools\Rx\unwrapObservableFromPromise;
+use function React\Promise\resolve;
 
 final class Client implements ClientInterface
 {
@@ -51,7 +53,6 @@ final class Client implements ClientInterface
         $this->entityInspector = new EntityInspector($annotationReader);
 
         $middleware[] = new GrammarMiddleware(new PostgreSQL());
-        $middleware[] = new ExecuteQueryMiddleware($this->client);
 
         $this->middlewareRunner = new MiddlewareRunner(...$middleware);
     }
@@ -67,6 +68,12 @@ final class Client implements ClientInterface
 
     public function query(QueryBuilder $query): Observable
     {
-        return unwrapObservableFromPromise($this->middlewareRunner->query($query));
+        return unwrapObservableFromPromise($this->middlewareRunner->query(
+            $query,
+            function (QueryBuilder $query): PromiseInterface
+            {
+                return resolve($this->client->executeStatement($query->getQuery(), $query->getParameters()));
+            }
+        ));
     }
 }

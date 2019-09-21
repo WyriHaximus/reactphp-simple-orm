@@ -15,11 +15,11 @@ final class QueryCountMiddleware implements MiddlewareInterface
     /** @var int */
     private $count = self::ZERO;
 
-    public function query(QueryBuilder $query): PromiseInterface
+    public function query(QueryBuilder $query, callable $next): PromiseInterface
     {
         $this->count++;
 
-        return resolve($query);
+        return resolve($next($query))->then();
     }
 
     public function getCount(): int

@@ -22,7 +22,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         self::assertSame(0, $middleware->getCount());
 
-        $middleware->query(QueryBuilder::create());
+        $middleware->query(QueryBuilder::create(), function () {});
 
         self::assertSame(1, $middleware->getCount());
 
