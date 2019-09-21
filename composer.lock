@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bc35b756d297d941cc1dfa79e80dfac2",
+    "content-hash": "55a4c2a327a782ded2243bc6739d6a3b",
     "packages": [
         {
             "name": "api-clients/rx",
@@ -1688,6 +1688,43 @@
                 "validate"
             ],
             "time": "2019-08-24T08:43:50+00:00"
+        },
+        {
+            "name": "wyrihaximus/constants",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/WyriHaximus/php-constants.git",
+                "reference": "0d99eede070b956ae405511b993484a59316afb0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/WyriHaximus/php-constants/zipball/0d99eede070b956ae405511b993484a59316afb0",
+                "reference": "0d99eede070b956ae405511b993484a59316afb0",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0 || ^5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/Numeric/constants.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cees-Jan Kiewiet",
+                    "email": "ceesjank@gmail.com",
+                    "homepage": "https://www.wyrihaximus.net/"
+                }
+            ],
+            "description": "Collection of constants for PHP",
+            "time": "2019-09-21T22:14:13+00:00"
         },
         {
             "name": "wyrihaximus/doctrine-annotation-autoloader",

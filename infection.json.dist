@@ -33,6 +33,11 @@
                  "WyriHaximus\\React\\SimpleORM\\Repository::translateFieldName"
              ]
          },
+         "Increment": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Middleware\\QueryCountMiddleware::query"
+             ]
+         },
          "OneZeroInteger": {
              "ignore": [
                  "WyriHaximus\\React\\SimpleORM\\Repository::count",

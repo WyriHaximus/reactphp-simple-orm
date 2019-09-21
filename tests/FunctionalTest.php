@@ -13,6 +13,7 @@ use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 use function Safe\sleep;
+use function WyriHaximus\iteratorOrArrayToArray;
 
 /**
  * @internal
@@ -40,7 +41,7 @@ final class FunctionalTest extends AsyncTestCase
         \exec('PHINX_DB_HOST=localhost php ./vendor/bin/phinx migrate');
         \exec('PHINX_DB_HOST=localhost php ./vendor/bin/phinx seed:run -v');
 
-        $this->counter = new QueryCountMiddleware();
+        $this->counter = new QueryCountMiddleware(1);
 
         $this->loop = Factory::create();
         $this->client = Client::create(
@@ -71,7 +72,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(1, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -87,7 +93,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(1, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -103,7 +114,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(1, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -119,7 +135,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(1, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -137,7 +158,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(2, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 2,
+            'successful' => 2,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -155,7 +181,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(1, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -173,7 +204,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(1, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -201,7 +237,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(2, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 2,
+            'successful' => 2,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -219,7 +260,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(2, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 2,
+            'successful' => 2,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -237,7 +283,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(1, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -257,7 +308,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(2, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 2,
+            'successful' => 2,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -277,7 +333,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(1, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -306,7 +367,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(2, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 2,
+            'successful' => 2,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -328,7 +394,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(2, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 2,
+            'successful' => 2,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -348,7 +419,12 @@ final class FunctionalTest extends AsyncTestCase
             )
         );
 
-        self::assertSame(1, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -368,7 +444,12 @@ final class FunctionalTest extends AsyncTestCase
         );
 
         self::assertSame($name, $user->getName());
-        self::assertSame(2, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 2,
+            'successful' => 2,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -405,7 +486,12 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame($originalBlogPost->getCreated()->format('U'), $updatedBlogPost->getCreated()->format('U'));
         self::assertGreaterThan($originalBlogPost->getModified(), $updatedBlogPost->getModified());
         self::assertSame($timestamp, (int)$updatedBlogPost->getModified()->format('U'));
-        self::assertSame(3, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 3,
+            'successful' => 3,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
     /**
@@ -428,6 +514,11 @@ final class FunctionalTest extends AsyncTestCase
         self::assertNotNull($userId);
         self::assertNotNull($self);
         self::assertSame($userId, $self->getId());
-        self::assertSame(2, $this->counter->getCount());
+        self::assertSame([
+            'initiated' => 2,
+            'successful' => 2,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 }
