@@ -6,6 +6,9 @@ use Plasma\SQL\QueryBuilder;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Promise\PromiseInterface;
 
+/**
+ * @internal
+ */
 final class MiddlewareRunner
 {
     /** @var MiddlewareInterface[] */
