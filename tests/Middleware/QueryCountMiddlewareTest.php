@@ -2,32 +2,149 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM\Middleware;
 
-use PgAsync\Client as PgClient;
 use Plasma\SQL\QueryBuilder;
-use Rx\Observable;
-use Rx\ObservableInterface;
+use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Middleware\ExecuteQueryMiddleware;
 use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
 use function ApiClients\Tools\Rx\observableFromArray;
+use function Safe\sleep;
+use function WyriHaximus\iteratorOrArrayToArray;
 
 /**
  * @internal
  */
 final class QueryCountMiddlewareTest extends AsyncTestCase
 {
-    public function testCounting(): void
+    public function testCountingSuccess(): void
     {
-        $middleware = new QueryCountMiddleware();
+        $middleware = new QueryCountMiddleware(1);
 
-        self::assertSame(0, $middleware->getCount());
+        self::assertSame([
+            'initiated' => 0,
+            'successful' => 0,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($middleware->getCounters()));
 
-        $middleware->query(QueryBuilder::create());
+        $deferred = new Deferred();
 
-        self::assertSame(1, $middleware->getCount());
+        $middleware->query(QueryBuilder::create(), function () use ($deferred): PromiseInterface {
+            return $deferred->promise();
+        });
 
-        $middleware->resetCount();
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 0,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($middleware->getCounters()));
 
-        self::assertSame(0, $middleware->getCount());
+        $deferred->resolve(observableFromArray([]));
+
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($middleware->getCounters()));
+
+        $middleware->resetCounters();
+
+        self::assertSame([
+            'initiated' => 0,
+            'successful' => 0,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($middleware->getCounters()));
+    }
+
+    public function testCountingError(): void
+    {
+        $middleware = new QueryCountMiddleware(1);
+
+        self::assertSame([
+            'initiated' => 0,
+            'successful' => 0,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($middleware->getCounters()));
+
+        $deferred = new Deferred();
+
+        $middleware->query(QueryBuilder::create(), function () use ($deferred): PromiseInterface {
+            return $deferred->promise();
+        });
+
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 0,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($middleware->getCounters()));
+
+        $deferred->reject(new \Exception('whoops'));
+
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 0,
+            'errored' => 1,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($middleware->getCounters()));
+
+        $middleware->resetCounters();
+
+        self::assertSame([
+            'initiated' => 0,
+            'successful' => 0,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($middleware->getCounters()));
+    }
+
+    public function testCountingErrorSlo(): void
+    {
+        $middleware = new QueryCountMiddleware(1);
+
+        self::assertSame([
+            'initiated' => 0,
+            'successful' => 0,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($middleware->getCounters()));
+
+        $deferred = new Deferred();
+
+        $middleware->query(QueryBuilder::create(), function () use ($deferred): PromiseInterface {
+            return $deferred->promise();
+        });
+
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 0,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($middleware->getCounters()));
+
+        sleep(2);
+
+        $deferred->reject(new \Exception('whoops'));
+
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 0,
+            'errored' => 1,
+            'slow' => 1,
+        ], iteratorOrArrayToArray($middleware->getCounters()));
+
+        $middleware->resetCounters();
+
+        self::assertSame([
+            'initiated' => 0,
+            'successful' => 0,
+            'errored' => 0,
+            'slow' => 0,
+        ], iteratorOrArrayToArray($middleware->getCounters()));
     }
 }

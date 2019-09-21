@@ -18,8 +18,8 @@ final class GrammarMiddleware implements MiddlewareInterface
         $this->grammer = $grammer;
     }
 
-    public function query(QueryBuilder $query): PromiseInterface
+    public function query(QueryBuilder $query, callable $next): PromiseInterface
     {
-        return resolve($query->withGrammar($this->grammer));
+        return resolve($next($query->withGrammar($this->grammer)));
     }
 }
