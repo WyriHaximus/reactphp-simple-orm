@@ -77,6 +77,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 1,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 1,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -98,6 +99,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 1,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 1,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -119,6 +121,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 1,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 1,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -140,6 +143,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 1,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 1,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -163,6 +167,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 2,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 2,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -186,6 +191,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 1,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 1,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -209,6 +215,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 1,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 1,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -242,6 +249,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 2,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 2,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -265,6 +273,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 2,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 2,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -288,6 +297,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 1,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 1,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -313,6 +323,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 2,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 2,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -338,6 +349,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 1,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 1,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -372,6 +384,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 2,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 2,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -399,6 +412,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 2,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 2,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -424,6 +438,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 1,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 1,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -449,6 +464,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 2,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 2,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -491,6 +507,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 3,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 3,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 
@@ -519,6 +536,7 @@ final class FunctionalTest extends AsyncTestCase
             'successful' => 2,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 2,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
     }
 }
