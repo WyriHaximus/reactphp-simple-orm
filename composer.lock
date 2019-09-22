@@ -1617,13 +1617,13 @@
             "authors": [
                 {
                     "name": "Matt Bonneau",
-                    "role": "Developer",
-                    "email": "matt@bonneau.net"
+                    "email": "matt@bonneau.net",
+                    "role": "Developer"
                 },
                 {
                     "name": "David Dan",
-                    "role": "Developer",
-                    "email": "davidwdan@gmail.com"
+                    "email": "davidwdan@gmail.com",
+                    "role": "Developer"
                 }
             ],
             "description": "Async Reactive Postgres Driver for PHP (Non-blocking)",
@@ -1691,16 +1691,16 @@
         },
         {
             "name": "wyrihaximus/constants",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WyriHaximus/php-constants.git",
-                "reference": "0d99eede070b956ae405511b993484a59316afb0"
+                "reference": "8773db280d74840fbc6544ea62b5b14f73a5fe61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WyriHaximus/php-constants/zipball/0d99eede070b956ae405511b993484a59316afb0",
-                "reference": "0d99eede070b956ae405511b993484a59316afb0",
+                "url": "https://api.github.com/repos/WyriHaximus/php-constants/zipball/8773db280d74840fbc6544ea62b5b14f73a5fe61",
+                "reference": "8773db280d74840fbc6544ea62b5b14f73a5fe61",
                 "shasum": ""
             },
             "require": {
@@ -1709,7 +1709,7 @@
             "type": "library",
             "autoload": {
                 "files": [
-                    "src/Numeric/constants.php"
+                    "src/Numeric/constants_include.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1724,7 +1724,7 @@
                 }
             ],
             "description": "Collection of constants for PHP",
-            "time": "2019-09-21T22:14:13+00:00"
+            "time": "2019-09-22T20:48:31+00:00"
         },
         {
             "name": "wyrihaximus/doctrine-annotation-autoloader",
