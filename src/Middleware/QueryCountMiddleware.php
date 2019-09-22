@@ -6,6 +6,7 @@ use PgAsync\Client as PgClient;
 use Plasma\SQL\QueryBuilder;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
+use Rx\Subject\Subject;
 use Throwable;
 use WyriHaximus\React\SimpleORM\MiddlewareInterface;
 use function React\Promise\reject;
@@ -28,6 +29,9 @@ final class QueryCountMiddleware implements MiddlewareInterface
     private $slowCount = self::ZERO;
 
     /** @var int */
+    private $completedCount = self::ZERO;
+
+    /** @var int */
     private $slowQueryTime;
 
     public function __construct(int $slowQueryTime)
@@ -42,21 +46,47 @@ final class QueryCountMiddleware implements MiddlewareInterface
         $startTime = hrtime()[0];
 
         return resolve($next($query))->then(function (Observable $observable) use ($startTime): PromiseInterface {
-            $this->successfulCount++;
+            return resolve(Observable::defer(function () use ($observable, $startTime) {
+                $handledInitialRow = false;
+                $subject = new Subject();
+                $observable->subscribe(
+                    function (array $row) use ($subject, $startTime, &$handledInitialRow): void {
+                        $subject->onNext($row);
 
-            if (hrtime()[0] - $startTime > $this->slowQueryTime) {
-                $this->slowCount++;
-            }
+                        if ($handledInitialRow === true) {
+                            return;
+                        }
 
-            return resolve($observable);
-        }, function (Throwable $throwable) use ($startTime): PromiseInterface {
-            $this->erroredCount++;
+                        $this->successfulCount++;
 
-            if (hrtime()[0] - $startTime > $this->slowQueryTime) {
-                $this->slowCount++;
-            }
+                        if (hrtime()[0] - $startTime > $this->slowQueryTime) {
+                            $this->slowCount++;
+                        }
 
-            return reject($throwable);
+                        $handledInitialRow = true;
+                    },
+                    function (Throwable $throwable) use ($startTime, $subject): void {
+                        $this->erroredCount++;
+
+                        if (hrtime()[0] - $startTime > $this->slowQueryTime) {
+                            $this->slowCount++;
+                        }
+
+                        $subject->onError($throwable);
+                    },
+                    function () use ($subject, &$handledInitialRow): void {
+                        $this->completedCount++;
+                        $subject->onCompleted();
+
+                        if ($handledInitialRow === true) {
+                            return;
+                        }
+
+                        $this->successfulCount++;
+                    },
+                );
+                return $subject;
+            }));
         });
     }
 
@@ -66,6 +96,7 @@ final class QueryCountMiddleware implements MiddlewareInterface
         yield 'successful' => $this->successfulCount;
         yield 'errored' => $this->erroredCount;
         yield 'slow' => $this->slowCount;
+        yield 'completed' => $this->completedCount;
     }
 
     public function resetCounters(): void
@@ -74,5 +105,6 @@ final class QueryCountMiddleware implements MiddlewareInterface
         $this->successfulCount = self::ZERO;
         $this->erroredCount = self::ZERO;
         $this->slowCount = self::ZERO;
+        $this->completedCount = self::ZERO;
     }
 }

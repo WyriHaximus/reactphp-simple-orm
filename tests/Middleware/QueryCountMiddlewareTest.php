@@ -5,10 +5,12 @@ namespace WyriHaximus\React\Tests\SimpleORM\Middleware;
 use Plasma\SQL\QueryBuilder;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
+use Rx\Subject\Subject;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Middleware\ExecuteQueryMiddleware;
 use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
 use function ApiClients\Tools\Rx\observableFromArray;
+use function ApiClients\Tools\Rx\unwrapObservableFromPromise;
 use function Safe\sleep;
 use function WyriHaximus\iteratorOrArrayToArray;
 
@@ -26,28 +28,31 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'successful' => 0,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 0,
         ], iteratorOrArrayToArray($middleware->getCounters()));
 
         $deferred = new Deferred();
 
-        $middleware->query(QueryBuilder::create(), function () use ($deferred): PromiseInterface {
+        unwrapObservableFromPromise($middleware->query(QueryBuilder::create(), function () use ($deferred): PromiseInterface {
             return $deferred->promise();
-        });
+        }))->subscribe(function () {}, function () {});
 
         self::assertSame([
             'initiated' => 1,
             'successful' => 0,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 0,
         ], iteratorOrArrayToArray($middleware->getCounters()));
 
-        $deferred->resolve(observableFromArray([]));
+        $deferred->resolve(observableFromArray([[]]));
 
         self::assertSame([
             'initiated' => 1,
             'successful' => 1,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 1,
         ], iteratorOrArrayToArray($middleware->getCounters()));
 
         $middleware->resetCounters();
@@ -57,6 +62,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'successful' => 0,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 0,
         ], iteratorOrArrayToArray($middleware->getCounters()));
     }
 
@@ -69,28 +75,33 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'successful' => 0,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 0,
         ], iteratorOrArrayToArray($middleware->getCounters()));
 
         $deferred = new Deferred();
 
-        $middleware->query(QueryBuilder::create(), function () use ($deferred): PromiseInterface {
+        unwrapObservableFromPromise($middleware->query(QueryBuilder::create(), function () use ($deferred): PromiseInterface {
             return $deferred->promise();
-        });
+        }))->subscribe(function () {}, function () {});
 
         self::assertSame([
             'initiated' => 1,
             'successful' => 0,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 0,
         ], iteratorOrArrayToArray($middleware->getCounters()));
 
-        $deferred->reject(new \Exception('whoops'));
+        $subject = new Subject();
+        $deferred->resolve($subject);
+        $subject->onError(new \Exception('whoops'));
 
         self::assertSame([
             'initiated' => 1,
             'successful' => 0,
             'errored' => 1,
             'slow' => 0,
+            'completed' => 0,
         ], iteratorOrArrayToArray($middleware->getCounters()));
 
         $middleware->resetCounters();
@@ -100,10 +111,11 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'successful' => 0,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 0,
         ], iteratorOrArrayToArray($middleware->getCounters()));
     }
 
-    public function testCountingErrorSlo(): void
+    public function testCountingErrorSlow(): void
     {
         $middleware = new QueryCountMiddleware(1);
 
@@ -112,30 +124,35 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'successful' => 0,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 0,
         ], iteratorOrArrayToArray($middleware->getCounters()));
 
         $deferred = new Deferred();
 
-        $middleware->query(QueryBuilder::create(), function () use ($deferred): PromiseInterface {
+        unwrapObservableFromPromise($middleware->query(QueryBuilder::create(), function () use ($deferred): PromiseInterface {
             return $deferred->promise();
-        });
+        }))->subscribe(function () {}, function () {});
 
         self::assertSame([
             'initiated' => 1,
             'successful' => 0,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 0,
         ], iteratorOrArrayToArray($middleware->getCounters()));
 
         sleep(2);
 
-        $deferred->reject(new \Exception('whoops'));
+        $subject = new Subject();
+        $deferred->resolve($subject);
+        $subject->onError(new \Exception('whoops'));
 
         self::assertSame([
             'initiated' => 1,
             'successful' => 0,
             'errored' => 1,
             'slow' => 1,
+            'completed' => 0,
         ], iteratorOrArrayToArray($middleware->getCounters()));
 
         $middleware->resetCounters();
@@ -145,6 +162,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'successful' => 0,
             'errored' => 0,
             'slow' => 0,
+            'completed' => 0,
         ], iteratorOrArrayToArray($middleware->getCounters()));
     }
 }
