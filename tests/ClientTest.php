@@ -2,6 +2,7 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
+use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use function ApiClients\Tools\Rx\observableFromArray;
 use Doctrine\Common\Annotations\Reader;
 use PgAsync\Client as PgClient;
@@ -40,7 +41,7 @@ final class ClientTest extends AsyncTestCase
 
         $this->pgClient = $this->prophesize(PgClient::class);
         $this->annotationReader = $this->prophesize(Reader::class);
-        $this->client = Client::createWithAnnotationReader($this->pgClient->reveal(), $this->annotationReader->reveal());
+        $this->client = Client::createWithAnnotationReader(new Postgres($this->pgClient->reveal()), $this->annotationReader->reveal());
     }
 
     public function testGetRepository(): void

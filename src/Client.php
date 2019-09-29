@@ -16,8 +16,8 @@ use function React\Promise\resolve;
 
 final class Client implements ClientInterface
 {
-    /** @var PgClient */
-    private $client;
+    /** @var AdapterInterface */
+    private $adapter;
 
     /** @var EntityInspector */
     private $entityInspector;
@@ -31,28 +31,28 @@ final class Client implements ClientInterface
     /**
      * @param array<int, MiddlewareInterface> $middleware
      */
-    public static function create(PgClient $client, MiddlewareInterface ...$middleware): self
+    public static function create(AdapterInterface $adapter, MiddlewareInterface ...$middleware): self
     {
-        return new self($client, new AnnotationReader(), ...$middleware);
+        return new self($adapter, new AnnotationReader(), ...$middleware);
     }
 
     /**
      * @param array<int, MiddlewareInterface> $middleware
      */
-    public static function createWithAnnotationReader(PgClient $client, Reader $annotationReader, MiddlewareInterface ...$middleware): self
+    public static function createWithAnnotationReader(AdapterInterface $adapter, Reader $annotationReader, MiddlewareInterface ...$middleware): self
     {
-        return new self($client, $annotationReader, ...$middleware);
+        return new self($adapter, $annotationReader, ...$middleware);
     }
 
     /**
      * @param array<int, MiddlewareInterface> $middleware
      */
-    private function __construct(PgClient $client, Reader $annotationReader, MiddlewareInterface ...$middleware)
+    private function __construct(AdapterInterface $adapter, Reader $annotationReader, MiddlewareInterface ...$middleware)
     {
-        $this->client = $client;
+        $this->adapter = $adapter;
         $this->entityInspector = new EntityInspector($annotationReader);
 
-        $middleware[] = new GrammarMiddleware(new PostgreSQL());
+        $middleware[] = new GrammarMiddleware($adapter->getGrammar());
 
         $this->middlewareRunner = new MiddlewareRunner(...$middleware);
     }
@@ -72,7 +72,7 @@ final class Client implements ClientInterface
             $query,
             function (QueryBuilder $query): PromiseInterface
             {
-                return resolve($this->client->executeStatement($query->getQuery(), $query->getParameters()));
+                return resolve($this->adapter->query($query));
             }
         ));
     }
