@@ -6,6 +6,7 @@ use PgAsync\Client as PgClient;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
+use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\SimpleORM\ClientInterface;
 use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
@@ -45,15 +46,17 @@ final class FunctionalTest extends AsyncTestCase
 
         $this->loop = Factory::create();
         $this->client = Client::create(
-            new PgClient(
-                [
-                    'host' => 'localhost',
-                    'port' => 5432,
-                    'user'     => \getenv('PHINX_DB_USER'),
-                    'password' => \getenv('PHINX_DB_PASSWORD'),
-                    'database' => \getenv('PHINX_DB_DATABASE'),
-                ],
-                $this->loop
+            new Postgres(
+                new PgClient(
+                    [
+                        'host' => 'localhost',
+                        'port' => 5432,
+                        'user'     => \getenv('PHINX_DB_USER'),
+                        'password' => \getenv('PHINX_DB_PASSWORD'),
+                        'database' => \getenv('PHINX_DB_DATABASE'),
+                    ],
+                    $this->loop
+                )
             ),
             $this->counter
         );
