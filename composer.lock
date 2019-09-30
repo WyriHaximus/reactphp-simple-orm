@@ -762,12 +762,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PlasmaPHP/core.git",
-                "reference": "b8132ec009ca00cfce57f0a5b04ec1b378dfe219"
+                "reference": "a0d12b93789b36775a5ae12bdae24198c2f14897"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PlasmaPHP/core/zipball/b8132ec009ca00cfce57f0a5b04ec1b378dfe219",
-                "reference": "b8132ec009ca00cfce57f0a5b04ec1b378dfe219",
+                "url": "https://api.github.com/repos/PlasmaPHP/core/zipball/a0d12b93789b36775a5ae12bdae24198c2f14897",
+                "reference": "a0d12b93789b36775a5ae12bdae24198c2f14897",
                 "shasum": ""
             },
             "require": {
@@ -800,7 +800,7 @@
                 }
             ],
             "description": "Core component of Plasma.",
-            "time": "2019-06-21T06:22:38+00:00"
+            "time": "2019-09-28T19:36:27+00:00"
         },
         {
             "name": "plasma/sql-common",
@@ -1691,16 +1691,16 @@
         },
         {
             "name": "wyrihaximus/constants",
-            "version": "1.1.1",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WyriHaximus/php-constants.git",
-                "reference": "8773db280d74840fbc6544ea62b5b14f73a5fe61"
+                "reference": "6510d1376ce15c9cdfb28e04ce5cc54d88214e84"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WyriHaximus/php-constants/zipball/8773db280d74840fbc6544ea62b5b14f73a5fe61",
-                "reference": "8773db280d74840fbc6544ea62b5b14f73a5fe61",
+                "url": "https://api.github.com/repos/WyriHaximus/php-constants/zipball/6510d1376ce15c9cdfb28e04ce5cc54d88214e84",
+                "reference": "6510d1376ce15c9cdfb28e04ce5cc54d88214e84",
                 "shasum": ""
             },
             "require": {
@@ -1709,6 +1709,7 @@
             "type": "library",
             "autoload": {
                 "files": [
+                    "src/Boolean/constants_include.php",
                     "src/Numeric/constants_include.php"
                 ]
             },
@@ -1724,7 +1725,7 @@
                 }
             ],
             "description": "Collection of constants for PHP",
-            "time": "2019-09-22T20:48:31+00:00"
+            "time": "2019-09-27T06:23:19+00:00"
         },
         {
             "name": "wyrihaximus/doctrine-annotation-autoloader",
@@ -3847,9 +3848,9 @@
             "authors": [
                 {
                     "name": "Christian Weiske",
-                    "role": "Developer",
                     "email": "cweiske@cweiske.de",
-                    "homepage": "http://github.com/cweiske/jsonmapper/"
+                    "homepage": "http://github.com/cweiske/jsonmapper/",
+                    "role": "Developer"
                 }
             ],
             "description": "Map nested JSON structures onto PHP classes",
