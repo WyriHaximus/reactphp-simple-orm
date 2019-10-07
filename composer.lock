@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "55a4c2a327a782ded2243bc6739d6a3b",
+    "content-hash": "696781433ebb6296b84e67bfb054822a",
     "packages": [
         {
             "name": "api-clients/rx",
@@ -758,16 +758,16 @@
         },
         {
             "name": "plasma/core",
-            "version": "dev-master",
+            "version": "v0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PlasmaPHP/core.git",
-                "reference": "b8132ec009ca00cfce57f0a5b04ec1b378dfe219"
+                "reference": "a0d12b93789b36775a5ae12bdae24198c2f14897"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PlasmaPHP/core/zipball/b8132ec009ca00cfce57f0a5b04ec1b378dfe219",
-                "reference": "b8132ec009ca00cfce57f0a5b04ec1b378dfe219",
+                "url": "https://api.github.com/repos/PlasmaPHP/core/zipball/a0d12b93789b36775a5ae12bdae24198c2f14897",
+                "reference": "a0d12b93789b36775a5ae12bdae24198c2f14897",
                 "shasum": ""
             },
             "require": {
@@ -800,25 +800,25 @@
                 }
             ],
             "description": "Core component of Plasma.",
-            "time": "2019-06-21T06:22:38+00:00"
+            "time": "2019-09-28T19:36:27+00:00"
         },
         {
             "name": "plasma/sql-common",
-            "version": "dev-master",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PlasmaPHP/sql-common.git",
-                "reference": "0d9d74bf80f3f9f3845eba14ff2f425306e964d3"
+                "reference": "d012739fee5427da63c85d885b35ebc0c36b8f9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PlasmaPHP/sql-common/zipball/0d9d74bf80f3f9f3845eba14ff2f425306e964d3",
-                "reference": "0d9d74bf80f3f9f3845eba14ff2f425306e964d3",
+                "url": "https://api.github.com/repos/PlasmaPHP/sql-common/zipball/d012739fee5427da63c85d885b35ebc0c36b8f9c",
+                "reference": "d012739fee5427da63c85d885b35ebc0c36b8f9c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.1",
-                "plasma/core": "^0.2.1|dev-master"
+                "plasma/core": "^0.3.0|^0.2.1|dev-master"
             },
             "require-dev": {
                 "phpunit/phpunit": "^7.0"
@@ -840,7 +840,7 @@
                 }
             ],
             "description": "Generic SQL commons and abstractions for Plasma.",
-            "time": "2019-06-09T20:43:56+00:00"
+            "time": "2019-10-05T09:16:54+00:00"
         },
         {
             "name": "ramsey/uuid",
@@ -1617,13 +1617,13 @@
             "authors": [
                 {
                     "name": "Matt Bonneau",
-                    "email": "matt@bonneau.net",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "matt@bonneau.net"
                 },
                 {
                     "name": "David Dan",
-                    "email": "davidwdan@gmail.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "davidwdan@gmail.com"
                 }
             ],
             "description": "Async Reactive Postgres Driver for PHP (Non-blocking)",
@@ -8240,10 +8240,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "plasma/core": 20,
-        "plasma/sql-common": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
