@@ -46,7 +46,8 @@
          },
          "Foreach_": {
              "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::buildTree"
+                 "WyriHaximus\\React\\SimpleORM\\Repository::buildTree",
+                 "WyriHaximus\\React\\SimpleORM\\Tools\\WithFieldsTrait::withFields"
              ]
          },
          "CastString": {
@@ -67,7 +68,18 @@
          },
          "Continue_": {
              "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::buildJoins"
+                 "WyriHaximus\\React\\SimpleORM\\Repository::buildJoins",
+                 "WyriHaximus\\React\\SimpleORM\\Tools\\WithFieldsTrait::withFields"
+             ]
+         },
+         "PublicVisibility": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Tools\\WithFieldsTrait::withFields"
+             ]
+         },
+         "ArrayItemRemoval": {
+             "ignore": [
+                 "WyriHaximus\\React\\SimpleORM\\Tools\\WithFieldsTrait::withFields"
              ]
          }
      }
