@@ -4,13 +4,11 @@ namespace WyriHaximus\React\SimpleORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
-use PgAsync\Client as PgClient;
-use Plasma\SQL\Grammar\PostgreSQL;
-use Plasma\SQL\QueryBuilder;
+use Latitude\QueryBuilder\ExpressionInterface;
+use Latitude\QueryBuilder\QueryFactory;
+use Latitude\QueryBuilder\QueryInterface;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
-use WyriHaximus\React\SimpleORM\Middleware\ExecuteQueryMiddleware;
-use WyriHaximus\React\SimpleORM\Middleware\GrammarMiddleware;
 use function ApiClients\Tools\Rx\unwrapObservableFromPromise;
 use function React\Promise\resolve;
 
@@ -27,6 +25,9 @@ final class Client implements ClientInterface
 
     /** @var MiddlewareRunner */
     private $middlewareRunner;
+
+    /** @var QueryFactory */
+    private $queryFactory;
 
     /**
      * @param array<int, MiddlewareInterface> $middleware
@@ -51,8 +52,7 @@ final class Client implements ClientInterface
     {
         $this->adapter = $adapter;
         $this->entityInspector = new EntityInspector($annotationReader);
-
-        $middleware[] = new GrammarMiddleware($adapter->getGrammar());
+        $this->queryFactory = new QueryFactory($adapter->engine());
 
         $this->middlewareRunner = new MiddlewareRunner(...$middleware);
     }
@@ -60,17 +60,17 @@ final class Client implements ClientInterface
     public function getRepository(string $entity): RepositoryInterface
     {
         if (!array_key_exists($entity, $this->repositories)) {
-            $this->repositories[$entity] = new Repository($this->entityInspector->getEntity($entity), $this);
+            $this->repositories[$entity] = new Repository($this->entityInspector->getEntity($entity), $this, $this->queryFactory);
         }
 
         return $this->repositories[$entity];
     }
 
-    public function query(QueryBuilder $query): Observable
+    public function query(ExpressionInterface $query): Observable
     {
         return unwrapObservableFromPromise($this->middlewareRunner->query(
             $query,
-            function (QueryBuilder $query): PromiseInterface
+            function (ExpressionInterface $query): PromiseInterface
             {
                 return resolve($this->adapter->query($query));
             }

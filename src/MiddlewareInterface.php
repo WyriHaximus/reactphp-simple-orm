@@ -2,7 +2,8 @@
 
 namespace WyriHaximus\React\SimpleORM;
 
-use Plasma\SQL\QueryBuilder;
+use Latitude\QueryBuilder\ExpressionInterface;
+use Latitude\QueryBuilder\QueryInterface;
 use React\Promise\PromiseInterface;
 
 interface MiddlewareInterface
@@ -10,10 +11,10 @@ interface MiddlewareInterface
     /**
      * Returns the (modified) query through a promise.
      *
-     * @param QueryBuilder $query
+     * @param ExpressionInterface $query
      * @param callable $next
      *
      * @return PromiseInterface
      */
-    public function query(QueryBuilder $query, callable $next): PromiseInterface;
+    public function query(ExpressionInterface $query, callable $next): PromiseInterface;
 }

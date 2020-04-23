@@ -2,8 +2,10 @@
 
 namespace WyriHaximus\React\SimpleORM;
 
-use Plasma\SQL\QueryBuilder;
-use Plasma\SQL\QueryExpressions\Fragment;
+use Latitude\QueryBuilder\ExpressionInterface;
+use Latitude\QueryBuilder\Query\SelectQuery;
+use Latitude\QueryBuilder\QueryFactory;
+use Latitude\QueryBuilder\QueryInterface;
 use Ramsey\Uuid\Uuid;
 use React\Promise\LazyPromise;
 use React\Promise\Promise;
@@ -11,7 +13,15 @@ use React\Promise\PromiseInterface;
 use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
 use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
+use WyriHaximus\React\SimpleORM\Query\ExpressionWhere;
+use WyriHaximus\React\SimpleORM\Query\Where;
+use function Latitude\QueryBuilder\alias;
+use function Latitude\QueryBuilder\field;
+use function Latitude\QueryBuilder\func;
+use function Latitude\QueryBuilder\on;
 use function Safe\substr;
+use const WyriHaximus\Constants\Numeric\ONE;
+use const WyriHaximus\Constants\Numeric\ZERO;
 
 final class Repository implements RepositoryInterface
 {
@@ -23,40 +33,49 @@ final class Repository implements RepositoryInterface
     /** @var ClientInterface */
     private $client;
 
+    /** @var QueryFactory */
+    private $queryFactory;
+
     /** @var Hydrator */
     private $hydrator;
 
     /**
-     * @var QueryBuilder
+     * @var QueryInterface
      *
      * @psalm-suppress PropertyNotSetInConstructor
      */
     private $baseQuery;
 
-    /** @var string[] */
+    /** @var ExpressionInterface[] */
     private $fields = [];
 
     /** @var string[] */
     private $tableAliases = [];
 
-    public function __construct(InspectedEntityInterface $entity, ClientInterface $client)
+    public function __construct(InspectedEntityInterface $entity, ClientInterface $client, QueryFactory $queryFactory)
     {
         $this->entity = $entity;
         $this->client = $client;
+        $this->queryFactory = $queryFactory;
         $this->hydrator = new Hydrator();
     }
 
     public function count(): PromiseInterface
     {
         return $this->client->query(
-            QueryBuilder::create()->from($this->entity->getTable())->select([
-                'COUNT(*) AS count',
-            ])
+            $this->queryFactory->select(alias(func('COUNT', '*'), 'count'))->from($this->entity->getTable())->asExpression()
         )->take(self::SINGLE)->toPromise()->then(function (array $row): int {
             return (int)$row['count'];
         });
     }
 
+    /**
+     * @param int $page
+     * @param Where[]|ExpressionWhere[] $where
+     * @param array $order
+     * @param int $perPage
+     * @return Observable
+     */
     public function page(int $page, array $where = [], array $order = [], int $perPage = RepositoryInterface::DEFAULT_PER_PAGE): Observable
     {
         $query = $this->buildSelectQuery($where, $order);
@@ -65,11 +84,18 @@ final class Repository implements RepositoryInterface
         return $this->fetchAndHydrate($query);
     }
 
+    /**
+     * @param Where[]|ExpressionWhere[] $where
+     * @param array $order
+     * @param int $limit
+     *
+     * @return Observable
+     */
     public function fetch(array $where = [], array $order = [], int $limit = 0): Observable
     {
         $query = $this->buildSelectQuery($where, $order);
         if ($limit > 0) {
-            $query = $query->limit($limit);
+            $query = $query->limit($limit)->offset(0);
         }
 
         return $this->fetchAndHydrate($query);
@@ -85,14 +111,14 @@ final class Repository implements RepositoryInterface
         $fields = $this->prepareFields($fields);
 
         return $this->client->query(
-            QueryBuilder::create()->insert($fields)->into($this->entity->getTable())->returning()
-        )->toPromise()->then(function (array $row) use ($id): PromiseInterface {
+            $this->queryFactory->insert($this->entity->getTable(), $fields)->asExpression()
+        )->toPromise()->then(function () use ($id): PromiseInterface {
             return $this->fetch([
-                [
+                new Where(
                     'id',
-                    '=',
-                    $id,
-                ],
+                    'eq',
+                    [$id],
+                ),
             ])->take(1)->toPromise();
         });
     }
@@ -101,65 +127,67 @@ final class Repository implements RepositoryInterface
     {
         $fields = $this->hydrator->extract($this->entity, $entity);
         $fields['modified'] = new \DateTimeImmutable();
-
         $fields = $this->prepareFields($fields);
 
         return $this->client->query(
-            QueryBuilder::create()->
-            update($fields)->
-            into($this->entity->getTable())->
-            where('id', '=', $entity->getId())
+            $this->queryFactory->update($this->entity->getTable(), $fields)->
+            where(field('id')->eq($entity->getId()))->asExpression()
         )->toPromise()->then(function () use ($entity) {
             return $this->fetch([
-                ['id', '=', $entity->getId()],
-            ])->take(self::SINGLE)->toPromise();
+                new Where('id', 'eq', [$entity->getId()]),
+            ], [], ONE)->toPromise();
         });
     }
 
     /**
-     * @param mixed[] $where
+     * @param Where[]|ExpressionWhere[] $constraints
      * @param mixed[] $order
      *
-     * @return QueryBuilder
+     * @return SelectQuery
      */
-    private function buildSelectQuery(array $where = [], array $order = []): QueryBuilder
+    private function buildSelectQuery(array $constraints, array $order): SelectQuery
     {
-        $query = $this->getBaseQuery();
+        $query = $this->buildBaseSelectQuery();
 
-        $query = $query->select($this->fields);
+        $query = $query->columns(...array_values($this->fields));
 
-        foreach ($where as $constraint) {
-            $constraint[0] = $this->translateFieldName((string)$constraint[0]);
-            $query = $query->where(...$constraint);
+        $whereCount = count($constraints);
+        if ($whereCount > 0) {
+            foreach ($constraints as $i => $constraint) {
+                if ($constraint instanceof ExpressionWhere) {
+                    $where = $constraint->expression();
+                    $where = $constraint->applyExpression($where);
+                } else {
+                    $where = field($this->translateFieldName($constraint->field()));
+                    $where = $constraint->applyCriteria($where);
+                }
+
+                if ($i === 0) {
+                    $query = $query->where($where);
+                    continue;
+                }
+
+                $query = $query->andWhere($where);
+            }
         }
 
         foreach ($order as $by) {
-            $by[0] = $this->translateFieldName($by[0]);
-            $query = $query->orderBy(...$by);
+            $by[0] = $this->translateFieldName($by[ZERO]);
+            $query = $query->orderBy($by[ZERO], $by[ONE] ? 'desc' : 'asc');
         }
 
         return $query;
     }
 
-    private function getBaseQuery(): QueryBuilder
-    {
-        /** @psalm-suppress DocblockTypeContradiction */
-        if ($this->baseQuery === null) {
-            $this->baseQuery = $this->buildBaseQuery();
-        }
-
-        return clone $this->baseQuery;
-    }
-
-    private function buildBaseQuery(): QueryBuilder
+    private function buildBaseSelectQuery(): SelectQuery
     {
         $i = 0;
         $tableKey = \spl_object_hash($this->entity) . '___root';
         $this->tableAliases[$tableKey] = 't' . $i++;
-        $query = QueryBuilder::create()->from($this->entity->getTable(), $this->tableAliases[$tableKey]);
+        $query = $this->queryFactory->select()->from(alias($this->entity->getTable(), $this->tableAliases[$tableKey]));
 
         foreach ($this->entity->getFields() as $field) {
-            $this->fields[$this->tableAliases[$tableKey] . '___' . $field->getName()] = $this->tableAliases[$tableKey]. '.' . $field->getName();
+            $this->fields[$this->tableAliases[$tableKey] . '___' . $field->getName()] = alias($this->tableAliases[$tableKey]. '.' . $field->getName(), $this->tableAliases[$tableKey] . '___' . $field->getName());
         }
 
         $query = $this->buildJoins($query, $this->entity, $i);
@@ -167,7 +195,7 @@ final class Repository implements RepositoryInterface
         return $query;
     }
 
-    private function buildJoins(QueryBuilder $query, InspectedEntityInterface $entity, int &$i, string $rootProperty = 'root'): QueryBuilder
+    private function buildJoins(SelectQuery $query, InspectedEntityInterface $entity, int &$i, string $rootProperty = 'root'): SelectQuery
     {
         foreach ($entity->getJoins() as $join) {
             if ($join->getType() !== 'inner') {
@@ -187,11 +215,7 @@ final class Repository implements RepositoryInterface
                 $this->tableAliases[$tableKey] = 't' . $i++;
             }
 
-            $query = $query->innerJoin(
-                $join->getEntity()->getTable(),
-                $this->tableAliases[$tableKey]
-            );
-
+            $clauses = null;
             foreach ($join->getClause() as $clause) {
                 $onLeftSide = $this->tableAliases[$tableKey] . '.' . $clause->getForeignKey();
                 if ($clause->getForeignFunction() !== null) {
@@ -214,11 +238,25 @@ final class Repository implements RepositoryInterface
                     $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $clause->getLocalCast() . ')';
                 }
 
-                $query = $query->on($onLeftSide, $onRightSide);
+                if ($clauses === null) {
+                    $clauses = on($onLeftSide, $onRightSide);
+
+                    continue;
+                }
+
+                $clauses = on($onLeftSide, $onRightSide)->and($clauses);
             }
 
+            /** @psalm-suppress PossiblyNullArgument */
+            $query = $query->innerJoin(
+                alias(
+                    $join->getEntity()->getTable(), $this->tableAliases[$tableKey]
+                ),
+                $clauses
+            );
+
             foreach ($join->getEntity()->getFields() as $field) {
-                $this->fields[$this->tableAliases[$tableKey] . '___' . $field->getName()] = $this->tableAliases[$tableKey] . '.' . $field->getName();
+                $this->fields[$this->tableAliases[$tableKey] . '___' . $field->getName()] = alias($this->tableAliases[$tableKey] . '.' . $field->getName(), $this->tableAliases[$tableKey] . '___' . $field->getName());
             }
 
             unset($this->fields[$entity->getTable() . '___' . $join->getProperty()]);
@@ -229,10 +267,10 @@ final class Repository implements RepositoryInterface
         return $query;
     }
 
-    private function fetchAndHydrate(QueryBuilder $query): Observable
+    private function fetchAndHydrate(QueryInterface $query): Observable
     {
         return $this->client->query(
-            $query
+            $query->asExpression()
         )->map(function (array $row): array {
             return $this->inflate($row);
         })->map(function (array $row): array {
@@ -294,19 +332,25 @@ final class Repository implements RepositoryInterface
                         foreach ($join->getClause() as $clause) {
                             $onLeftSide = $clause->getForeignKey();
                             if ($clause->getForeignFunction() !== null) {
-                                /** @psalm-suppress PossiblyNullOperand */
-                                $onLeftSide = new Fragment($clause->getForeignFunction() . '(' . $onLeftSide . ')');
+                                /** @psalm-suppress PossiblyNullArgument */
+                                $onLeftSide = func($clause->getForeignFunction(), $onLeftSide);
                             }
                             if ($clause->getForeignCast() !== null) {
-                                /** @psalm-suppress PossiblyNullOperand */
-                                $onLeftSide = new Fragment('CAST(' . (string)$onLeftSide . ' AS ' . $clause->getForeignCast() . ')');
+                                /** @psalm-suppress PossiblyNullArgument */
+                                $onLeftSide = alias(func('CAST', $onLeftSide), $clause->getForeignCast());
                             }
 
-                            $where[] = [
+                            $whereClass = ExpressionWhere::class;
+                            if (is_string($onLeftSide)) {
+                                $whereClass = Where::class;
+                            }
+                            $where[] = new $whereClass(
                                 $onLeftSide,
-                                '=',
-                                $row[$this->tableAliases[$tableKey]][$clause->getLocalKey()],
-                            ];
+                                'eq',
+                                [
+                                    $row[$this->tableAliases[$tableKey]][$clause->getLocalKey()],
+                                ]
+                            );
                         }
 
                         $this->client
@@ -326,11 +370,13 @@ final class Repository implements RepositoryInterface
                     $where = [];
 
                     foreach ($join->getClause() as $clause) {
-                        $where[] = [
+                        $where[] = new Where(
                             $clause->getForeignKey(),
-                            '=',
-                            $row[$this->tableAliases[$tableKey]][$clause->getLocalKey()],
-                        ];
+                            'eq',
+                            [
+                                $row[$this->tableAliases[$tableKey]][$clause->getLocalKey()],
+                            ]
+                        );
                     }
 
                     return $this->client->getRepository($join->getEntity()->getClass())->fetch($where);
@@ -361,7 +407,7 @@ final class Repository implements RepositoryInterface
     {
         foreach ($fields as $key => $value) {
             if ($value instanceof \DateTimeInterface) {
-                $fields[$key] = $value = $value->format('Y-m-d H:i:s');
+                $fields[$key] = $value = date('Y-m-d H:i:s e', (int) $value->format('U'));
             }
 
             if (\is_scalar($value)) {

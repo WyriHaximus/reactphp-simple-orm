@@ -4,6 +4,8 @@ parameters:
 		- '#Cannot call method getDocBlockTypes() on Roave\\BetterReflection\\Reflection\\ReflectionProperty|null.#'
 		- '#Argument of an invalid type WyriHaximus\\React\\SimpleORM\\Annotation\\[a-zA-Z0-9_]+ supplied for foreach, only iterables are supported.#'
 		- '#Variable property access on \$this\(WyriHaximus\\React\\SimpleORM\\Annotation\\[a-zA-Z0-9_]+\).#'
+		- '#Variable method call on Latitude\\QueryBuilder\\Builder\\CriteriaBuilder#'
+		- '#Parameter \#1 $expression of class WyriHaximus\\React\\SimpleORM\\Query\\ExpressionWhere constructor expects Latitude\\QueryBuilder\\ExpressionInterface, Latitude\\QueryBuilder\\ExpressionInterface|string given.#'
 	classesAllowedToBeExtended:
 		- League\Fractal\Serializer\JsonApiSerializer
 		- League\Fractal\TransformerAbstract

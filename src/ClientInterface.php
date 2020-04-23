@@ -2,12 +2,13 @@
 
 namespace WyriHaximus\React\SimpleORM;
 
-use Plasma\SQL\QueryBuilder;
+use Latitude\QueryBuilder\ExpressionInterface;
+use Latitude\QueryBuilder\QueryInterface;
 use Rx\Observable;
 
 interface ClientInterface
 {
     public function getRepository(string $entity): RepositoryInterface;
 
-    public function query(QueryBuilder $query): Observable;
+    public function query(ExpressionInterface $query): Observable;
 }

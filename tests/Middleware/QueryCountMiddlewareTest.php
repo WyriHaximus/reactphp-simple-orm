@@ -2,6 +2,7 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM\Middleware;
 
+use Latitude\QueryBuilder\QueryFactory;
 use Plasma\SQL\QueryBuilder;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
@@ -33,7 +34,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         $deferred = new Deferred();
 
-        unwrapObservableFromPromise($middleware->query(QueryBuilder::create(), function () use ($deferred): PromiseInterface {
+        unwrapObservableFromPromise($middleware->query((new QueryFactory())->select()->asExpression(), function () use ($deferred): PromiseInterface {
             return $deferred->promise();
         }))->subscribe(function () {}, function () {});
 
@@ -80,7 +81,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         $deferred = new Deferred();
 
-        unwrapObservableFromPromise($middleware->query(QueryBuilder::create(), function () use ($deferred): PromiseInterface {
+        unwrapObservableFromPromise($middleware->query((new QueryFactory())->select()->asExpression(), function () use ($deferred): PromiseInterface {
             return $deferred->promise();
         }))->subscribe(function () {}, function () {});
 
@@ -129,7 +130,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         $deferred = new Deferred();
 
-        unwrapObservableFromPromise($middleware->query(QueryBuilder::create(), function () use ($deferred): PromiseInterface {
+        unwrapObservableFromPromise($middleware->query((new QueryFactory())->select()->asExpression(), function () use ($deferred): PromiseInterface {
             return $deferred->promise();
         }))->subscribe(function () {}, function () {});
 

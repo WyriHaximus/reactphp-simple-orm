@@ -4,6 +4,8 @@ namespace WyriHaximus\React\SimpleORM;
 
 use React\Promise\PromiseInterface;
 use Rx\Observable;
+use WyriHaximus\React\SimpleORM\Query\ExpressionWhere;
+use WyriHaximus\React\SimpleORM\Query\Where;
 
 interface RepositoryInterface
 {
@@ -13,7 +15,7 @@ interface RepositoryInterface
 
     /**
      * @param int $page
-     * @param mixed[] $where
+     * @param Where[]|ExpressionWhere[] $where
      * @param mixed[] $order
      * @param int $perPage
      *
@@ -22,7 +24,7 @@ interface RepositoryInterface
     public function page(int $page, array $where = [], array $order = [], int $perPage = self::DEFAULT_PER_PAGE): Observable;
 
     /**
-     * @param mixed[] $where
+     * @param Where[]|ExpressionWhere[] $where
      * @param mixed[] $order
      * @param int $limit
      *

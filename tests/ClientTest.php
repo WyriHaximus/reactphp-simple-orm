@@ -2,6 +2,8 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
+use Latitude\QueryBuilder\Partial\Criteria;
+use Latitude\QueryBuilder\QueryFactory;
 use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use function ApiClients\Tools\Rx\observableFromArray;
 use Doctrine\Common\Annotations\Reader;
@@ -14,6 +16,7 @@ use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
+use function Latitude\QueryBuilder\field;
 
 /**
  * @internal
@@ -62,7 +65,7 @@ final class ClientTest extends AsyncTestCase
 
     public function testFetch(): void
     {
-        $query = QueryBuilder::create()->select()->from('table')->where('id', '=', 1);
+        $query = (new QueryFactory())->select()->from('table')->where(field('id')->eq(1))->asExpression();
 
         $this->pgClient->executeStatement('SELECT * FROM "table" WHERE "id" = $1', [1])->shouldBeCalled()->willReturn(
             observableFromArray([

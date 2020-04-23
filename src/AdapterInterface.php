@@ -2,13 +2,14 @@
 
 namespace WyriHaximus\React\SimpleORM;
 
-use Plasma\SQL\GrammarInterface;
-use Plasma\SQL\QueryBuilder;
+use Latitude\QueryBuilder\EngineInterface;
+use Latitude\QueryBuilder\ExpressionInterface;
+use Latitude\QueryBuilder\QueryInterface;
 use Rx\Observable;
 
 interface AdapterInterface
 {
-    public function query(QueryBuilder $query): Observable;
+    public function query(ExpressionInterface $expression): Observable;
 
-    public function getGrammar(): GrammarInterface;
+    public function engine(): EngineInterface;
 }

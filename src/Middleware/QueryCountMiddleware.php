@@ -2,14 +2,13 @@
 
 namespace WyriHaximus\React\SimpleORM\Middleware;
 
-use PgAsync\Client as PgClient;
-use Plasma\SQL\QueryBuilder;
+use Latitude\QueryBuilder\ExpressionInterface;
+use Latitude\QueryBuilder\QueryInterface;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
 use Rx\Subject\Subject;
 use Throwable;
 use WyriHaximus\React\SimpleORM\MiddlewareInterface;
-use function React\Promise\reject;
 use function React\Promise\resolve;
 
 final class QueryCountMiddleware implements MiddlewareInterface
@@ -39,7 +38,7 @@ final class QueryCountMiddleware implements MiddlewareInterface
         $this->slowQueryTime = $slowQueryTime;
     }
 
-    public function query(QueryBuilder $query, callable $next): PromiseInterface
+    public function query(ExpressionInterface $query, callable $next): PromiseInterface
     {
         $this->initiatedCount++;
 

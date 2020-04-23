@@ -51,6 +51,7 @@ final class Hydrator
         /**
          * @psalm-suppress PossiblyNullReference
          * @psalm-suppress InvalidMethodCall
+         * @psalm-suppress InvalidStringClass
          */
         return $this->hydrators[$class]->hydrate($data, new $class());
     }

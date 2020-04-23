@@ -477,6 +477,7 @@ final class FunctionalTest extends AsyncTestCase
     public function increaseViews(): void
     {
         sleep(3);
+        self::waitUntilTheNextSecond();
 
         $repository = $this->client->getRepository(BlogPostStub::class);
 
@@ -502,6 +503,7 @@ final class FunctionalTest extends AsyncTestCase
         );
 
         self::assertSame(167, $updatedBlogPost->getViews());
+        self::assertSame($originalBlogPost->getId(), $updatedBlogPost->getId());
         self::assertSame($originalBlogPost->getCreated()->format('U'), $updatedBlogPost->getCreated()->format('U'));
         self::assertGreaterThan($originalBlogPost->getModified(), $updatedBlogPost->getModified());
         self::assertSame($timestamp, (int)$updatedBlogPost->getModified()->format('U'));

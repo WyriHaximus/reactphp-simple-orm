@@ -2,6 +2,10 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
+use Latitude\QueryBuilder\Engine\PostgresEngine;
+use Latitude\QueryBuilder\ExpressionInterface;
+use Latitude\QueryBuilder\QueryFactory;
+use WyriHaximus\React\SimpleORM\Query\Where;
 use function ApiClients\Tools\Rx\observableFromArray;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Plasma\SQL\QueryBuilder;
@@ -34,11 +38,11 @@ final class RepositoryTest extends AsyncTestCase
 
     public function testCount(): void
     {
-        $this->client->query(Argument::that(function (QueryBuilder $builder) {
-            self::assertCount(0, $builder->getParameters());
-            $query = $builder->getQuery();
-            self::assertStringContainsString('FROM users', $query);
-            self::assertStringContainsString('COUNT(*) AS count', $query);
+        $this->client->query(Argument::that(function (ExpressionInterface $expression) {
+            self::assertCount(0, $expression->params(new PostgresEngine()));
+            $query = $expression->sql(new PostgresEngine());
+            self::assertStringContainsString('FROM "users"', $query);
+            self::assertStringContainsString('COUNT(*) AS "count"', $query);
 
             return true;
         }))->shouldBeCalled()->willReturn(observableFromArray([
@@ -52,7 +56,8 @@ final class RepositoryTest extends AsyncTestCase
 
         $repository = new Repository(
             (new EntityInspector(new AnnotationReader()))->getEntity(UserStub::class),
-            $client
+            $client,
+            new QueryFactory()
         );
 
         self::assertSame(123, $this->await($repository->count()));
@@ -62,11 +67,11 @@ final class RepositoryTest extends AsyncTestCase
     {
         $this->client->getRepository(CommentStub::class)->shouldNotBeCalled();
 
-        $this->client->query(Argument::that(function (QueryBuilder $builder) {
-            self::assertCount(0, $builder->getParameters());
-            $query = $builder->getQuery();
+        $this->client->query(Argument::that(function (ExpressionInterface $expression) {
+            self::assertCount(0, $expression->params(new PostgresEngine()));
+            $query = $expression->sql(new PostgresEngine());
             self::assertStringContainsString('blog_posts', $query);
-            self::assertStringContainsString('COUNT(*) AS count', $query);
+            self::assertStringContainsString('COUNT(*) AS "count"', $query);
             self::assertStringNotContainsString('INNER JOIN users', $query);
             self::assertStringNotContainsString('LEFT JOIN comments', $query);
 
@@ -85,7 +90,8 @@ final class RepositoryTest extends AsyncTestCase
 
         $repository = new Repository(
             (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
-            $client
+            $client,
+            new QueryFactory()
         );
 
         self::assertSame(123, $this->await($repository->count()));
@@ -95,25 +101,25 @@ final class RepositoryTest extends AsyncTestCase
     {
         $this->client->getRepository(CommentStub::class)->shouldNotBeCalled();
 
-        $this->client->query(Argument::that(function (QueryBuilder $builder) {
-            self::assertCount(1, $builder->getParameters());
-            self::assertSame(['98ce9eaf-b38b-4a51-93ed-131ffac4051e'], $builder->getParameters());
-            $query = $builder->getQuery();
+        $this->client->query(Argument::that(function (ExpressionInterface $expression) {
+            self::assertCount(1, $expression->params(new PostgresEngine()));
+            self::assertSame(['98ce9eaf-b38b-4a51-93ed-131ffac4051e'], $expression->params(new PostgresEngine()));
+            $query = $expression->sql(new PostgresEngine());
             self::assertStringContainsString('blog_posts', $query);
             self::assertStringContainsString('users', $query);
             self::assertStringContainsString('INNER JOIN', $query);
-            self::assertStringContainsString('t1.id = t0.author_id', $query);
-            self::assertStringContainsString('t2.id = t0.publisher_id', $query);
+            self::assertStringContainsString('"t1"."id" = "t0"."author_id"', $query);
+            self::assertStringContainsString('"t2"."id" = "t0"."publisher_id"', $query);
             self::assertStringContainsString('WHERE', $query);
-            self::assertStringContainsString('t0.id = ?', $query);
+            self::assertStringContainsString('"t0"."id" = ?', $query);
             self::assertStringContainsString('ORDER BY', $query);
-            self::assertStringContainsString('t0.id DESC', $query);
+            self::assertStringContainsString('"t0"."id" DESC', $query);
 
             // Assert the LEFT JOIN isn't happening
-            self::assertStringNotContainsString('LEFT JOIN comments AS', $query);
+            self::assertStringNotContainsString('LEFT JOIN "comments" AS', $query);
 
             // Assert we're not loading in anything from the comments table
-            self::assertStringNotContainsString('FROM comments', $query);
+            self::assertStringNotContainsString('FROM "comments"', $query);
 
             return true;
         }))->shouldBeCalled()->willReturn(observableFromArray([
@@ -133,12 +139,13 @@ final class RepositoryTest extends AsyncTestCase
 
         $repository = new Repository(
             (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
-            $client
+            $client,
+            new QueryFactory()
         );
 
         /** @var BlogPostStub $blogPost */
         $blogPost = $this->await($repository->fetch([
-            ['id', '=', '98ce9eaf-b38b-4a51-93ed-131ffac4051e',],
+            new Where('id', 'eq', ['98ce9eaf-b38b-4a51-93ed-131ffac4051e']),
         ], [
             ['id', true,],
         ])->take(1)->toPromise());
@@ -158,33 +165,33 @@ final class RepositoryTest extends AsyncTestCase
         $client = $this->client->reveal();
 
         $this->client->getRepository(CommentStub::class)->shouldBeCalled()->willReturn(
-            new Repository((new EntityInspector(new AnnotationReader()))->getEntity(CommentStub::class), $client)
+            new Repository((new EntityInspector(new AnnotationReader()))->getEntity(CommentStub::class), $client, new QueryFactory())
         );
 
-        $this->client->query(Argument::that(function (QueryBuilder $builder) {
-            self::assertCount(1, $builder->getParameters());
-            self::assertSame(['99d00028-28d6-4194-b377-a0039b278c4d'], $builder->getParameters());
-            $query = $builder->getQuery();
+        $this->client->query(Argument::that(function (ExpressionInterface $expression) {
+            self::assertCount(1, $expression->params(new PostgresEngine()));
+            self::assertSame(['99d00028-28d6-4194-b377-a0039b278c4d'], $expression->params(new PostgresEngine()));
+            $query = $expression->sql(new PostgresEngine());
 
-            if (\strpos($query, 'FROM blog_posts') === false) {
+            if (\strpos($query, 'FROM "blog_posts"') === false) {
                 return false;
             }
 
             self::assertStringContainsString('blog_posts', $query);
             self::assertStringContainsString('users', $query);
             self::assertStringContainsString('INNER JOIN', $query);
-            self::assertStringContainsString('t1.id = t0.author_id', $query);
-            self::assertStringContainsString('t2.id = t0.publisher_id', $query);
+            self::assertStringContainsString('"t1"."id" = "t0"."author_id"', $query);
+            self::assertStringContainsString('"t2"."id" = "t0"."publisher_id"', $query);
             self::assertStringContainsString('WHERE', $query);
-            self::assertStringContainsString('t0.id = ?', $query);
+            self::assertStringContainsString('"t0"."id" = ?', $query);
             self::assertStringContainsString('ORDER BY', $query);
-            self::assertStringContainsString('t0.id DESC', $query);
+            self::assertStringContainsString('"t0"."id" DESC', $query);
 
             // Assert the LEFT JOIN isn't happening
-            self::assertStringNotContainsString('LEFT JOIN comments AS', $query);
+            self::assertStringNotContainsString('LEFT JOIN "comments" AS', $query);
 
             // Assert we're not loading in anything from the comments table
-            self::assertStringNotContainsString('FROM comments', $query);
+            self::assertStringNotContainsString('FROM "comments"', $query);
 
             return true;
         }))->shouldBeCalled()->willReturn(observableFromArray([
@@ -198,21 +205,21 @@ final class RepositoryTest extends AsyncTestCase
                 ],
         ]));
 
-        $this->client->query(Argument::that(function (QueryBuilder $builder) {
-            self::assertCount(1, $builder->getParameters());
-            self::assertSame(['99d00028-28d6-4194-b377-a0039b278c4d'], $builder->getParameters());
-            $query = $builder->getQuery();
+        $this->client->query(Argument::that(function (ExpressionInterface $expression) {
+            self::assertCount(1, $expression->params(new PostgresEngine()));
+            self::assertSame(['99d00028-28d6-4194-b377-a0039b278c4d'], $expression->params(new PostgresEngine()));
+            $query = $expression->sql(new PostgresEngine());
 
-            if (\strpos($query, 'FROM comments') === false) {
+            if (\strpos($query, 'FROM "comments"') === false) {
                 return false;
             }
 
-            self::assertStringContainsString('FROM comments', $query);
+            self::assertStringContainsString('FROM "comments"', $query);
             self::assertStringContainsString('users', $query);
-            self::assertStringContainsString('INNER JOIN users', $query);
-            self::assertStringContainsString('t1.id = t0.author_id', $query);
+            self::assertStringContainsString('INNER JOIN "users"', $query);
+            self::assertStringContainsString('"t1"."id" = "t0"."author_id"', $query);
             self::assertStringContainsString('WHERE', $query);
-            self::assertStringContainsString('t0.blog_post_id = ?', $query);
+            self::assertStringContainsString('"t0"."blog_post_id" = ?', $query);
 
             return true;
         }))->shouldBeCalled()->willReturn(observableFromArray([
@@ -272,12 +279,13 @@ final class RepositoryTest extends AsyncTestCase
 
         $repository = new Repository(
             (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
-            $client
+            $client,
+            new QueryFactory()
         );
 
         /** @var BlogPostStub $blogPost */
         $blogPost = $this->await($repository->fetch([
-            ['id', '=', '99d00028-28d6-4194-b377-a0039b278c4d',],
+            new Where('id', 'eq', ['99d00028-28d6-4194-b377-a0039b278c4d']),
         ], [
             ['id', true,],
         ])->take(1)->toPromise());

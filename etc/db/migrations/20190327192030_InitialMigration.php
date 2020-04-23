@@ -9,8 +9,8 @@ class InitialMigration extends AbstractMigration
         $this->table('users', ['id' => false, 'primary_key' => ['id']])
             ->addColumn('id', 'uuid')
             ->addColumn('name', 'string')
-            ->addColumn('created', 'datetime')
-            ->addColumn('modified', 'datetime')
+            ->addColumn('created', 'datetime', ['timezone' => true])
+            ->addColumn('modified', 'datetime', ['timezone' => true])
             ->create();
 
         $this->table('blog_posts', ['id' => false, 'primary_key' => ['id']])
@@ -22,8 +22,8 @@ class InitialMigration extends AbstractMigration
             ->addColumn('title', 'string')
             ->addColumn('contents', 'string')
             ->addColumn('views', 'integer')
-            ->addColumn('created', 'datetime')
-            ->addColumn('modified', 'datetime')
+            ->addColumn('created', 'datetime', ['timezone' => true])
+            ->addColumn('modified', 'datetime', ['timezone' => true])
             ->create();
 
         $this->table('comments', ['id' => false, 'primary_key' => ['id']])
@@ -31,8 +31,8 @@ class InitialMigration extends AbstractMigration
             ->addColumn('author_id', 'uuid')
             ->addColumn('blog_post_id', 'uuid')
             ->addColumn('contents', 'string')
-            ->addColumn('created', 'datetime')
-            ->addColumn('modified', 'datetime')
+            ->addColumn('created', 'datetime', ['timezone' => true])
+            ->addColumn('modified', 'datetime', ['timezone' => true])
             ->create();
     }
 }
