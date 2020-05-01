@@ -6,28 +6,24 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
 use Latitude\QueryBuilder\ExpressionInterface;
 use Latitude\QueryBuilder\QueryFactory;
-use Latitude\QueryBuilder\QueryInterface;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
 use function ApiClients\Tools\Rx\unwrapObservableFromPromise;
+use function array_key_exists;
 use function React\Promise\resolve;
 
 final class Client implements ClientInterface
 {
-    /** @var AdapterInterface */
-    private $adapter;
+    private AdapterInterface $adapter;
 
-    /** @var EntityInspector */
-    private $entityInspector;
+    private EntityInspector $entityInspector;
 
     /** @var Repository[] */
-    private $repositories = [];
+    private array $repositories = [];
 
-    /** @var MiddlewareRunner */
-    private $middlewareRunner;
+    private MiddlewareRunner $middlewareRunner;
 
-    /** @var QueryFactory */
-    private $queryFactory;
+    private QueryFactory $queryFactory;
 
     /**
      * @param array<int, MiddlewareInterface> $middleware
@@ -50,16 +46,16 @@ final class Client implements ClientInterface
      */
     private function __construct(AdapterInterface $adapter, Reader $annotationReader, MiddlewareInterface ...$middleware)
     {
-        $this->adapter = $adapter;
+        $this->adapter         = $adapter;
         $this->entityInspector = new EntityInspector($annotationReader);
-        $this->queryFactory = new QueryFactory($adapter->engine());
+        $this->queryFactory    = new QueryFactory($adapter->engine());
 
         $this->middlewareRunner = new MiddlewareRunner(...$middleware);
     }
 
     public function getRepository(string $entity): RepositoryInterface
     {
-        if (!array_key_exists($entity, $this->repositories)) {
+        if (! array_key_exists($entity, $this->repositories)) {
             $this->repositories[$entity] = new Repository($this->entityInspector->getEntity($entity), $this, $this->queryFactory);
         }
 
@@ -70,8 +66,7 @@ final class Client implements ClientInterface
     {
         return unwrapObservableFromPromise($this->middlewareRunner->query(
             $query,
-            function (ExpressionInterface $query): PromiseInterface
-            {
+            function (ExpressionInterface $query): PromiseInterface {
                 return resolve($this->adapter->query($query));
             }
         ));

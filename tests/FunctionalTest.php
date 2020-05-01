@@ -5,6 +5,8 @@ namespace WyriHaximus\React\Tests\SimpleORM;
 use PgAsync\Client as PgClient;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
+use React\Promise\PromiseInterface;
+use Safe\DateTimeImmutable;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use WyriHaximus\React\SimpleORM\Client;
@@ -13,47 +15,47 @@ use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
+use function array_map;
+use function array_values;
+use function assert;
+use function bin2hex;
+use function exec;
+use function getenv;
+use function random_bytes;
 use function Safe\sleep;
+use function time;
 use function WyriHaximus\iteratorOrArrayToArray;
 
-/**
- * @internal
- */
 final class FunctionalTest extends AsyncTestCase
 {
-    /**
-     * @var LoopInterface
-     */
-    private $loop;
+    private const AWAIT_TIMEOUT = 66.6;
 
-    /**
-     * @var ClientInterface
-     */
-    private $client;
+    private LoopInterface $loop;
 
-    /** @var QueryCountMiddleware */
-    private $counter;
+    private ClientInterface $client;
+
+    private QueryCountMiddleware $counter;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        \exec('PHINX_DB_HOST=localhost php ./vendor/bin/phinx rollback');
-        \exec('PHINX_DB_HOST=localhost php ./vendor/bin/phinx migrate');
-        \exec('PHINX_DB_HOST=localhost php ./vendor/bin/phinx seed:run -v');
+        exec('php ./vendor/bin/phinx rollback');
+        exec('php ./vendor/bin/phinx migrate');
+        exec('php ./vendor/bin/phinx seed:run -v');
 
         $this->counter = new QueryCountMiddleware(1);
 
-        $this->loop = Factory::create();
+        $this->loop   = Factory::create();
         $this->client = Client::create(
             new Postgres(
                 new PgClient(
                     [
-                        'host' => 'localhost',
+                        'host' => getenv('PHINX_DB_HOST'),
                         'port' => 5432,
-                        'user'     => \getenv('PHINX_DB_USER'),
-                        'password' => \getenv('PHINX_DB_PASSWORD'),
-                        'database' => \getenv('PHINX_DB_DATABASE'),
+                        'user'     => getenv('PHINX_DB_USER'),
+                        'password' => getenv('PHINX_DB_PASSWORD'),
+                        'database' => getenv('PHINX_DB_DATABASE'),
                     ],
                     $this->loop
                 )
@@ -71,7 +73,8 @@ final class FunctionalTest extends AsyncTestCase
             3,
             $this->await(
                 $this->client->getRepository(UserStub::class)->count(),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -93,7 +96,8 @@ final class FunctionalTest extends AsyncTestCase
             3,
             $this->await(
                 $this->client->getRepository(UserStub::class)->fetch()->toArray()->toPromise(),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -115,7 +119,8 @@ final class FunctionalTest extends AsyncTestCase
             2,
             $this->await(
                 $this->client->getRepository(BlogPostStub::class)->count(),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -137,7 +142,8 @@ final class FunctionalTest extends AsyncTestCase
             2,
             $this->await(
                 $this->client->getRepository(BlogPostStub::class)->fetch()->toArray()->toPromise(),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -158,10 +164,11 @@ final class FunctionalTest extends AsyncTestCase
         self::assertCount(
             2,
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getComments()->toArray()->toPromise();
                 }),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -182,10 +189,11 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame(
             'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): string {
                     return $blogPost->getAuthor()->getId();
                 }),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -206,10 +214,11 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame(
             'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch([], [], 1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                $this->client->getRepository(BlogPostStub::class)->fetch([], [], 1)->toPromise()->then(static function (BlogPostStub $blogPost): string {
                     return $blogPost->getAuthor()->getId();
                 }),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -232,16 +241,17 @@ final class FunctionalTest extends AsyncTestCase
                 '2fa0d077-d374-4409-b1ef-9687c6729158',
                 '15f25357-4b3d-4d4d-b6a5-2ceb93864b77',
             ],
-            \array_values(
-                \array_map(
-                    function (CommentStub $comment) {
+            array_values(
+                array_map(
+                    static function (CommentStub $comment): string {
                         return $comment->getAuthor()->getId();
                     },
                     $this->await(
-                        $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                        $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                             return $blogPost->getComments()->toArray()->toPromise();
                         }),
-                        $this->loop
+                        $this->loop,
+                        self::AWAIT_TIMEOUT
                     )
                 )
             )
@@ -264,10 +274,11 @@ final class FunctionalTest extends AsyncTestCase
         self::assertInstanceOf(
             BlogPostStub::class,
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getNextBlogPost();
                 }),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -285,13 +296,13 @@ final class FunctionalTest extends AsyncTestCase
      */
     public function firstBlogPostPreviousBlogPostResolvesToNull(): void
     {
-        self::assertSame(
-            null,
+        self::assertNull(
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(function (BlogPostStub $blogPost) {
+                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getPreviousBlogPost();
                 }),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -312,12 +323,13 @@ final class FunctionalTest extends AsyncTestCase
         self::assertCount(
             1,
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
+                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
                     return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
-                })->toPromise()->then(function (BlogPostStub $blogPost) {
+                })->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getComments()->toArray()->toPromise();
                 }),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -338,12 +350,13 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame(
             '15f25357-4b3d-4d4d-b6a5-2ceb93864b77',
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
+                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
                     return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
-                })->toPromise()->then(function (BlogPostStub $blogPost) {
+                })->toPromise()->then(static function (BlogPostStub $blogPost): string {
                     return $blogPost->getAuthor()->getId();
                 }),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -362,21 +375,20 @@ final class FunctionalTest extends AsyncTestCase
     public function secondBlogPostCommentAuthorIds(): void
     {
         self::assertSame(
-            [
-                'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
-            ],
-            \array_values(
-                \array_map(
-                    function (CommentStub $comment) {
+            ['fb175cbc-04cc-41c7-8e35-6b817ac016ca'],
+            array_values(
+                array_map(
+                    static function (CommentStub $comment): string {
                         return $comment->getAuthor()->getId();
                     },
                     $this->await(
-                        $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
+                        $this->client->getRepository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
                             return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
-                        })->toPromise()->then(function (BlogPostStub $blogPost) {
+                        })->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                             return $blogPost->getComments()->toArray()->toPromise();
                         }),
-                        $this->loop
+                        $this->loop,
+                        self::AWAIT_TIMEOUT
                     )
                 )
             )
@@ -399,14 +411,15 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame(
             'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
+                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
                     return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
-                })->toPromise()->then(function (BlogPostStub $blogPost) {
+                })->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getPreviousBlogPost();
-                })->then(function (BlogPostStub $blogPost) {
+                })->then(static function (BlogPostStub $blogPost): string {
                     return $blogPost->getAuthor()->getId();
                 }),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -424,15 +437,15 @@ final class FunctionalTest extends AsyncTestCase
      */
     public function secondBlogPostNextBlogPostResolvesToNull(): void
     {
-        self::assertSame(
-            null,
+        self::assertNull(
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(function (BlogPostStub $blogPost): bool {
+                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
                     return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
-                })->toPromise()->then(function (BlogPostStub $blogPost) {
+                })->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getNextBlogPost();
                 }),
-                $this->loop
+                $this->loop,
+                self::AWAIT_TIMEOUT
             )
         );
 
@@ -452,13 +465,12 @@ final class FunctionalTest extends AsyncTestCase
     {
         $name = 'Commander Fuzzy paws';
 
-        $fields = [
-            'name' => $name,
-        ];
+        $fields = ['name' => $name];
 
         $user = $this->await(
             $this->client->getRepository(UserStub::class)->create($fields),
-            $this->loop
+            $this->loop,
+            self::AWAIT_TIMEOUT
         );
 
         self::assertSame($name, $user->getName());
@@ -481,32 +493,33 @@ final class FunctionalTest extends AsyncTestCase
 
         $repository = $this->client->getRepository(BlogPostStub::class);
 
-        /** @var BlogPostStub $originalBlogPost */
         $originalBlogPost = null;
+        $timestamp        = null;
+        $randomContents   = bin2hex(random_bytes(13));
 
-        /** @var int $timestamp */
-        $timestamp = null;
-
-        /** @var BlogPostStub $updatedBlogPost */
         $updatedBlogPost = $this->await(
-            $repository->fetch()->takeLast(1)->toPromise()->then(function (BlogPostStub $blogPost) use (&$originalBlogPost, &$timestamp) {
+            $repository->fetch()->takeLast(1)->toPromise()->then(static function (BlogPostStub $blogPost) use (&$originalBlogPost, &$timestamp, $randomContents): BlogPostStub {
                 self::waitUntilTheNextSecond();
 
                 $originalBlogPost = $blogPost;
-                $timestamp = \time();
+                $timestamp        = time();
 
-                return $blogPost->withViews($blogPost->getViews() + 1);
-            })->then(function (BlogPostStub $blogPost) use ($repository) {
+                return $blogPost->withViews($blogPost->getViews() + 1)->withFields(['contents' => $randomContents, 'id' => 'nah', 'created' => new DateTimeImmutable(), 'modified' => new DateTimeImmutable()]);
+            })->then(static function (BlogPostStub $blogPost) use ($repository): PromiseInterface {
                 return $repository->update($blogPost);
             }),
-            $this->loop
+            $this->loop,
+            self::AWAIT_TIMEOUT
         );
+
+        assert($originalBlogPost instanceof BlogPostStub);
+        assert($updatedBlogPost instanceof BlogPostStub);
 
         self::assertSame(167, $updatedBlogPost->getViews());
         self::assertSame($originalBlogPost->getId(), $updatedBlogPost->getId());
         self::assertSame($originalBlogPost->getCreated()->format('U'), $updatedBlogPost->getCreated()->format('U'));
         self::assertGreaterThan($originalBlogPost->getModified(), $updatedBlogPost->getModified());
-        self::assertSame($timestamp, (int)$updatedBlogPost->getModified()->format('U'));
+        self::assertSame($timestamp, (int) $updatedBlogPost->getModified()->format('U'));
         self::assertSame([
             'initiated' => 3,
             'successful' => 3,
@@ -514,6 +527,8 @@ final class FunctionalTest extends AsyncTestCase
             'slow' => 0,
             'completed' => 3,
         ], iteratorOrArrayToArray($this->counter->getCounters()));
+        self::assertNotSame($originalBlogPost->getContents(), $updatedBlogPost->getContents());
+        self::assertSame($updatedBlogPost->getContents(), $randomContents);
     }
 
     /**
@@ -523,15 +538,13 @@ final class FunctionalTest extends AsyncTestCase
     {
         $repository = $this->client->getRepository(UserStub::class);
 
-        /** @var string|null $userId */
         $userId = null;
 
-        /** @var UserStub|null $self */
-        $self = $this->await($repository->fetch()->take(1)->toPromise()->then(function (UserStub $user) use (&$userId) {
+        $self = $this->await($repository->fetch()->take(1)->toPromise()->then(static function (UserStub $user) use (&$userId): PromiseInterface {
             $userId = $user->getId();
 
             return $user->getZelf();
-        }), $this->loop);
+        }), $this->loop, self::AWAIT_TIMEOUT);
 
         self::assertNotNull($userId);
         self::assertNotNull($self);

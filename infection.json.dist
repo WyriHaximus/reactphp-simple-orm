@@ -8,79 +8,49 @@
     "logs": {
         "text": "infection-log.txt"
     },
-     "mutators": {
-         "@default": true,
-         "Multiplication": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::page"
-             ]
-         },
-         "Decrement": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::page"
-             ]
-         },
-         "DecrementInteger": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::translateFieldName"
-             ]
-         },
-         "IncrementInteger": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::create",
-                 "WyriHaximus\\React\\SimpleORM\\Repository::count",
-                 "WyriHaximus\\React\\SimpleORM\\Repository::buildTree",
-                 "WyriHaximus\\React\\SimpleORM\\Repository::translateFieldName"
-             ]
-         },
-         "Increment": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Middleware\\QueryCountMiddleware::query"
-             ]
-         },
-         "OneZeroInteger": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::count",
-                 "WyriHaximus\\React\\SimpleORM\\Repository::translateFieldName"
-             ]
-         },
-         "Foreach_": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::buildTree",
-                 "WyriHaximus\\React\\SimpleORM\\Tools\\WithFieldsTrait::withFields"
-             ]
-         },
-         "CastString": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::buildTree"
-             ]
-         },
-         "Plus": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::translateFieldName"
-             ]
-         },
-         "NotIdentical": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::buildTree",
-                 "WyriHaximus\\React\\SimpleORM\\Repository::buildJoins"
-             ]
-         },
-         "Continue_": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Repository::buildJoins",
-                 "WyriHaximus\\React\\SimpleORM\\Tools\\WithFieldsTrait::withFields"
-             ]
-         },
-         "PublicVisibility": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Tools\\WithFieldsTrait::withFields"
-             ]
-         },
-         "ArrayItemRemoval": {
-             "ignore": [
-                 "WyriHaximus\\React\\SimpleORM\\Tools\\WithFieldsTrait::withFields"
-             ]
-         }
-     }
+    "mutators": {
+        "@default": true,
+        "CastInt": false,
+        "CastString": false,
+        "Increment": false,
+        "GreaterThan": false,
+        "Identical": false,
+        "Continue_": false,
+        "Multiplication": false,
+        "Plus": false,
+        "Foreach_": false,
+        "CloneRemoval": false,
+        "Decrement": false,
+        "FunctionCallRemoval": {
+            "ignore": [
+                "WyriHaximus\\TestUtilities\\TestCase::waitUntilTheNextSecond"
+            ]
+        },
+        "MethodCallRemoval": {
+            "ignore": [
+                "WyriHaximus\\TestUtilities\\TestCase::tearDown"
+            ]
+        },
+        "TrueValue": {
+            "ignore": [
+                "WyriHaximus\\TestUtilities\\TestCase::provideTrueFalse"
+            ]
+        },
+        "ArrayItemRemoval": false,
+        "FalseValue": {
+            "ignore": [
+                "WyriHaximus\\TestUtilities\\TestCase::provideTrueFalse"
+            ]
+        },
+        "PublicVisibility": {
+            "ignore": [
+                "WyriHaximus\\TestUtilities\\TestCase::provideTrueFalse"
+            ]
+        },
+        "UnwrapStrToUpper": {
+            "ignore": [
+                "WyriHaximus\\TestUtilities\\TestCase::getSysTempDir"
+            ]
+        }
+    }
 }

@@ -3,35 +3,29 @@
 namespace WyriHaximus\React\SimpleORM\Middleware;
 
 use Latitude\QueryBuilder\ExpressionInterface;
-use Latitude\QueryBuilder\QueryInterface;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
 use Rx\Subject\Subject;
 use Throwable;
 use WyriHaximus\React\SimpleORM\MiddlewareInterface;
+use function hrtime;
 use function React\Promise\resolve;
 
 final class QueryCountMiddleware implements MiddlewareInterface
 {
     private const ZERO = 0;
 
-    /** @var int */
-    private $initiatedCount = self::ZERO;
+    private int $initiatedCount = self::ZERO;
 
-    /** @var int */
-    private $successfulCount = self::ZERO;
+    private int $successfulCount = self::ZERO;
 
-    /** @var int */
-    private $erroredCount = self::ZERO;
+    private int $erroredCount = self::ZERO;
 
-    /** @var int */
-    private $slowCount = self::ZERO;
+    private int $slowCount = self::ZERO;
 
-    /** @var int */
-    private $completedCount = self::ZERO;
+    private int $completedCount = self::ZERO;
 
-    /** @var int */
-    private $slowQueryTime;
+    private int $slowQueryTime;
 
     public function __construct(int $slowQueryTime)
     {
@@ -45,9 +39,9 @@ final class QueryCountMiddleware implements MiddlewareInterface
         $startTime = hrtime()[0];
 
         return resolve($next($query))->then(function (Observable $observable) use ($startTime): PromiseInterface {
-            return resolve(Observable::defer(function () use ($observable, $startTime) {
+            return resolve(Observable::defer(function () use ($observable, $startTime): Subject {
                 $handledInitialRow = false;
-                $subject = new Subject();
+                $subject           = new Subject();
                 $observable->subscribe(
                     function (array $row) use ($subject, $startTime, &$handledInitialRow): void {
                         $subject->onNext($row);
@@ -84,11 +78,15 @@ final class QueryCountMiddleware implements MiddlewareInterface
                         $this->successfulCount++;
                     },
                 );
+
                 return $subject;
             }));
         });
     }
 
+    /**
+     * @return iterable<string, int>
+     */
     public function getCounters(): iterable
     {
         yield 'initiated' => $this->initiatedCount;
@@ -100,10 +98,10 @@ final class QueryCountMiddleware implements MiddlewareInterface
 
     public function resetCounters(): void
     {
-        $this->initiatedCount = self::ZERO;
+        $this->initiatedCount  = self::ZERO;
         $this->successfulCount = self::ZERO;
-        $this->erroredCount = self::ZERO;
-        $this->slowCount = self::ZERO;
-        $this->completedCount = self::ZERO;
+        $this->erroredCount    = self::ZERO;
+        $this->slowCount       = self::ZERO;
+        $this->completedCount  = self::ZERO;
     }
 }

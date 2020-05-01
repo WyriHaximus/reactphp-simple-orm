@@ -2,49 +2,35 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
-use Latitude\QueryBuilder\Partial\Criteria;
-use Latitude\QueryBuilder\QueryFactory;
-use WyriHaximus\React\SimpleORM\Adapter\Postgres;
-use function ApiClients\Tools\Rx\observableFromArray;
 use Doctrine\Common\Annotations\Reader;
+use Latitude\QueryBuilder\QueryFactory;
 use PgAsync\Client as PgClient;
-use Plasma\SQL\QueryBuilder;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionClass;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
+use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
+use function ApiClients\Tools\Rx\observableFromArray;
 use function Latitude\QueryBuilder\field;
 
-/**
- * @internal
- */
 final class ClientTest extends AsyncTestCase
 {
-    /**
-     * @var ObjectProphecy
-     */
-    private $pgClient;
+    private ObjectProphecy $pgClient;
 
-    /**
-     * @var ObjectProphecy
-     */
-    private $annotationReader;
+    private ObjectProphecy $annotationReader;
 
-    /**
-     * @var Client
-     */
-    private $client;
+    private Client $client;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->pgClient = $this->prophesize(PgClient::class);
+        $this->pgClient         = $this->prophesize(PgClient::class);
         $this->annotationReader = $this->prophesize(Reader::class);
-        $this->client = Client::createWithAnnotationReader(new Postgres($this->pgClient->reveal()), $this->annotationReader->reveal());
+        $this->client           = Client::createWithAnnotationReader(new Postgres($this->pgClient->reveal()), $this->annotationReader->reveal());
     }
 
     public function testGetRepository(): void

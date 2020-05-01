@@ -13,6 +13,8 @@ services:
       - postgres
     depends_on:
       - postgres
+    networks:
+        - reactphp-simple-orm
 
   postgres:
     ports:
@@ -20,4 +22,10 @@ services:
     image: postgres:11.2-alpine
     restart: always
     environment:
-      POSTGRES_PASSWORD:
+      POSTGRES_PASSWORD: postgres
+    networks:
+        - reactphp-simple-orm
+
+networks:
+    reactphp-simple-orm:
+        name: reactphp-simple-orm

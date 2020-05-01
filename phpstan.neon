@@ -1,14 +1,19 @@
 parameters:
 	ignoreErrors:
-		- '#Class WyriHaximus\\React\\Tests\\SimpleORM\\Stub\\[a-zA-Z0-9_]+ is neither abstract nor final.#'
-		- '#Cannot call method getDocBlockTypes() on Roave\\BetterReflection\\Reflection\\ReflectionProperty|null.#'
-		- '#Argument of an invalid type WyriHaximus\\React\\SimpleORM\\Annotation\\[a-zA-Z0-9_]+ supplied for foreach, only iterables are supported.#'
-		- '#Variable property access on \$this\(WyriHaximus\\React\\SimpleORM\\Annotation\\[a-zA-Z0-9_]+\).#'
-		- '#Variable method call on Latitude\\QueryBuilder\\Builder\\CriteriaBuilder#'
-		- '#Parameter \#1 $expression of class WyriHaximus\\React\\SimpleORM\\Query\\ExpressionWhere constructor expects Latitude\\QueryBuilder\\ExpressionInterface, Latitude\\QueryBuilder\\ExpressionInterface|string given.#'
-	classesAllowedToBeExtended:
-		- League\Fractal\Serializer\JsonApiSerializer
-		- League\Fractal\TransformerAbstract
+		- '#Variable method call on Latitude\\QueryBuilder\\Builder\\CriteriaBuilder.#'
+		- '#Method WyriHaximus\\React\\SimpleORM\\LazyInspectedEntity::getTable\(\) should return string but returns string\|null.#'
+		- '#Method WyriHaximus\\React\\SimpleORM\\Annotation\\Clause::getLocalCast\(\) has a nullable return type declaration.#'
+		- '#Method WyriHaximus\\React\\SimpleORM\\Annotation\\Clause::getForeignCast\(\) has a nullable return type declaration.#'
+		- '#Method WyriHaximus\\React\\SimpleORM\\Annotation\\Clause::getLocalFunction\(\) has a nullable return type declaration.#'
+		- '#Method WyriHaximus\\React\\SimpleORM\\Annotation\\Clause::getForeignFunction\(\) has a nullable return type declaration.#'
+		- '#Variable property access on \$this\(WyriHaximus\\React\\SimpleORM\\Annotation\\Clause\).#'
+		- '#Variable property access on \$this\(WyriHaximus\\React\\SimpleORM\\Annotation\\InnerJoin\).#'
+		- '#Variable property access on \$this\(WyriHaximus\\React\\SimpleORM\\Annotation\\LeftJoin\).#'
+		- '#Parameter \#1 \$argument of class ReflectionClass constructor expects class-string<T of object>\|T of object, string given.#'
+		- '#Variable property access on#'
+	ergebnis:
+		classesAllowedToBeExtended:
+			- WyriHaximus\TestUtilities\TestCase
 
 includes:
 	- vendor/wyrihaximus/async-test-utilities/rules.neon

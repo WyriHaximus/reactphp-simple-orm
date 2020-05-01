@@ -6,6 +6,7 @@ use WyriHaximus\React\SimpleORM\Annotation\Clause;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\EntityInterface;
+use WyriHaximus\React\SimpleORM\Tools\WithFieldsTrait;
 
 /**
  * @Table("comments")
@@ -30,25 +31,23 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
         property="blog_post"
  * )
  */
-class CommentStub implements EntityInterface
+final class CommentStub implements EntityInterface
 {
-    /** @var string */
-    protected $id;
+    use WithFieldsTrait;
 
-    /** @var string */
-    protected $author_id;
+    //phpcs:disable
+    protected string $id;
 
-    /** @var UserStub */
-    protected $author;
+    protected string $author_id;
 
-    /** @var string */
-    protected $blog_post_id;
+    protected UserStub $author;
 
-    /** @var BlogPostStub */
-    protected $blog_post;
+    protected string $blog_post_id;
 
-    /** @var string */
-    protected $contents;
+    protected BlogPostStub $blog_post;
+
+    protected string $contents;
+    //phpcs:enable
 
     public function getId(): string
     {
@@ -62,7 +61,9 @@ class CommentStub implements EntityInterface
 
     public function getBlogPost(): BlogPostStub
     {
+        //phpcs:disable
         return $this->blog_post;
+        //phpcs:enable
     }
 
     public function getAuthor(): UserStub

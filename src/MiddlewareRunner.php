@@ -3,9 +3,8 @@
 namespace WyriHaximus\React\SimpleORM;
 
 use Latitude\QueryBuilder\ExpressionInterface;
-use Latitude\QueryBuilder\QueryInterface;
 use React\Promise\PromiseInterface;
-use const WyriHaximus\Constants\Numeric\ONE;
+use function array_key_exists;
 use const WyriHaximus\Constants\Numeric\ZERO;
 
 /**
@@ -15,7 +14,7 @@ use const WyriHaximus\Constants\Numeric\ZERO;
 final class MiddlewareRunner
 {
     /** @var MiddlewareInterface[] */
-    private $middleware;
+    private array $middleware;
 
     /**
      * @param array<int, MiddlewareInterface> $middleware
@@ -27,7 +26,7 @@ final class MiddlewareRunner
 
     public function query(ExpressionInterface $query, callable $last): PromiseInterface
     {
-        if (!array_key_exists(ZERO, $this->middleware)) {
+        if (! array_key_exists(ZERO, $this->middleware)) {
             return $last($query);
         }
 
@@ -39,11 +38,11 @@ final class MiddlewareRunner
         $nextPosition = $position;
         $nextPosition++;
         // final request handler will be invoked without hooking into the promise
-        if (!array_key_exists($nextPosition, $this->middleware)) {
+        if (! array_key_exists($nextPosition, $this->middleware)) {
             return $this->middleware[$position]->query($query, $last);
         }
 
-        return $this->middleware[$position]->query($query, function (ExpressionInterface $query) use ($nextPosition, $last) {
+        return $this->middleware[$position]->query($query, function (ExpressionInterface $query) use ($nextPosition, $last): PromiseInterface {
             return $this->call($query, $nextPosition, $last);
         });
     }

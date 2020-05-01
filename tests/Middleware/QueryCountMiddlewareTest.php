@@ -2,13 +2,12 @@
 
 namespace WyriHaximus\React\Tests\SimpleORM\Middleware;
 
+use Exception;
 use Latitude\QueryBuilder\QueryFactory;
-use Plasma\SQL\QueryBuilder;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use Rx\Subject\Subject;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
-use WyriHaximus\React\SimpleORM\Middleware\ExecuteQueryMiddleware;
 use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
 use function ApiClients\Tools\Rx\observableFromArray;
 use function ApiClients\Tools\Rx\unwrapObservableFromPromise;
@@ -34,9 +33,11 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         $deferred = new Deferred();
 
-        unwrapObservableFromPromise($middleware->query((new QueryFactory())->select()->asExpression(), function () use ($deferred): PromiseInterface {
+        unwrapObservableFromPromise($middleware->query((new QueryFactory())->select()->asExpression(), static function () use ($deferred): PromiseInterface {
             return $deferred->promise();
-        }))->subscribe(function () {}, function () {});
+        }))->subscribe(static function (): void {
+        }, static function (): void {
+        });
 
         self::assertSame([
             'initiated' => 1,
@@ -81,9 +82,11 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         $deferred = new Deferred();
 
-        unwrapObservableFromPromise($middleware->query((new QueryFactory())->select()->asExpression(), function () use ($deferred): PromiseInterface {
+        unwrapObservableFromPromise($middleware->query((new QueryFactory())->select()->asExpression(), static function () use ($deferred): PromiseInterface {
             return $deferred->promise();
-        }))->subscribe(function () {}, function () {});
+        }))->subscribe(static function (): void {
+        }, static function (): void {
+        });
 
         self::assertSame([
             'initiated' => 1,
@@ -95,7 +98,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         $subject = new Subject();
         $deferred->resolve($subject);
-        $subject->onError(new \Exception('whoops'));
+        $subject->onError(new Exception('whoops'));
 
         self::assertSame([
             'initiated' => 1,
@@ -130,9 +133,11 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         $deferred = new Deferred();
 
-        unwrapObservableFromPromise($middleware->query((new QueryFactory())->select()->asExpression(), function () use ($deferred): PromiseInterface {
+        unwrapObservableFromPromise($middleware->query((new QueryFactory())->select()->asExpression(), static function () use ($deferred): PromiseInterface {
             return $deferred->promise();
-        }))->subscribe(function () {}, function () {});
+        }))->subscribe(static function (): void {
+        }, static function (): void {
+        });
 
         self::assertSame([
             'initiated' => 1,
@@ -146,7 +151,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         $subject = new Subject();
         $deferred->resolve($subject);
-        $subject->onError(new \Exception('whoops'));
+        $subject->onError(new Exception('whoops'));
 
         self::assertSame([
             'initiated' => 1,

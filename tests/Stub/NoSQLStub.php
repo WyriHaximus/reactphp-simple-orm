@@ -4,7 +4,7 @@ namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
 use WyriHaximus\React\SimpleORM\EntityInterface;
 
-class NoSQLStub implements EntityInterface
+final class NoSQLStub implements EntityInterface
 {
     public function getId(): string
     {

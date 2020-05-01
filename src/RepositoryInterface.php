@@ -14,28 +14,19 @@ interface RepositoryInterface
     public function count(): PromiseInterface;
 
     /**
-     * @param int $page
      * @param Where[]|ExpressionWhere[] $where
-     * @param mixed[] $order
-     * @param int $perPage
-     *
-     * @return Observable
+     * @param mixed[]                   $order
      */
     public function page(int $page, array $where = [], array $order = [], int $perPage = self::DEFAULT_PER_PAGE): Observable;
 
     /**
      * @param Where[]|ExpressionWhere[] $where
-     * @param mixed[] $order
-     * @param int $limit
-     *
-     * @return Observable
+     * @param mixed[]                   $order
      */
     public function fetch(array $where = [], array $order = [], int $limit = 0): Observable;
 
     /**
-     * @param mixed[] $fields
-     *
-     * @return PromiseInterface
+     * @param array<string, mixed> $fields
      */
     public function create(array $fields): PromiseInterface;
 

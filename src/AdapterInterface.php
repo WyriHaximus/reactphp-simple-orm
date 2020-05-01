@@ -4,7 +4,6 @@ namespace WyriHaximus\React\SimpleORM;
 
 use Latitude\QueryBuilder\EngineInterface;
 use Latitude\QueryBuilder\ExpressionInterface;
-use Latitude\QueryBuilder\QueryInterface;
 use Rx\Observable;
 
 interface AdapterInterface

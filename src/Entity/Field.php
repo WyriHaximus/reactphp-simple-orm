@@ -4,11 +4,9 @@ namespace WyriHaximus\React\SimpleORM\Entity;
 
 final class Field
 {
-    /** @var string */
-    private $name;
+    private string $name;
 
-    /** @var string */
-    private $type;
+    private string $type;
 
     public function __construct(string $name, string $type)
     {

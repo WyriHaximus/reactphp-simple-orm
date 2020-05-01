@@ -3,6 +3,7 @@
 namespace WyriHaximus\React\SimpleORM\Annotation;
 
 use Doctrine\Common\Annotations\Annotation\Target;
+use function current;
 
 /**
  * @Annotation
@@ -10,15 +11,14 @@ use Doctrine\Common\Annotations\Annotation\Target;
  */
 final class Table
 {
-    /** @var string */
-    private $table;
+    private string $table;
 
     /**
      * @param string[] $table
      */
     public function __construct(array $table)
     {
-        $this->table = \current($table);
+        $this->table = current($table);
     }
 
     public function getTable(): string
