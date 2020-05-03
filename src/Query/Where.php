@@ -2,33 +2,21 @@
 
 namespace WyriHaximus\React\SimpleORM\Query;
 
-use Latitude\QueryBuilder\Builder\CriteriaBuilder;
-use Latitude\QueryBuilder\CriteriaInterface;
-
 final class Where
 {
-    private string $field;
-    private string $criteria;
-    /** @var mixed[]  */
-    private array $criteriaArguments = [];
+    /** @var array<WhereInterface> */
+    private array $wheres = [];
+
+    public function __construct(WhereInterface ...$wheres)
+    {
+        $this->wheres = $wheres;
+    }
 
     /**
-     * @param mixed[] $criteriaArguments
+     * @return iterable<WhereInterface>
      */
-    public function __construct(string $field, string $criteria, array $criteriaArguments)
+    public function wheres(): iterable
     {
-        $this->field             = $field;
-        $this->criteria          = $criteria;
-        $this->criteriaArguments = $criteriaArguments;
-    }
-
-    public function field(): string
-    {
-        return $this->field;
-    }
-
-    public function applyCriteria(CriteriaBuilder $criteria): CriteriaInterface
-    {
-        return $criteria->{$this->criteria}(...$this->criteriaArguments);
+        yield from $this->wheres;
     }
 }

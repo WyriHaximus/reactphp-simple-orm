@@ -21,6 +21,7 @@
         "Foreach_": false,
         "CloneRemoval": false,
         "Decrement": false,
+        "Coalesce": false,
         "FunctionCallRemoval": {
             "ignore": [
                 "WyriHaximus\\TestUtilities\\TestCase::waitUntilTheNextSecond"

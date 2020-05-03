@@ -4,7 +4,7 @@ namespace WyriHaximus\React\SimpleORM;
 
 use React\Promise\PromiseInterface;
 use Rx\Observable;
-use WyriHaximus\React\SimpleORM\Query\ExpressionWhere;
+use WyriHaximus\React\SimpleORM\Query\Order;
 use WyriHaximus\React\SimpleORM\Query\Where;
 
 interface RepositoryInterface
@@ -13,17 +13,9 @@ interface RepositoryInterface
 
     public function count(): PromiseInterface;
 
-    /**
-     * @param Where[]|ExpressionWhere[] $where
-     * @param mixed[]                   $order
-     */
-    public function page(int $page, array $where = [], array $order = [], int $perPage = self::DEFAULT_PER_PAGE): Observable;
+    public function page(int $page, ?Where $where = null, ?Order $order = null, int $perPage = self::DEFAULT_PER_PAGE): Observable;
 
-    /**
-     * @param Where[]|ExpressionWhere[] $where
-     * @param mixed[]                   $order
-     */
-    public function fetch(array $where = [], array $order = [], int $limit = 0): Observable;
+    public function fetch(?Where $where = null, ?Order $order = null, int $limit = 0): Observable;
 
     /**
      * @param array<string, mixed> $fields

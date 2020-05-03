@@ -11,6 +11,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\ClientInterface;
 use WyriHaximus\React\SimpleORM\EntityInspector;
+use WyriHaximus\React\SimpleORM\Query\Order;
 use WyriHaximus\React\SimpleORM\Query\Where;
 use WyriHaximus\React\SimpleORM\Repository;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
@@ -138,11 +139,11 @@ final class RepositoryTest extends AsyncTestCase
             new QueryFactory()
         );
 
-        $blogPost = $this->await($repository->fetch([
-            new Where('id', 'eq', ['98ce9eaf-b38b-4a51-93ed-131ffac4051e']),
-        ], [
-            ['id', true],
-        ])->take(1)->toPromise());
+        $blogPost = $this->await($repository->fetch(new Where(
+            new Where\Field('id', 'eq', ['98ce9eaf-b38b-4a51-93ed-131ffac4051e']),
+        ), new Order(
+            new Order\Desc('id'),
+        ))->take(1)->toPromise());
         assert($blogPost instanceof BlogPostStub);
 
         self::assertSame('98ce9eaf-b38b-4a51-93ed-131ffac4051e', $blogPost->getId());
@@ -313,11 +314,11 @@ final class RepositoryTest extends AsyncTestCase
             new QueryFactory()
         );
 
-        $blogPost = $this->await($repository->fetch([
-            new Where('id', 'eq', ['99d00028-28d6-4194-b377-a0039b278c4d']),
-        ], [
-            ['id', true],
-        ])->take(1)->toPromise());
+        $blogPost = $this->await($repository->fetch(new Where(
+            new Where\Field('id', 'eq', ['99d00028-28d6-4194-b377-a0039b278c4d']),
+        ), new Order(
+            new Order\Desc('id'),
+        ))->take(1)->toPromise());
         assert($blogPost instanceof BlogPostStub);
 
         self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $blogPost->getId());

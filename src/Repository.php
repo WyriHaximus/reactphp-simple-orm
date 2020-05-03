@@ -15,11 +15,12 @@ use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
 use Safe\DateTimeImmutable;
 use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
-use WyriHaximus\React\SimpleORM\Query\ExpressionWhere;
+use WyriHaximus\React\SimpleORM\Query\Order;
 use WyriHaximus\React\SimpleORM\Query\Where;
+use WyriHaximus\React\SimpleORM\Query\Where\Expression;
+use WyriHaximus\React\SimpleORM\Query\Where\Field;
 use function array_key_exists;
 use function array_values;
-use function count;
 use function date;
 use function explode;
 use function is_scalar;
@@ -70,25 +71,17 @@ final class Repository implements RepositoryInterface
         });
     }
 
-    /**
-     * @param Where[]|ExpressionWhere[] $where
-     * @param array<mixed, mixed>       $order
-     */
-    public function page(int $page, array $where = [], array $order = [], int $perPage = RepositoryInterface::DEFAULT_PER_PAGE): Observable
+    public function page(int $page, ?Where $where = null, ?Order $order = null, int $perPage = RepositoryInterface::DEFAULT_PER_PAGE): Observable
     {
-        $query = $this->buildSelectQuery($where, $order);
+        $query = $this->buildSelectQuery($where ?? new Where(), $order ?? new Order());
         $query = $query->limit($perPage)->offset(--$page * $perPage);
 
         return $this->fetchAndHydrate($query);
     }
 
-    /**
-     * @param Where[]|ExpressionWhere[] $where
-     * @param array<mixed, mixed>       $order
-     */
-    public function fetch(array $where = [], array $order = [], int $limit = ZERO): Observable
+    public function fetch(?Where $where = null, ?Order $order = null, int $limit = ZERO): Observable
     {
-        $query = $this->buildSelectQuery($where, $order);
+        $query = $this->buildSelectQuery($where ?? new Where(), $order ?? new Order());
         if ($limit > ZERO) {
             $query = $query->limit($limit)->offset(ZERO);
         }
@@ -111,13 +104,13 @@ final class Repository implements RepositoryInterface
         return $this->client->query(
             $this->queryFactory->insert($this->entity->getTable(), $fields)->asExpression()
         )->toPromise()->then(function () use ($id): PromiseInterface {
-            return $this->fetch([
-                new Where(
+            return $this->fetch(new Where(
+                new Where\Field(
                     'id',
                     'eq',
                     [$id],
                 ),
-            ])->take(ONE)->toPromise();
+            ))->take(ONE)->toPromise();
         });
     }
 
@@ -131,45 +124,40 @@ final class Repository implements RepositoryInterface
             $this->queryFactory->update($this->entity->getTable(), $fields)->
             where(field('id')->eq($entity->getId()))->asExpression()
         )->toPromise()->then(function () use ($entity): PromiseInterface {
-            return $this->fetch([
-                new Where('id', 'eq', [$entity->getId()]),
-            ], [], ONE)->toPromise();
+            return $this->fetch(new Where(
+                new Where\Field('id', 'eq', [$entity->getId()]),
+            ), new Order(), ONE)->toPromise();
         });
     }
 
-    /**
-     * @param Where[]|ExpressionWhere[] $constraints
-     * @param mixed[]                   $order
-     */
-    private function buildSelectQuery(array $constraints, array $order): SelectQuery
+    private function buildSelectQuery(Where $constraints, Order $order): SelectQuery
     {
         $query = $this->buildBaseSelectQuery();
 
         $query = $query->columns(...array_values($this->fields));
 
-        $whereCount = count($constraints);
-        if ($whereCount > ZERO) {
-            foreach ($constraints as $i => $constraint) {
-                if ($constraint instanceof ExpressionWhere) {
-                    $where = $constraint->expression();
-                    $where = $constraint->applyExpression($where);
-                } else {
-                    $where = field($this->translateFieldName($constraint->field()));
-                    $where = $constraint->applyCriteria($where);
-                }
-
-                if ($i === ZERO) {
-                    $query = $query->where($where);
-                    continue;
-                }
-
-                $query = $query->andWhere($where);
+        foreach ($constraints->wheres() as $i => $constraint) {
+            if ($constraint instanceof Expression) {
+                $where = $constraint->expression();
+                $where = $constraint->applyExpression($where);
+            } elseif ($constraint instanceof Field) {
+                $where = field($this->translateFieldName($constraint->field()));
+                $where = $constraint->applyCriteria($where);
+            } else {
+                continue;
             }
+
+            if ($i === ZERO) {
+                $query = $query->where($where);
+                continue;
+            }
+
+            $query = $query->andWhere($where);
         }
 
-        foreach ($order as $by) {
-            $by[ZERO] = $this->translateFieldName($by[ZERO]);
-            $query    = $query->orderBy($by[ZERO], $by[ONE] ? 'desc' : 'asc');
+        foreach ($order->orders() as $by) {
+            $field = $this->translateFieldName($by->field());
+            $query = $query->orderBy($field, $by->order());
         }
 
         return $query;
@@ -341,7 +329,7 @@ final class Repository implements RepositoryInterface
                             }
 
                             if (is_string($onLeftSide)) {
-                                $where[] = new Where(
+                                $where[] = new Where\Field(
                                     $onLeftSide,
                                     'eq',
                                     [
@@ -349,7 +337,7 @@ final class Repository implements RepositoryInterface
                                     ]
                                 );
                             } else {
-                                $where[] = new ExpressionWhere(
+                                $where[] = new Where\Expression(
                                     $onLeftSide,
                                     'eq',
                                     [
@@ -362,7 +350,7 @@ final class Repository implements RepositoryInterface
                         $this->client
                             ->getRepository($join->getEntity()
                             ->getClass())
-                            ->fetch($where, [], self::SINGLE)
+                            ->fetch(new Where(...$where), new Order(), self::SINGLE)
                             ->toPromise()
                             ->then($resolve, $reject);
                     });
@@ -376,7 +364,7 @@ final class Repository implements RepositoryInterface
                     $where = [];
 
                     foreach ($join->getClause() as $clause) {
-                        $where[] = new Where(
+                        $where[] = new Where\Field(
                             $clause->getForeignKey(),
                             'eq',
                             [
@@ -385,7 +373,7 @@ final class Repository implements RepositoryInterface
                         );
                     }
 
-                    return $this->client->getRepository($join->getEntity()->getClass())->fetch($where);
+                    return $this->client->getRepository($join->getEntity()->getClass())->fetch(new Where(...$where));
                 },
                 new ImmediateScheduler()
             );
