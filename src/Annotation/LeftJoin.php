@@ -3,6 +3,7 @@
 namespace WyriHaximus\React\SimpleORM\Annotation;
 
 use Doctrine\Common\Annotations\Annotation\Target;
+use function property_exists;
 
 /**
  * @Annotation
@@ -11,28 +12,27 @@ use Doctrine\Common\Annotations\Annotation\Target;
  */
 final class LeftJoin implements JoinInterface
 {
-    /** @var string */
-    private $entity;
+    private string $entity;
 
     /** @var Clause[] */
-    private $clause;
+    private array $clause;
 
-    /** @var string */
-    private $property;
+    private string $property;
 
-    /** @var bool */
-    private $lazy = self::IS_NOT_LAZY;
+    private bool $lazy = self::IS_NOT_LAZY;
 
     /**
-     * @param array[] $leftJoin
+     * @param string[]|array[]|bool[] $leftJoin
      */
     public function __construct(array $leftJoin)
     {
         /** @psalm-suppress RawObjectIteration */
-        foreach ($this as $name => $value) {
-            if (array_key_exists($name, $leftJoin)) {
-                $this->$name = $leftJoin[$name];
+        foreach ($leftJoin as $name => $value) {
+            if (! property_exists($this, $name)) {
+                continue;
             }
+
+            $this->$name = $leftJoin[$name];
         }
     }
 

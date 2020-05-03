@@ -2,30 +2,54 @@
 
 namespace WyriHaximus\React\SimpleORM\Adapter;
 
+use Latitude\QueryBuilder\Engine\PostgresEngine;
+use Latitude\QueryBuilder\EngineInterface;
+use Latitude\QueryBuilder\ExpressionInterface;
 use PgAsync\Client as PgClient;
-use Plasma\SQL\Grammar\PostgreSQL;
-use Plasma\SQL\GrammarInterface;
-use Plasma\SQL\QueryBuilder;
 use Rx\Observable;
 use WyriHaximus\React\SimpleORM\AdapterInterface;
+use function explode;
+use function implode;
+use function strpos;
+use const WyriHaximus\Constants\Boolean\FALSE_;
+use const WyriHaximus\Constants\Numeric\ZERO;
 
 final class Postgres implements AdapterInterface
 {
-    /** @var PgClient */
-    private $client;
+    private PgClient $client;
+
+    private EngineInterface $engine;
 
     public function __construct(PgClient $client)
     {
         $this->client = $client;
+        $this->engine = new PostgresEngine();
     }
 
-    public function query(QueryBuilder $query): Observable
+    public function query(ExpressionInterface $query): Observable
     {
-        return $this->client->executeStatement($query->getQuery(), $query->getParameters());
+        $params = $query->params($this->engine);
+        $sql    = $query->sql($this->engine);
+        if (strpos($sql, '?') !== FALSE_) {
+            $chunks    = explode('?', $sql);
+            $sqlChunks = [];
+            foreach ($chunks as $i => $chunk) {
+                if ($i === ZERO) {
+                    $sqlChunks[] = $chunk;
+                    continue;
+                }
+
+                $sqlChunks[] = '$' . $i . $chunk;
+            }
+
+            $sql = implode('', $sqlChunks);
+        }
+
+        return $this->client->executeStatement($sql, $params);
     }
 
-    public function getGrammar(): GrammarInterface
+    public function engine(): EngineInterface
     {
-        return new PostgreSQL();
+        return $this->engine;
     }
 }

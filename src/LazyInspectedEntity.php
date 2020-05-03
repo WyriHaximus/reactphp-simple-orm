@@ -7,24 +7,21 @@ use WyriHaximus\React\SimpleORM\Entity\Join;
 
 final class LazyInspectedEntity implements InspectedEntityInterface
 {
-    /** @var string */
-    private $class;
+    private string $class;
 
-    /** @var string|null */
-    private $table;
+    private ?string $table = null;
 
     /** @var Field[] */
-    private $fields = [];
+    private array $fields = [];
 
     /** @var Join[] */
-    private $joins = [];
+    private array $joins = [];
 
-    /** @var EntityInspector|null */
-    private $entityInspector;
+    private ?EntityInspector $entityInspector = null;
 
     public function __construct(EntityInspector $entityInspector, string $class)
     {
-        $this->class = $class;
+        $this->class           = $class;
         $this->entityInspector = $entityInspector;
     }
 
@@ -74,11 +71,11 @@ final class LazyInspectedEntity implements InspectedEntityInterface
             return;
         }
 
-        $inspectedEntity = $this->entityInspector->getEntity($this->class);
+        $inspectedEntity       = $this->entityInspector->getEntity($this->class);
         $this->entityInspector = null;
 
-        $this->table = $inspectedEntity->getTable();
+        $this->table  = $inspectedEntity->getTable();
         $this->fields = $inspectedEntity->getFields();
-        $this->joins = $inspectedEntity->getJoins();
+        $this->joins  = $inspectedEntity->getJoins();
     }
 }

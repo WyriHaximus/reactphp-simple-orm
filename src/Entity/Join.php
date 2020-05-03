@@ -7,35 +7,27 @@ use WyriHaximus\React\SimpleORM\InspectedEntityInterface;
 
 final class Join
 {
-    /** @var InspectedEntityInterface */
-    private $entity;
+    private InspectedEntityInterface $entity;
 
-    /** @var string */
-    private $type;
+    private string $type;
 
-    /** @var string */
-    private $property;
+    private string $property;
 
-    /** @var bool */
-    private $lazy;
+    private bool $lazy;
 
     /** @var Clause[] */
-    private $clause;
+    private array $clause;
 
     /**
-     * @param InspectedEntityInterface $entity
-     * @param string $type
-     * @param string $property
-     * @param bool $lazy
      * @param array<int, Clause> $clause
      */
     public function __construct(InspectedEntityInterface $entity, string $type, string $property, bool $lazy, Clause ...$clause)
     {
-        $this->entity = $entity;
-        $this->type = $type;
+        $this->entity   = $entity;
+        $this->type     = $type;
         $this->property = $property;
-        $this->lazy = $lazy;
-        $this->clause = $clause;
+        $this->lazy     = $lazy;
+        $this->clause   = $clause;
     }
 
     public function getEntity(): InspectedEntityInterface

@@ -2,10 +2,9 @@
 
 namespace WyriHaximus\React\SimpleORM;
 
-use Plasma\SQL\QueryBuilder;
-use Psr\Http\Message\ServerRequestInterface;
+use Latitude\QueryBuilder\ExpressionInterface;
 use React\Promise\PromiseInterface;
-use const WyriHaximus\Constants\Numeric\ONE;
+use function array_key_exists;
 use const WyriHaximus\Constants\Numeric\ZERO;
 
 /**
@@ -15,7 +14,7 @@ use const WyriHaximus\Constants\Numeric\ZERO;
 final class MiddlewareRunner
 {
     /** @var MiddlewareInterface[] */
-    private $middleware;
+    private array $middleware;
 
     /**
      * @param array<int, MiddlewareInterface> $middleware
@@ -25,20 +24,26 @@ final class MiddlewareRunner
         $this->middleware = $middleware;
     }
 
-    public function query(QueryBuilder $query, callable $last): PromiseInterface
+    public function query(ExpressionInterface $query, callable $last): PromiseInterface
     {
+        if (! array_key_exists(ZERO, $this->middleware)) {
+            return $last($query);
+        }
+
         return $this->call($query, ZERO, $last);
     }
 
-    private function call(QueryBuilder $query, int $position, callable $last): PromiseInterface
+    private function call(ExpressionInterface $query, int $position, callable $last): PromiseInterface
     {
+        $nextPosition = $position;
+        $nextPosition++;
         // final request handler will be invoked without hooking into the promise
-        if (!array_key_exists($position + ONE, $this->middleware)) {
+        if (! array_key_exists($nextPosition, $this->middleware)) {
             return $this->middleware[$position]->query($query, $last);
         }
 
-        return $this->middleware[$position]->query($query, function (QueryBuilder $query) use ($position, $last) {
-            return $this->call($query, $position + ONE, $last);
+        return $this->middleware[$position]->query($query, function (ExpressionInterface $query) use ($nextPosition, $last): PromiseInterface {
+            return $this->call($query, $nextPosition, $last);
         });
     }
 }

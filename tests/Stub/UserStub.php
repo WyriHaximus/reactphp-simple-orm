@@ -7,6 +7,7 @@ use WyriHaximus\React\SimpleORM\Annotation\Clause;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\EntityInterface;
+use WyriHaximus\React\SimpleORM\Tools\WithFieldsTrait;
 
 /**
  * @Table("users")
@@ -23,16 +24,15 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
         lazy=true
  * )
  */
-class UserStub implements EntityInterface
+final class UserStub implements EntityInterface
 {
-    /** @var string */
-    protected $id;
+    use WithFieldsTrait;
 
-    /** @var string */
-    protected $name;
+    protected string $id;
 
-    /** @var PromiseInterface */
-    protected $zelf;
+    protected string $name;
+
+    protected PromiseInterface $zelf;
 
     public function getId(): string
     {

@@ -4,15 +4,18 @@ namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
 use React\Promise\PromiseInterface;
 use Rx\Observable;
+use Safe\DateTimeImmutable;
 use WyriHaximus\React\SimpleORM\Annotation\Clause;
 use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
 use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\EntityInterface;
+use WyriHaximus\React\SimpleORM\Tools\WithFieldsTrait;
 
 /**
  * @Table("blog_posts")
  * @LeftJoin(
+        nonExistingProperty="fake",
         entity=CommentStub::class,
         clause={
             @Clause(
@@ -69,52 +72,41 @@ use WyriHaximus\React\SimpleORM\EntityInterface;
        lazy=InnerJoin::IS_NOT_LAZY
  * )
  */
-class BlogPostStub implements EntityInterface
+final class BlogPostStub implements EntityInterface
 {
-    /** @var string */
-    protected $id;
+    use WithFieldsTrait;
 
-    /** @var string|null */
-    protected $previous_blog_post_id;
+    //phpcs:disable
+    protected string $id;
 
-    /** @var PromiseInterface */
-    protected $previous_blog_post;
+    protected ?string $previous_blog_post_id = null;
 
-    /** @var string|null */
-    protected $next_blog_post_id;
+    protected PromiseInterface $previous_blog_post;
 
-    /** @var PromiseInterface */
-    protected $next_blog_post;
+    protected ?string $next_blog_post_id = null;
 
-    /** @var string */
-    protected $author_id;
+    protected PromiseInterface $next_blog_post;
 
-    /** @var string */
-    protected $publisher_id;
+    protected string $author_id;
 
-    /** @var string */
-    protected $title;
+    protected string $publisher_id;
 
-    /** @var string */
-    protected $contents;
+    protected string $title;
 
-    /** @var UserStub */
-    protected $author;
+    protected string $contents;
 
-    /** @var UserStub */
-    protected $publisher;
+    protected UserStub $author;
 
-    /** @var Observable */
-    protected $comments;
+    protected UserStub $publisher;
 
-    /** @var int */
-    protected $views;
+    protected Observable $comments;
 
-    /** @var \DateTimeImmutable */
-    protected $created;
+    protected int $views;
 
-    /** @var \DateTimeImmutable */
-    protected $modified;
+    protected DateTimeImmutable $created;
+
+    protected DateTimeImmutable $modified;
+    //phpcs:enable
 
     public function getId(): string
     {
@@ -123,12 +115,16 @@ class BlogPostStub implements EntityInterface
 
     public function getPreviousBlogPost(): PromiseInterface
     {
+        //phpcs:disable
         return $this->previous_blog_post;
+        //phpcs:enable
     }
 
     public function getNextBlogPost(): PromiseInterface
     {
+        //phpcs:disable
         return $this->next_blog_post;
+        //phpcs:enable
     }
 
     public function getAuthor(): UserStub
@@ -148,7 +144,7 @@ class BlogPostStub implements EntityInterface
 
     public function getContents(): string
     {
-        return $this->title;
+        return $this->contents;
     }
 
     public function getComments(): Observable
@@ -163,19 +159,19 @@ class BlogPostStub implements EntityInterface
 
     public function withViews(int $views): self
     {
-        $clone = clone $this;
+        $clone        = clone $this;
         $clone->views = $views;
 
         return $clone;
     }
 
-    public function getCreated(): \DateTimeImmutable
+    public function getCreated(): DateTimeImmutable
     {
-        return new \DateTimeImmutable($this->created);
+        return $this->created;
     }
 
-    public function getModified(): \DateTimeImmutable
+    public function getModified(): DateTimeImmutable
     {
-        return new \DateTimeImmutable($this->modified);
+        return $this->modified;
     }
 }

@@ -7,31 +7,26 @@ use WyriHaximus\React\SimpleORM\Entity\Join;
 
 final class InspectedEntity implements InspectedEntityInterface
 {
-    /** @var string */
-    private $class;
+    private string $class;
 
-    /** @var string */
-    private $table;
+    private string $table;
 
     /** @var Field[] */
-    private $fields = [];
+    private array $fields = [];
 
     /** @var Join[] */
-    private $joins = [];
+    private array $joins = [];
 
     /**
-     * InspectedEntity constructor.
-     * @param string $class
-     * @param string $table
      * @param Field[] $fields
-     * @param Join[] $joins
+     * @param Join[]  $joins
      */
     public function __construct(string $class, string $table, array $fields, array $joins)
     {
-        $this->class = $class;
-        $this->table = $table;
+        $this->class  = $class;
+        $this->table  = $table;
         $this->fields = $fields;
-        $this->joins = $joins;
+        $this->joins  = $joins;
     }
 
     public function getClass(): string

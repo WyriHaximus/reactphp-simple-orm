@@ -4,29 +4,26 @@ namespace WyriHaximus\React\SimpleORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
-use PgAsync\Client as PgClient;
-use Plasma\SQL\Grammar\PostgreSQL;
-use Plasma\SQL\QueryBuilder;
+use Latitude\QueryBuilder\ExpressionInterface;
+use Latitude\QueryBuilder\QueryFactory;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
-use WyriHaximus\React\SimpleORM\Middleware\ExecuteQueryMiddleware;
-use WyriHaximus\React\SimpleORM\Middleware\GrammarMiddleware;
 use function ApiClients\Tools\Rx\unwrapObservableFromPromise;
+use function array_key_exists;
 use function React\Promise\resolve;
 
 final class Client implements ClientInterface
 {
-    /** @var AdapterInterface */
-    private $adapter;
+    private AdapterInterface $adapter;
 
-    /** @var EntityInspector */
-    private $entityInspector;
+    private EntityInspector $entityInspector;
 
     /** @var Repository[] */
-    private $repositories = [];
+    private array $repositories = [];
 
-    /** @var MiddlewareRunner */
-    private $middlewareRunner;
+    private MiddlewareRunner $middlewareRunner;
+
+    private QueryFactory $queryFactory;
 
     /**
      * @param array<int, MiddlewareInterface> $middleware
@@ -49,29 +46,27 @@ final class Client implements ClientInterface
      */
     private function __construct(AdapterInterface $adapter, Reader $annotationReader, MiddlewareInterface ...$middleware)
     {
-        $this->adapter = $adapter;
+        $this->adapter         = $adapter;
         $this->entityInspector = new EntityInspector($annotationReader);
-
-        $middleware[] = new GrammarMiddleware($adapter->getGrammar());
+        $this->queryFactory    = new QueryFactory($adapter->engine());
 
         $this->middlewareRunner = new MiddlewareRunner(...$middleware);
     }
 
     public function getRepository(string $entity): RepositoryInterface
     {
-        if (!array_key_exists($entity, $this->repositories)) {
-            $this->repositories[$entity] = new Repository($this->entityInspector->getEntity($entity), $this);
+        if (! array_key_exists($entity, $this->repositories)) {
+            $this->repositories[$entity] = new Repository($this->entityInspector->getEntity($entity), $this, $this->queryFactory);
         }
 
         return $this->repositories[$entity];
     }
 
-    public function query(QueryBuilder $query): Observable
+    public function query(ExpressionInterface $query): Observable
     {
         return unwrapObservableFromPromise($this->middlewareRunner->query(
             $query,
-            function (QueryBuilder $query): PromiseInterface
-            {
+            function (ExpressionInterface $query): PromiseInterface {
                 return resolve($this->adapter->query($query));
             }
         ));
