@@ -32,7 +32,7 @@
   "require-dev": {
     "robmorgan/phinx": "^0.12.1",
     "symfony/yaml": "^5.0",
-    "vlucas/phpdotenv": "^3.6",
+    "vlucas/phpdotenv": "^3.6 || ^4.0",
     "wyrihaximus/async-test-utilities": "^2.1"
   },
   "config": {
