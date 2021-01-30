@@ -130,6 +130,14 @@ final class Repository implements RepositoryInterface
         });
     }
 
+    public function delete(EntityInterface $entity): PromiseInterface
+    {
+        return $this->client->query(
+            $this->queryFactory->delete($this->entity->getTable())->
+            where(field('id')->eq($entity->getId()))->asExpression()
+        )->toPromise();
+    }
+
     private function buildSelectQuery(Where $constraints, Order $order): SelectQuery
     {
         $query = $this->buildBaseSelectQuery();

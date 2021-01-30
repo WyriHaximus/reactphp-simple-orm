@@ -23,4 +23,6 @@ interface RepositoryInterface
     public function create(array $fields): PromiseInterface;
 
     public function update(EntityInterface $entity): PromiseInterface;
+
+    public function delete(EntityInterface $entity): PromiseInterface;
 }
