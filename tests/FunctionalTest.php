@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
@@ -15,6 +17,7 @@ use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
+
 use function array_map;
 use function array_values;
 use function assert;
@@ -72,7 +75,7 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame(
             3,
             $this->await(
-                $this->client->getRepository(UserStub::class)->count(),
+                $this->client->repository(UserStub::class)->count(),
                 $this->loop,
                 self::AWAIT_TIMEOUT
             )
@@ -84,7 +87,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 1,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -95,7 +98,7 @@ final class FunctionalTest extends AsyncTestCase
         self::assertCount(
             3,
             $this->await(
-                $this->client->getRepository(UserStub::class)->fetch()->toArray()->toPromise(),
+                $this->client->repository(UserStub::class)->fetch()->toArray()->toPromise(),
                 $this->loop,
                 self::AWAIT_TIMEOUT
             )
@@ -107,7 +110,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 1,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -118,7 +121,7 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame(
             2,
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->count(),
+                $this->client->repository(BlogPostStub::class)->count(),
                 $this->loop,
                 self::AWAIT_TIMEOUT
             )
@@ -130,7 +133,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 1,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -141,7 +144,7 @@ final class FunctionalTest extends AsyncTestCase
         self::assertCount(
             2,
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->toArray()->toPromise(),
+                $this->client->repository(BlogPostStub::class)->fetch()->toArray()->toPromise(),
                 $this->loop,
                 self::AWAIT_TIMEOUT
             )
@@ -153,7 +156,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 1,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -164,7 +167,7 @@ final class FunctionalTest extends AsyncTestCase
         self::assertCount(
             2,
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
+                $this->client->repository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getComments()->toArray()->toPromise();
                 }),
                 $this->loop,
@@ -178,7 +181,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 2,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -189,8 +192,8 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame(
             'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): string {
-                    return $blogPost->getAuthor()->getId();
+                $this->client->repository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): string {
+                    return $blogPost->getAuthor()->id();
                 }),
                 $this->loop,
                 self::AWAIT_TIMEOUT
@@ -203,7 +206,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 1,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -214,8 +217,8 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame(
             'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch(null, null, 1)->toPromise()->then(static function (BlogPostStub $blogPost): string {
-                    return $blogPost->getAuthor()->getId();
+                $this->client->repository(BlogPostStub::class)->fetch(null, null, 1)->toPromise()->then(static function (BlogPostStub $blogPost): string {
+                    return $blogPost->getAuthor()->id();
                 }),
                 $this->loop,
                 self::AWAIT_TIMEOUT
@@ -228,7 +231,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 1,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -244,10 +247,10 @@ final class FunctionalTest extends AsyncTestCase
             array_values(
                 array_map(
                     static function (CommentStub $comment): string {
-                        return $comment->getAuthor()->getId();
+                        return $comment->getAuthor()->id();
                     },
                     $this->await(
-                        $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
+                        $this->client->repository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                             return $blogPost->getComments()->toArray()->toPromise();
                         }),
                         $this->loop,
@@ -263,7 +266,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 2,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -274,7 +277,7 @@ final class FunctionalTest extends AsyncTestCase
         self::assertInstanceOf(
             BlogPostStub::class,
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
+                $this->client->repository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getNextBlogPost();
                 }),
                 $this->loop,
@@ -288,7 +291,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 2,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -298,7 +301,7 @@ final class FunctionalTest extends AsyncTestCase
     {
         self::assertNull(
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
+                $this->client->repository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getPreviousBlogPost();
                 }),
                 $this->loop,
@@ -312,7 +315,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 1,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -323,8 +326,8 @@ final class FunctionalTest extends AsyncTestCase
         self::assertCount(
             1,
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
-                    return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
+                $this->client->repository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
+                    return $blogPost->id() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
                 })->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getComments()->toArray()->toPromise();
                 }),
@@ -339,7 +342,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 2,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -350,10 +353,10 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame(
             '15f25357-4b3d-4d4d-b6a5-2ceb93864b77',
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
-                    return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
+                $this->client->repository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
+                    return $blogPost->id() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
                 })->toPromise()->then(static function (BlogPostStub $blogPost): string {
-                    return $blogPost->getAuthor()->getId();
+                    return $blogPost->getAuthor()->id();
                 }),
                 $this->loop,
                 self::AWAIT_TIMEOUT
@@ -366,7 +369,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 1,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -379,11 +382,11 @@ final class FunctionalTest extends AsyncTestCase
             array_values(
                 array_map(
                     static function (CommentStub $comment): string {
-                        return $comment->getAuthor()->getId();
+                        return $comment->getAuthor()->id();
                     },
                     $this->await(
-                        $this->client->getRepository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
-                            return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
+                        $this->client->repository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
+                            return $blogPost->id() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
                         })->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                             return $blogPost->getComments()->toArray()->toPromise();
                         }),
@@ -400,7 +403,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 2,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -411,12 +414,12 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame(
             'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
-                    return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
+                $this->client->repository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
+                    return $blogPost->id() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
                 })->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getPreviousBlogPost();
                 })->then(static function (BlogPostStub $blogPost): string {
-                    return $blogPost->getAuthor()->getId();
+                    return $blogPost->getAuthor()->id();
                 }),
                 $this->loop,
                 self::AWAIT_TIMEOUT
@@ -429,7 +432,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 2,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -439,8 +442,8 @@ final class FunctionalTest extends AsyncTestCase
     {
         self::assertNull(
             $this->await(
-                $this->client->getRepository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
-                    return $blogPost->getId() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
+                $this->client->repository(BlogPostStub::class)->fetch()->filter(static function (BlogPostStub $blogPost): bool {
+                    return $blogPost->id() === '090fa83b-5c5a-4042-9f05-58d9ab649a1a';
                 })->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getNextBlogPost();
                 }),
@@ -455,7 +458,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 1,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -468,7 +471,7 @@ final class FunctionalTest extends AsyncTestCase
         $fields = ['name' => $name];
 
         $user = $this->await(
-            $this->client->getRepository(UserStub::class)->create($fields),
+            $this->client->repository(UserStub::class)->create($fields),
             $this->loop,
             self::AWAIT_TIMEOUT
         );
@@ -480,7 +483,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 2,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 
     /**
@@ -491,7 +494,7 @@ final class FunctionalTest extends AsyncTestCase
         sleep(3);
         self::waitUntilTheNextSecond();
 
-        $repository = $this->client->getRepository(BlogPostStub::class);
+        $repository = $this->client->repository(BlogPostStub::class);
 
         $originalBlogPost = null;
         $timestamp        = null;
@@ -516,7 +519,7 @@ final class FunctionalTest extends AsyncTestCase
         assert($updatedBlogPost instanceof BlogPostStub);
 
         self::assertSame(167, $updatedBlogPost->getViews());
-        self::assertSame($originalBlogPost->getId(), $updatedBlogPost->getId());
+        self::assertSame($originalBlogPost->id(), $updatedBlogPost->id());
         self::assertSame($originalBlogPost->getCreated()->format('U'), $updatedBlogPost->getCreated()->format('U'));
         self::assertGreaterThan($originalBlogPost->getModified(), $updatedBlogPost->getModified());
         self::assertSame($timestamp, (int) $updatedBlogPost->getModified()->format('U'));
@@ -526,7 +529,7 @@ final class FunctionalTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 3,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
         self::assertNotSame($originalBlogPost->getContents(), $updatedBlogPost->getContents());
         self::assertSame($updatedBlogPost->getContents(), $randomContents);
     }
@@ -536,25 +539,25 @@ final class FunctionalTest extends AsyncTestCase
      */
     public function userSelf(): void
     {
-        $repository = $this->client->getRepository(UserStub::class);
+        $repository = $this->client->repository(UserStub::class);
 
         $userId = null;
 
         $self = $this->await($repository->fetch()->take(1)->toPromise()->then(static function (UserStub $user) use (&$userId): PromiseInterface {
-            $userId = $user->getId();
+            $userId = $user->id();
 
             return $user->getZelf();
         }), $this->loop, self::AWAIT_TIMEOUT);
 
         self::assertNotNull($userId);
         self::assertNotNull($self);
-        self::assertSame($userId, $self->getId());
+        self::assertSame($userId, $self->id());
         self::assertSame([
             'initiated' => 2,
             'successful' => 2,
             'errored' => 0,
             'slow' => 0,
             'completed' => 2,
-        ], iteratorOrArrayToArray($this->counter->getCounters()));
+        ], iteratorOrArrayToArray($this->counter->counters()));
     }
 }

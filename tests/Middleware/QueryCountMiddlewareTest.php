@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM\Middleware;
 
@@ -9,6 +11,7 @@ use React\Promise\PromiseInterface;
 use Rx\Subject\Subject;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
+
 use function ApiClients\Tools\Rx\observableFromArray;
 use function ApiClients\Tools\Rx\unwrapObservableFromPromise;
 use function Safe\sleep;
@@ -29,7 +32,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->getCounters()));
+        ], iteratorOrArrayToArray($middleware->counters()));
 
         $deferred = new Deferred();
 
@@ -45,7 +48,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->getCounters()));
+        ], iteratorOrArrayToArray($middleware->counters()));
 
         $deferred->resolve(observableFromArray([[]]));
 
@@ -55,7 +58,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 1,
-        ], iteratorOrArrayToArray($middleware->getCounters()));
+        ], iteratorOrArrayToArray($middleware->counters()));
 
         $middleware->resetCounters();
 
@@ -65,7 +68,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->getCounters()));
+        ], iteratorOrArrayToArray($middleware->counters()));
     }
 
     public function testCountingError(): void
@@ -78,7 +81,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->getCounters()));
+        ], iteratorOrArrayToArray($middleware->counters()));
 
         $deferred = new Deferred();
 
@@ -94,7 +97,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->getCounters()));
+        ], iteratorOrArrayToArray($middleware->counters()));
 
         $subject = new Subject();
         $deferred->resolve($subject);
@@ -106,7 +109,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 1,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->getCounters()));
+        ], iteratorOrArrayToArray($middleware->counters()));
 
         $middleware->resetCounters();
 
@@ -116,7 +119,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->getCounters()));
+        ], iteratorOrArrayToArray($middleware->counters()));
     }
 
     public function testCountingErrorSlow(): void
@@ -129,7 +132,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->getCounters()));
+        ], iteratorOrArrayToArray($middleware->counters()));
 
         $deferred = new Deferred();
 
@@ -145,7 +148,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->getCounters()));
+        ], iteratorOrArrayToArray($middleware->counters()));
 
         sleep(2);
 
@@ -159,7 +162,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 1,
             'slow' => 1,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->getCounters()));
+        ], iteratorOrArrayToArray($middleware->counters()));
 
         $middleware->resetCounters();
 
@@ -169,6 +172,6 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->getCounters()));
+        ], iteratorOrArrayToArray($middleware->counters()));
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Tools;
 
@@ -18,7 +20,7 @@ trait WithFieldsTrait
                 continue;
             }
 
-            $clone->$key = $value;
+            $clone->$key = $value; /** @phpstan-ignore-line */
         }
 
         return $clone;

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Adapter;
 
@@ -8,9 +10,11 @@ use Latitude\QueryBuilder\ExpressionInterface;
 use PgAsync\Client as PgClient;
 use Rx\Observable;
 use WyriHaximus\React\SimpleORM\AdapterInterface;
+
 use function explode;
 use function implode;
 use function strpos;
+
 use const WyriHaximus\Constants\Boolean\FALSE_;
 use const WyriHaximus\Constants\Numeric\ZERO;
 

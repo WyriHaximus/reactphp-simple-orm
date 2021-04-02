@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
@@ -8,6 +10,7 @@ use Latitude\QueryBuilder\ExpressionInterface;
 use Latitude\QueryBuilder\QueryFactory;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
+
 use function ApiClients\Tools\Rx\unwrapObservableFromPromise;
 use function array_key_exists;
 use function React\Promise\resolve;
@@ -18,32 +21,23 @@ final class Client implements ClientInterface
 
     private EntityInspector $entityInspector;
 
-    /** @var Repository[] */
+    /** @var array<string, Repository> */
     private array $repositories = [];
 
     private MiddlewareRunner $middlewareRunner;
 
     private QueryFactory $queryFactory;
 
-    /**
-     * @param array<int, MiddlewareInterface> $middleware
-     */
     public static function create(AdapterInterface $adapter, MiddlewareInterface ...$middleware): self
     {
         return new self($adapter, new AnnotationReader(), ...$middleware);
     }
 
-    /**
-     * @param array<int, MiddlewareInterface> $middleware
-     */
     public static function createWithAnnotationReader(AdapterInterface $adapter, Reader $annotationReader, MiddlewareInterface ...$middleware): self
     {
         return new self($adapter, $annotationReader, ...$middleware);
     }
 
-    /**
-     * @param array<int, MiddlewareInterface> $middleware
-     */
     private function __construct(AdapterInterface $adapter, Reader $annotationReader, MiddlewareInterface ...$middleware)
     {
         $this->adapter         = $adapter;
@@ -53,10 +47,10 @@ final class Client implements ClientInterface
         $this->middlewareRunner = new MiddlewareRunner(...$middleware);
     }
 
-    public function getRepository(string $entity): RepositoryInterface
+    public function repository(string $entity): RepositoryInterface
     {
         if (! array_key_exists($entity, $this->repositories)) {
-            $this->repositories[$entity] = new Repository($this->entityInspector->getEntity($entity), $this, $this->queryFactory);
+            $this->repositories[$entity] = new Repository($this->entityInspector->entity($entity), $this, $this->queryFactory);
         }
 
         return $this->repositories[$entity];

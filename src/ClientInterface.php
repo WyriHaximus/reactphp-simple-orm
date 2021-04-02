@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
@@ -7,7 +9,7 @@ use Rx\Observable;
 
 interface ClientInterface
 {
-    public function getRepository(string $entity): RepositoryInterface;
+    public function repository(string $entity): RepositoryInterface;
 
     public function query(ExpressionInterface $query): Observable;
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
@@ -7,17 +9,17 @@ use WyriHaximus\React\SimpleORM\Entity\Join;
 
 interface InspectedEntityInterface
 {
-    public function getClass(): string;
+    public function class(): string;
 
-    public function getTable(): string;
+    public function table(): string;
 
     /**
      * @return Field[]
      */
-    public function getFields(): array;
+    public function fields(): array;
 
     /**
      * @return Join[]
      */
-    public function getJoins(): array;
+    public function joins(): array;
 }

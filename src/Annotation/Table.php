@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Annotation;
 
 use Doctrine\Common\Annotations\Annotation\Target;
+
 use function current;
 
 /**
@@ -18,10 +21,10 @@ final class Table
      */
     public function __construct(array $table)
     {
-        $this->table = current($table);
+        $this->table = current($table); /** @phpstan-ignore-line */
     }
 
-    public function getTable(): string
+    public function table(): string
     {
         return $this->table;
     }

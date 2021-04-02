@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
@@ -13,6 +15,7 @@ use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
+
 use function ApiClients\Tools\Rx\observableFromArray;
 use function Latitude\QueryBuilder\field;
 
@@ -46,7 +49,7 @@ final class ClientTest extends AsyncTestCase
             new Table(['users']),
         ]);
 
-        $this->client->getRepository(UserStub::class);
+        $this->client->repository(UserStub::class);
     }
 
     public function testFetch(): void

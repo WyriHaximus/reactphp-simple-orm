@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Annotation;
 
 use Doctrine\Common\Annotations\Annotation\Target;
+
 use function property_exists;
 
 /**
@@ -32,21 +35,21 @@ final class InnerJoin implements JoinInterface
                 continue;
             }
 
-            $this->$name = $innerJoin[$name];
+            $this->$name = $innerJoin[$name]; /** @phpstan-ignore-line */
         }
     }
 
-    public function getEntity(): string
+    public function entity(): string
     {
         return $this->entity;
     }
 
-    public function getType(): string
+    public function type(): string
     {
         return 'inner';
     }
 
-    public function getLazy(): bool
+    public function lazy(): bool
     {
         return $this->lazy;
     }
@@ -54,12 +57,12 @@ final class InnerJoin implements JoinInterface
     /**
      * @return Clause[]
      */
-    public function getClause(): array
+    public function clause(): array
     {
         return $this->clause;
     }
 
-    public function getProperty(): string
+    public function property(): string
     {
         return $this->property;
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
@@ -17,9 +19,10 @@ use WyriHaximus\React\SimpleORM\Repository;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
+
 use function ApiClients\Tools\Rx\observableFromArray;
 use function assert;
-use function date;
+use function Safe\date;
 use function strpos;
 
 final class RepositoryTest extends AsyncTestCase
@@ -50,7 +53,7 @@ final class RepositoryTest extends AsyncTestCase
         assert($client instanceof ClientInterface);
 
         $repository = new Repository(
-            (new EntityInspector(new AnnotationReader()))->getEntity(UserStub::class),
+            (new EntityInspector(new AnnotationReader()))->entity(UserStub::class),
             $client,
             new QueryFactory()
         );
@@ -60,7 +63,7 @@ final class RepositoryTest extends AsyncTestCase
 
     public function testCountWithJoins(): void
     {
-        $this->client->getRepository(CommentStub::class)->shouldNotBeCalled();
+        $this->client->repository(CommentStub::class)->shouldNotBeCalled();
 
         $this->client->query(Argument::that(static function (ExpressionInterface $expression): bool {
             self::assertCount(0, $expression->params(new PostgresEngine()));
@@ -80,7 +83,7 @@ final class RepositoryTest extends AsyncTestCase
         assert($client instanceof ClientInterface);
 
         $repository = new Repository(
-            (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
+            (new EntityInspector(new AnnotationReader()))->entity(BlogPostStub::class),
             $client,
             new QueryFactory()
         );
@@ -90,7 +93,7 @@ final class RepositoryTest extends AsyncTestCase
 
     public function testFetchWithJoins(): void
     {
-        $this->client->getRepository(CommentStub::class)->shouldNotBeCalled();
+        $this->client->repository(CommentStub::class)->shouldNotBeCalled();
 
         $this->client->query(Argument::that(static function (ExpressionInterface $expression): bool {
             self::assertCount(1, $expression->params(new PostgresEngine()));
@@ -134,7 +137,7 @@ final class RepositoryTest extends AsyncTestCase
         assert($client instanceof ClientInterface);
 
         $repository = new Repository(
-            (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
+            (new EntityInspector(new AnnotationReader()))->entity(BlogPostStub::class),
             $client,
             new QueryFactory()
         );
@@ -146,12 +149,12 @@ final class RepositoryTest extends AsyncTestCase
         ))->take(1)->toPromise());
         assert($blogPost instanceof BlogPostStub);
 
-        self::assertSame('98ce9eaf-b38b-4a51-93ed-131ffac4051e', $blogPost->getId());
+        self::assertSame('98ce9eaf-b38b-4a51-93ed-131ffac4051e', $blogPost->id());
         self::assertSame('blog_post_title', $blogPost->getTitle());
         self::assertSame(123, $blogPost->getViews());
-        self::assertSame('1a6cf50d-fa06-45ac-a510-375328f26541', $blogPost->getAuthor()->getId());
+        self::assertSame('1a6cf50d-fa06-45ac-a510-375328f26541', $blogPost->getAuthor()->id());
         self::assertSame('author_name', $blogPost->getAuthor()->getName());
-        self::assertSame('7bfdcadd-1e93-4c6e-9edf-d9bdf98a871c', $blogPost->getPublisher()->getId());
+        self::assertSame('7bfdcadd-1e93-4c6e-9edf-d9bdf98a871c', $blogPost->getPublisher()->id());
         self::assertSame('publisher_name', $blogPost->getPublisher()->getName());
     }
 
@@ -160,8 +163,8 @@ final class RepositoryTest extends AsyncTestCase
         $client = $this->client->reveal();
         assert($client instanceof ClientInterface);
 
-        $this->client->getRepository(CommentStub::class)->shouldBeCalled()->willReturn(
-            new Repository((new EntityInspector(new AnnotationReader()))->getEntity(CommentStub::class), $client, new QueryFactory())
+        $this->client->repository(CommentStub::class)->shouldBeCalled()->willReturn(
+            new Repository((new EntityInspector(new AnnotationReader()))->entity(CommentStub::class), $client, new QueryFactory())
         );
 
         $this->client->query(Argument::that(static function (ExpressionInterface $expression): bool {
@@ -309,7 +312,7 @@ final class RepositoryTest extends AsyncTestCase
         ]));
 
         $repository = new Repository(
-            (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
+            (new EntityInspector(new AnnotationReader()))->entity(BlogPostStub::class),
             $client,
             new QueryFactory()
         );
@@ -321,34 +324,34 @@ final class RepositoryTest extends AsyncTestCase
         ))->take(1)->toPromise());
         assert($blogPost instanceof BlogPostStub);
 
-        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $blogPost->getId());
+        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $blogPost->id());
         self::assertSame('blog_post_title', $blogPost->getTitle());
-        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $blogPost->getAuthor()->getId());
+        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $blogPost->getAuthor()->id());
         self::assertSame('author_name', $blogPost->getAuthor()->getName());
-        self::assertSame('d45e8a1b-b962-4c1b-a7e7-c867fa06ffa7', $blogPost->getPublisher()->getId());
+        self::assertSame('d45e8a1b-b962-4c1b-a7e7-c867fa06ffa7', $blogPost->getPublisher()->id());
         self::assertSame('publisher_name', $blogPost->getPublisher()->getName());
 
         /** @var CommentStub[] $comments */
         $comments = $this->await($blogPost->getComments()->toArray()->toPromise());
 
-        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[0]->getId());
-        self::assertSame('d45e8a1b-b962-4c1b-a7e7-c867fa06ffa7', $comments[0]->getAuthor()->getId());
-        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[0]->getBlogPost()->getId());
-        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[0]->getBlogPost()->getAuthor()->getId());
+        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[0]->id());
+        self::assertSame('d45e8a1b-b962-4c1b-a7e7-c867fa06ffa7', $comments[0]->getAuthor()->id());
+        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[0]->getBlogPost()->id());
+        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[0]->getBlogPost()->getAuthor()->id());
 
-        self::assertSame('fa41900d-4f62-4037-9eb3-8cfb4b90eeef', $comments[1]->getId());
-        self::assertSame('0da49bee-ab27-4b24-a949-7b71a0b0449a', $comments[1]->getAuthor()->getId());
-        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[1]->getBlogPost()->getId());
-        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[1]->getBlogPost()->getAuthor()->getId());
+        self::assertSame('fa41900d-4f62-4037-9eb3-8cfb4b90eeef', $comments[1]->id());
+        self::assertSame('0da49bee-ab27-4b24-a949-7b71a0b0449a', $comments[1]->getAuthor()->id());
+        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[1]->getBlogPost()->id());
+        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[1]->getBlogPost()->getAuthor()->id());
 
-        self::assertSame('83f451cb-4b20-41b5-a8be-637af0bf1284', $comments[2]->getId());
-        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[2]->getAuthor()->getId());
-        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[2]->getBlogPost()->getId());
-        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[2]->getBlogPost()->getAuthor()->getId());
+        self::assertSame('83f451cb-4b20-41b5-a8be-637af0bf1284', $comments[2]->id());
+        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[2]->getAuthor()->id());
+        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[2]->getBlogPost()->id());
+        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[2]->getBlogPost()->getAuthor()->id());
 
-        self::assertSame('590d4a9d-afb2-4860-a746-b0a086554064', $comments[3]->getId());
-        self::assertSame('0da49bee-ab27-4b24-a949-7b71a0b0449a', $comments[3]->getAuthor()->getId());
-        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[3]->getBlogPost()->getId());
-        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[3]->getBlogPost()->getAuthor()->getId());
+        self::assertSame('590d4a9d-afb2-4860-a746-b0a086554064', $comments[3]->id());
+        self::assertSame('0da49bee-ab27-4b24-a949-7b71a0b0449a', $comments[3]->getAuthor()->id());
+        self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[3]->getBlogPost()->id());
+        self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[3]->getBlogPost()->getAuthor()->id());
     }
 }

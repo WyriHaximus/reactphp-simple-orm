@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Middleware;
 
@@ -8,6 +10,7 @@ use Rx\Observable;
 use Rx\Subject\Subject;
 use Throwable;
 use WyriHaximus\React\SimpleORM\MiddlewareInterface;
+
 use function hrtime;
 use function React\Promise\resolve;
 
@@ -87,7 +90,7 @@ final class QueryCountMiddleware implements MiddlewareInterface
     /**
      * @return iterable<string, int>
      */
-    public function getCounters(): iterable
+    public function counters(): iterable
     {
         yield 'initiated' => $this->initiatedCount;
         yield 'successful' => $this->successfulCount;

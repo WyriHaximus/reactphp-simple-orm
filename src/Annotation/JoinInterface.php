@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Annotation;
 
@@ -7,16 +9,16 @@ interface JoinInterface
     public const IS_LAZY     = true;
     public const IS_NOT_LAZY = false;
 
-    public function getEntity(): string;
+    public function entity(): string;
 
-    public function getType(): string;
+    public function type(): string;
 
-    public function getProperty(): string;
+    public function property(): string;
 
-    public function getLazy(): bool;
+    public function lazy(): bool;
 
     /**
      * @return Clause[]
      */
-    public function getClause(): array;
+    public function clause(): array;
 }
