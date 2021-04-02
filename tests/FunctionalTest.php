@@ -14,6 +14,7 @@ use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\SimpleORM\ClientInterface;
 use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
+use WyriHaximus\React\SimpleORM\Query\Limit;
 use WyriHaximus\React\SimpleORM\Query\Where;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
@@ -218,7 +219,7 @@ final class FunctionalTest extends AsyncTestCase
         self::assertSame(
             'fb175cbc-04cc-41c7-8e35-6b817ac016ca',
             $this->await(
-                $this->client->repository(BlogPostStub::class)->fetch(null, null, 1)->toPromise()->then(static function (BlogPostStub $blogPost): string {
+                $this->client->repository(BlogPostStub::class)->fetch(new Limit(1))->toPromise()->then(static function (BlogPostStub $blogPost): string {
                     return $blogPost->getAuthor()->id();
                 }),
                 $this->loop,

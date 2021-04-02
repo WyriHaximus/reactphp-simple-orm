@@ -17,7 +17,9 @@ use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
 use Safe\DateTimeImmutable;
 use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
+use WyriHaximus\React\SimpleORM\Query\Limit;
 use WyriHaximus\React\SimpleORM\Query\Order;
+use WyriHaximus\React\SimpleORM\Query\SectionInterface;
 use WyriHaximus\React\SimpleORM\Query\Where;
 use WyriHaximus\React\SimpleORM\Query\Where\Expression;
 use WyriHaximus\React\SimpleORM\Query\Where\Field;
@@ -36,6 +38,7 @@ use function Safe\substr;
 use function spl_object_hash;
 use function strpos;
 
+use const WyriHaximus\Constants\Boolean\TRUE_;
 use const WyriHaximus\Constants\Numeric\ONE;
 use const WyriHaximus\Constants\Numeric\ZERO;
 
@@ -90,12 +93,20 @@ final class Repository implements RepositoryInterface
         return $this->fetchAndHydrate($query);
     }
 
-    /** @phpstan-ignore-next-line */
-    public function fetch(?Where $where = null, ?Order $order = null, int $limit = ZERO): Observable
+    /**
+     * @param array<SectionInterface> $sections
+     *
+     * @phpstan-ignore-next-line
+     */
+    public function fetch(SectionInterface ...$sections): Observable
     {
-        $query = $this->buildSelectQuery($where ?? new Where(), $order ?? new Order());
-        if ($limit > ZERO) {
-            $query = $query->limit($limit)->offset(ZERO);
+        $query = $this->buildSelectQuery(...$sections);
+        foreach ($sections as $section) {
+            if (! ($section instanceof Limit) || $section->limit() <= ZERO) {
+                continue;
+            }
+
+            $query = $query->limit($section->limit())->offset(ZERO);
         }
 
         return $this->fetchAndHydrate($query);
@@ -138,7 +149,7 @@ final class Repository implements RepositoryInterface
         )->toPromise()->then(function () use ($entity): PromiseInterface {
             return $this->fetch(new Where(
                 new Where\Field('id', 'eq', [$entity->id()]),
-            ), new Order(), ONE)->toPromise();
+            ), new Limit(ONE))->toPromise();
         });
     }
 
@@ -150,15 +161,31 @@ final class Repository implements RepositoryInterface
         )->toPromise();
     }
 
-    private function buildSelectQuery(Where $constraints, Order $order): SelectQuery
+    /**
+     * @param array<SectionInterface> $sections
+     *
+     * @phpstan-ignore-next-line
+     */
+    private function buildSelectQuery(SectionInterface ...$sections): SelectQuery
     {
         $query = $this->buildBaseSelectQuery();
         $query = $query->columns(...array_values($this->fields));
-        $query = $this->applyWhereToQuery($constraints, $query);
+        foreach ($sections as $section) {
+            /** @phpstan-ignore-next-line */
+            switch (TRUE_) {
+                case $section instanceof Where:
+                    /** @psalm-suppress ArgumentTypeCoercion */
+                    $query = $this->applyWhereToQuery($section, $query);
+                    break;
+                case $section instanceof Order:
+                    /** @psalm-suppress UndefinedInterfaceMethod */
+                    foreach ($section->orders() as $by) {
+                        $field = $this->translateFieldName($by->field());
+                        $query = $query->orderBy($field, $by->order());
+                    }
 
-        foreach ($order->orders() as $by) {
-            $field = $this->translateFieldName($by->field());
-            $query = $query->orderBy($field, $by->order());
+                    break;
+            }
         }
 
         return $query;
@@ -379,7 +406,7 @@ final class Repository implements RepositoryInterface
                         $this->client
                             ->repository($join->entity()
                             ->class())
-                            ->fetch(new Where(...$where), new Order(), self::SINGLE)
+                            ->fetch(new Where(...$where), new Limit(self::SINGLE))
                             ->toPromise()
                             ->then($resolve, $reject);
                     });

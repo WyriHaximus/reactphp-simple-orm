@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Query;
 
-final class Where
+final class Where implements SectionInterface
 {
     /** @var array<WhereInterface> */
     private array $wheres = [];
