@@ -61,6 +61,36 @@ final class RepositoryTest extends AsyncTestCase
         self::assertSame(123, $this->await($repository->count()));
     }
 
+    public function testCountWithContraints(): void
+    {
+        $this->client->query(Argument::that(static function (ExpressionInterface $expression): bool {
+            self::assertCount(1, $expression->params(new PostgresEngine()));
+            $query = $expression->sql(new PostgresEngine());
+            self::assertStringContainsString('FROM "users"', $query);
+            self::assertStringContainsString('COUNT(*) AS "count"', $query);
+            self::assertStringContainsString('WHERE "t0"."field" = ?', $query);
+
+            return true;
+        }))->shouldBeCalled()->willReturn(observableFromArray([
+            ['count' => '123'],
+        ]));
+
+        $client = $this->client->reveal();
+        assert($client instanceof ClientInterface);
+
+        $repository = new Repository(
+            (new EntityInspector(new AnnotationReader()))->entity(UserStub::class),
+            $client,
+            new QueryFactory()
+        );
+
+        self::assertSame(123, $this->await($repository->count(
+            new Where(
+                new Where\Field('field', 'eq', ['values']),
+            ),
+        )));
+    }
+
     public function testCountWithJoins(): void
     {
         $this->client->repository(CommentStub::class)->shouldNotBeCalled();
