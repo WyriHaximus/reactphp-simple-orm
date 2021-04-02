@@ -66,10 +66,16 @@ final class Repository implements RepositoryInterface
         $this->hydrator     = new Hydrator();
     }
 
-    public function count(): PromiseInterface
+    /** @phpstan-ignore-next-line */
+    public function count(?Where $where = null): PromiseInterface
     {
+        $query = $this->queryFactory->select(alias(func('COUNT', '*'), 'count'))->from(alias($this->entity->table(), 't0'));
+        if ($where instanceof Where) {
+            $query = $this->applyWhereToQuery($where, $query);
+        }
+
         return $this->client->query(
-            $this->queryFactory->select(alias(func('COUNT', '*'), 'count'))->from($this->entity->table())->asExpression()
+            $query->asExpression()
         )->take(self::SINGLE)->toPromise()->then(static function (array $row): int {
             return (int) $row['count'];
         });
@@ -147,9 +153,19 @@ final class Repository implements RepositoryInterface
     private function buildSelectQuery(Where $constraints, Order $order): SelectQuery
     {
         $query = $this->buildBaseSelectQuery();
-
         $query = $query->columns(...array_values($this->fields));
+        $query = $this->applyWhereToQuery($constraints, $query);
 
+        foreach ($order->orders() as $by) {
+            $field = $this->translateFieldName($by->field());
+            $query = $query->orderBy($field, $by->order());
+        }
+
+        return $query;
+    }
+
+    private function applyWhereToQuery(Where $constraints, SelectQuery $query): SelectQuery
+    {
         foreach ($constraints->wheres() as $i => $constraint) {
             if ($constraint instanceof Expression) {
                 $where = $constraint->expression();
@@ -167,11 +183,6 @@ final class Repository implements RepositoryInterface
             }
 
             $query = $query->andWhere($where);
-        }
-
-        foreach ($order->orders() as $by) {
-            $field = $this->translateFieldName($by->field());
-            $query = $query->orderBy($field, $by->order());
         }
 
         return $query;

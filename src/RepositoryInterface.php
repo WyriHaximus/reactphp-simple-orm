@@ -13,7 +13,8 @@ interface RepositoryInterface
 {
     public const DEFAULT_PER_PAGE = 50;
 
-    public function count(): PromiseInterface;
+    /** @phpstan-ignore-next-line */
+    public function count(?Where $where = null): PromiseInterface;
 
     /** @phpstan-ignore-next-line */
     public function page(int $page, ?Where $where = null, ?Order $order = null, int $perPage = self::DEFAULT_PER_PAGE): Observable;
