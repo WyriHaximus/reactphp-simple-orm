@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
@@ -13,8 +15,10 @@ interface RepositoryInterface
 
     public function count(): PromiseInterface;
 
+    /** @phpstan-ignore-next-line */
     public function page(int $page, ?Where $where = null, ?Order $order = null, int $perPage = self::DEFAULT_PER_PAGE): Observable;
 
+    /** @phpstan-ignore-next-line */
     public function fetch(?Where $where = null, ?Order $order = null, int $limit = 0): Observable;
 
     /**

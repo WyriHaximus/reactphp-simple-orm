@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
@@ -29,12 +31,12 @@ final class InspectedEntity implements InspectedEntityInterface
         $this->joins  = $joins;
     }
 
-    public function getClass(): string
+    public function class(): string
     {
         return $this->class;
     }
 
-    public function getTable(): string
+    public function table(): string
     {
         return $this->table;
     }
@@ -42,7 +44,7 @@ final class InspectedEntity implements InspectedEntityInterface
     /**
      * @return Field[]
      */
-    public function getFields(): array
+    public function fields(): array
     {
         return $this->fields;
     }
@@ -50,7 +52,7 @@ final class InspectedEntity implements InspectedEntityInterface
     /**
      * @return Join[]
      */
-    public function getJoins(): array
+    public function joins(): array
     {
         return $this->joins;
     }

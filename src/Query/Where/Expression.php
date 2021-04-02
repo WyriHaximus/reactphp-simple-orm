@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Query\Where;
 
@@ -31,6 +33,7 @@ final class Expression implements WhereInterface
 
     public function applyExpression(ExpressionInterface $expression): CriteriaInterface
     {
+        /** @phpstan-ignore-next-line */
         return (new CriteriaBuilder($expression))->{$this->criteria}(...$this->criteriaArguments);
     }
 }

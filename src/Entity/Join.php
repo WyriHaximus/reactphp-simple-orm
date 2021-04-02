@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Entity;
 
@@ -15,12 +17,9 @@ final class Join
 
     private bool $lazy;
 
-    /** @var Clause[] */
+    /** @var array<Clause> */
     private array $clause;
 
-    /**
-     * @param array<int, Clause> $clause
-     */
     public function __construct(InspectedEntityInterface $entity, string $type, string $property, bool $lazy, Clause ...$clause)
     {
         $this->entity   = $entity;
@@ -30,22 +29,22 @@ final class Join
         $this->clause   = $clause;
     }
 
-    public function getEntity(): InspectedEntityInterface
+    public function entity(): InspectedEntityInterface
     {
         return $this->entity;
     }
 
-    public function getType(): string
+    public function type(): string
     {
         return $this->type;
     }
 
-    public function getProperty(): string
+    public function property(): string
     {
         return $this->property;
     }
 
-    public function getLazy(): bool
+    public function lazy(): bool
     {
         return $this->lazy;
     }
@@ -53,7 +52,7 @@ final class Join
     /**
      * @return Clause[]
      */
-    public function getClause(): array
+    public function clause(): array
     {
         return $this->clause;
     }

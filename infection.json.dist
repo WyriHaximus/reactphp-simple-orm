@@ -6,52 +6,15 @@
         ]
     },
     "logs": {
-        "text": "infection-log.txt"
+        "text": "./var/infection.log",
+        "summary": "./var/infection-summary.log",
+        "json": "./var/infection.json",
+        "perMutator": "./var/infection-per-mutator.md"
     },
     "mutators": {
-        "@default": true,
-        "CastInt": false,
-        "CastString": false,
-        "Increment": false,
-        "GreaterThan": false,
-        "Identical": false,
-        "Continue_": false,
-        "Multiplication": false,
-        "Plus": false,
-        "Foreach_": false,
-        "CloneRemoval": false,
-        "Decrement": false,
-        "Coalesce": false,
-        "FunctionCallRemoval": {
-            "ignore": [
-                "WyriHaximus\\TestUtilities\\TestCase::waitUntilTheNextSecond"
-            ]
-        },
-        "MethodCallRemoval": {
-            "ignore": [
-                "WyriHaximus\\TestUtilities\\TestCase::tearDown"
-            ]
-        },
-        "TrueValue": {
-            "ignore": [
-                "WyriHaximus\\TestUtilities\\TestCase::provideTrueFalse"
-            ]
-        },
-        "ArrayItemRemoval": false,
-        "FalseValue": {
-            "ignore": [
-                "WyriHaximus\\TestUtilities\\TestCase::provideTrueFalse"
-            ]
-        },
-        "PublicVisibility": {
-            "ignore": [
-                "WyriHaximus\\TestUtilities\\TestCase::provideTrueFalse"
-            ]
-        },
-        "UnwrapStrToUpper": {
-            "ignore": [
-                "WyriHaximus\\TestUtilities\\TestCase::getSysTempDir"
-            ]
-        }
+        "@default": false
+    },
+    "phpUnit": {
+        "configDir": "./etc/qa/"
     }
 }

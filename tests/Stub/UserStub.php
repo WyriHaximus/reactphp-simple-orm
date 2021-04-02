@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
@@ -34,7 +36,7 @@ final class UserStub implements EntityInterface
 
     protected PromiseInterface $zelf;
 
-    public function getId(): string
+    public function id(): string
     {
         return $this->id;
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
@@ -25,26 +27,31 @@ final class LazyInspectedEntity implements InspectedEntityInterface
         $this->entityInspector = $entityInspector;
     }
 
-    public function getClass(): string
+    public function class(): string
     {
         return $this->class;
     }
 
-    /** @psalm-suppress InvalidNullableReturnType */
-    public function getTable(): string
+    /**
+     * @psalm-suppress InvalidNullableReturnType
+     */
+    public function table(): string
     {
         if ($this->table === null) {
             $this->loadEntity();
         }
 
-        /** @psalm-suppress NullableReturnStatement */
+        /**
+         * @phpstan-ignore-next-line
+         * @psalm-suppress NullableReturnStatement
+         */
         return $this->table;
     }
 
     /**
      * @return Field[]
      */
-    public function getFields(): array
+    public function fields(): array
     {
         if ($this->table === null) {
             $this->loadEntity();
@@ -56,7 +63,7 @@ final class LazyInspectedEntity implements InspectedEntityInterface
     /**
      * @return Join[]
      */
-    public function getJoins(): array
+    public function joins(): array
     {
         if ($this->table === null) {
             $this->loadEntity();
@@ -71,11 +78,11 @@ final class LazyInspectedEntity implements InspectedEntityInterface
             return;
         }
 
-        $inspectedEntity       = $this->entityInspector->getEntity($this->class);
+        $inspectedEntity       = $this->entityInspector->entity($this->class);
         $this->entityInspector = null;
 
-        $this->table  = $inspectedEntity->getTable();
-        $this->fields = $inspectedEntity->getFields();
-        $this->joins  = $inspectedEntity->getJoins();
+        $this->table  = $inspectedEntity->table();
+        $this->fields = $inspectedEntity->fields();
+        $this->joins  = $inspectedEntity->joins();
     }
 }

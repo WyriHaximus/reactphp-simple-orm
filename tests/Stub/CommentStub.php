@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
@@ -49,7 +51,7 @@ final class CommentStub implements EntityInterface
     protected string $contents;
     //phpcs:enable
 
-    public function getId(): string
+    public function id(): string
     {
         return $this->id;
     }

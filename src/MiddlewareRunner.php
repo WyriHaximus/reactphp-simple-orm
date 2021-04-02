@@ -1,10 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
 use Latitude\QueryBuilder\ExpressionInterface;
 use React\Promise\PromiseInterface;
+
 use function array_key_exists;
+
 use const WyriHaximus\Constants\Numeric\ZERO;
 
 /**
@@ -13,12 +17,9 @@ use const WyriHaximus\Constants\Numeric\ZERO;
 
 final class MiddlewareRunner
 {
-    /** @var MiddlewareInterface[] */
+    /** @var array<MiddlewareInterface> */
     private array $middleware;
 
-    /**
-     * @param array<int, MiddlewareInterface> $middleware
-     */
     public function __construct(MiddlewareInterface ...$middleware)
     {
         $this->middleware = $middleware;

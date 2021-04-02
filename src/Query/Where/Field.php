@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Query\Where;
 
@@ -30,6 +32,7 @@ final class Field implements WhereInterface
 
     public function applyCriteria(CriteriaBuilder $criteria): CriteriaInterface
     {
+        /** @phpstan-ignore-next-line */
         return $criteria->{$this->criteria}(...$this->criteriaArguments);
     }
 }

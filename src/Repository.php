@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
@@ -19,9 +21,9 @@ use WyriHaximus\React\SimpleORM\Query\Order;
 use WyriHaximus\React\SimpleORM\Query\Where;
 use WyriHaximus\React\SimpleORM\Query\Where\Expression;
 use WyriHaximus\React\SimpleORM\Query\Where\Field;
+
 use function array_key_exists;
 use function array_values;
-use function date;
 use function explode;
 use function is_scalar;
 use function is_string;
@@ -29,9 +31,11 @@ use function Latitude\QueryBuilder\alias;
 use function Latitude\QueryBuilder\field;
 use function Latitude\QueryBuilder\func;
 use function Latitude\QueryBuilder\on;
+use function Safe\date;
 use function Safe\substr;
 use function spl_object_hash;
 use function strpos;
+
 use const WyriHaximus\Constants\Numeric\ONE;
 use const WyriHaximus\Constants\Numeric\ZERO;
 
@@ -65,12 +69,13 @@ final class Repository implements RepositoryInterface
     public function count(): PromiseInterface
     {
         return $this->client->query(
-            $this->queryFactory->select(alias(func('COUNT', '*'), 'count'))->from($this->entity->getTable())->asExpression()
+            $this->queryFactory->select(alias(func('COUNT', '*'), 'count'))->from($this->entity->table())->asExpression()
         )->take(self::SINGLE)->toPromise()->then(static function (array $row): int {
             return (int) $row['count'];
         });
     }
 
+    /** @phpstan-ignore-next-line */
     public function page(int $page, ?Where $where = null, ?Order $order = null, int $perPage = RepositoryInterface::DEFAULT_PER_PAGE): Observable
     {
         $query = $this->buildSelectQuery($where ?? new Where(), $order ?? new Order());
@@ -79,6 +84,7 @@ final class Repository implements RepositoryInterface
         return $this->fetchAndHydrate($query);
     }
 
+    /** @phpstan-ignore-next-line */
     public function fetch(?Where $where = null, ?Order $order = null, int $limit = ZERO): Observable
     {
         $query = $this->buildSelectQuery($where ?? new Where(), $order ?? new Order());
@@ -102,7 +108,7 @@ final class Repository implements RepositoryInterface
         $fields = $this->prepareFields($fields);
 
         return $this->client->query(
-            $this->queryFactory->insert($this->entity->getTable(), $fields)->asExpression()
+            $this->queryFactory->insert($this->entity->table(), $fields)->asExpression()
         )->toPromise()->then(function () use ($id): PromiseInterface {
             return $this->fetch(new Where(
                 new Where\Field(
@@ -121,11 +127,11 @@ final class Repository implements RepositoryInterface
         $fields             = $this->prepareFields($fields);
 
         return $this->client->query(
-            $this->queryFactory->update($this->entity->getTable(), $fields)->
-            where(field('id')->eq($entity->getId()))->asExpression()
+            $this->queryFactory->update($this->entity->table(), $fields)->
+            where(field('id')->eq($entity->id()))->asExpression()
         )->toPromise()->then(function () use ($entity): PromiseInterface {
             return $this->fetch(new Where(
-                new Where\Field('id', 'eq', [$entity->getId()]),
+                new Where\Field('id', 'eq', [$entity->id()]),
             ), new Order(), ONE)->toPromise();
         });
     }
@@ -133,8 +139,8 @@ final class Repository implements RepositoryInterface
     public function delete(EntityInterface $entity): PromiseInterface
     {
         return $this->client->query(
-            $this->queryFactory->delete($this->entity->getTable())->
-            where(field('id')->eq($entity->getId()))->asExpression()
+            $this->queryFactory->delete($this->entity->table())->
+            where(field('id')->eq($entity->id()))->asExpression()
         )->toPromise();
     }
 
@@ -176,10 +182,10 @@ final class Repository implements RepositoryInterface
         $i                             = ZERO;
         $tableKey                      = spl_object_hash($this->entity) . '___root';
         $this->tableAliases[$tableKey] = 't' . $i++;
-        $query                         = $this->queryFactory->select()->from(alias($this->entity->getTable(), $this->tableAliases[$tableKey]));
+        $query                         = $this->queryFactory->select()->from(alias($this->entity->table(), $this->tableAliases[$tableKey]));
 
-        foreach ($this->entity->getFields() as $field) {
-            $this->fields[$this->tableAliases[$tableKey] . '___' . $field->getName()] = alias($this->tableAliases[$tableKey] . '.' . $field->getName(), $this->tableAliases[$tableKey] . '___' . $field->getName());
+        foreach ($this->entity->fields() as $field) {
+            $this->fields[$this->tableAliases[$tableKey] . '___' . $field->name()] = alias($this->tableAliases[$tableKey] . '.' . $field->name(), $this->tableAliases[$tableKey] . '___' . $field->name());
         }
 
         $query = $this->buildJoins($query, $this->entity, $i);
@@ -189,47 +195,47 @@ final class Repository implements RepositoryInterface
 
     private function buildJoins(SelectQuery $query, InspectedEntityInterface $entity, int &$i, string $rootProperty = 'root'): SelectQuery
     {
-        foreach ($entity->getJoins() as $join) {
-            if ($join->getType() !== 'inner') {
+        foreach ($entity->joins() as $join) {
+            if ($join->type() !== 'inner') {
                 continue;
             }
 
-            if ($join->getLazy() === JoinInterface::IS_LAZY) {
+            if ($join->lazy() === JoinInterface::IS_LAZY) {
                 continue;
             }
 
-            if ($entity->getClass() === $join->getEntity()->getClass()) {
+            if ($entity->class() === $join->entity()->class()) {
                 continue;
             }
 
-            $tableKey = spl_object_hash($join->getEntity()) . '___' . $join->getProperty();
+            $tableKey = spl_object_hash($join->entity()) . '___' . $join->property();
             if (! array_key_exists($tableKey, $this->tableAliases)) {
                 $this->tableAliases[$tableKey] = 't' . $i++;
             }
 
             $clauses = null;
-            foreach ($join->getClause() as $clause) {
-                $onLeftSide = $this->tableAliases[$tableKey] . '.' . $clause->getForeignKey();
-                if ($clause->getForeignFunction() !== null) {
+            foreach ($join->clause() as $clause) {
+                $onLeftSide = $this->tableAliases[$tableKey] . '.' . $clause->foreignKey();
+                if ($clause->foreignFunction() !== null) {
                     /** @psalm-suppress PossiblyNullOperand */
-                    $onLeftSide = $clause->getForeignFunction() . '(' . $onLeftSide . ')';
+                    $onLeftSide = $clause->foreignFunction() . '(' . $onLeftSide . ')';
                 }
 
-                if ($clause->getForeignCast() !== null) {
+                if ($clause->foreignCast() !== null) {
                     /** @psalm-suppress PossiblyNullOperand */
-                    $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $clause->getForeignCast() . ')';
+                    $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $clause->foreignCast() . ')';
                 }
 
                 $onRightSide =
-                    $this->tableAliases[spl_object_hash($entity) . '___' . $rootProperty] . '.' . $clause->getLocalKey();
-                if ($clause->getLocalFunction() !== null) {
+                    $this->tableAliases[spl_object_hash($entity) . '___' . $rootProperty] . '.' . $clause->localKey();
+                if ($clause->localFunction() !== null) {
                     /** @psalm-suppress PossiblyNullOperand */
-                    $onRightSide = $clause->getLocalFunction() . '(' . $onRightSide . ')';
+                    $onRightSide = $clause->localFunction() . '(' . $onRightSide . ')';
                 }
 
-                if ($clause->getLocalCast() !== null) {
+                if ($clause->localCast() !== null) {
                     /** @psalm-suppress PossiblyNullOperand */
-                    $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $clause->getLocalCast() . ')';
+                    $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $clause->localCast() . ')';
                 }
 
                 if ($clauses === null) {
@@ -245,20 +251,20 @@ final class Repository implements RepositoryInterface
                 /** @psalm-suppress PossiblyNullArgument */
                 $query = $query->innerJoin(
                     alias(
-                        $join->getEntity()->getTable(),
+                        $join->entity()->table(),
                         $this->tableAliases[$tableKey]
                     ),
                     $clauses
                 );
             }
 
-            foreach ($join->getEntity()->getFields() as $field) {
-                $this->fields[$this->tableAliases[$tableKey] . '___' . $field->getName()] = alias($this->tableAliases[$tableKey] . '.' . $field->getName(), $this->tableAliases[$tableKey] . '___' . $field->getName());
+            foreach ($join->entity()->fields() as $field) {
+                $this->fields[$this->tableAliases[$tableKey] . '___' . $field->name()] = alias($this->tableAliases[$tableKey] . '.' . $field->name(), $this->tableAliases[$tableKey] . '___' . $field->name());
             }
 
-            unset($this->fields[$entity->getTable() . '___' . $join->getProperty()]);
+            unset($this->fields[$entity->table() . '___' . $join->property()]);
 
-            $query = $this->buildJoins($query, $join->getEntity(), $i, $join->getProperty());
+            $query = $this->buildJoins($query, $join->entity(), $i, $join->property());
         }
 
         return $query;
@@ -304,18 +310,22 @@ final class Repository implements RepositoryInterface
         $tableKey = spl_object_hash($entity) . '___' . $tableKeySuffix;
         $tree     = $row[$this->tableAliases[$tableKey]];
 
-        foreach ($entity->getJoins() as $join) {
-            if ($join->getType() === 'inner' && $entity->getClass() !== $join->getEntity()->getClass() && $join->getLazy() === false) {
-                $tree[$join->getProperty()] = $this->buildTree($row, $join->getEntity(), $join->getProperty());
+        foreach ($entity->joins() as $join) {
+            if ($join->type() === 'inner' && $entity->class() !== $join->entity()->class() && $join->lazy() === false) {
+                $tree[$join->property()] = $this->buildTree($row, $join->entity(), $join->property());
 
                 continue;
             }
 
-            if ($join->getType() === 'inner' && ($join->getLazy() === JoinInterface::IS_LAZY || $entity->getClass() === $join->getEntity()->getClass())) {
-                $tree[$join->getProperty()] = new LazyPromise(function () use ($row, $join, $tableKey): PromiseInterface {
+            if ($join->type() === 'inner' && ($join->lazy() === JoinInterface::IS_LAZY || $entity->class() === $join->entity()->class())) {
+                /**
+                 * @phpstan-ignore-next-line
+                 * @psalm-suppress DeprecatedClass
+                 */
+                $tree[$join->property()] = new LazyPromise(function () use ($row, $join, $tableKey): PromiseInterface {
                     return new Promise(function (callable $resolve, callable $reject) use ($row, $join, $tableKey): void {
-                        foreach ($join->getClause() as $clause) {
-                            if ($row[$this->tableAliases[$tableKey]][$clause->getLocalKey()] === null) {
+                        foreach ($join->clause() as $clause) {
+                            if ($row[$this->tableAliases[$tableKey]][$clause->localKey()] === null) {
                                 $resolve(null);
 
                                 return;
@@ -324,16 +334,16 @@ final class Repository implements RepositoryInterface
 
                         $where = [];
 
-                        foreach ($join->getClause() as $clause) {
-                            $onLeftSide = $clause->getForeignKey();
-                            if ($clause->getForeignFunction() !== null) {
+                        foreach ($join->clause() as $clause) {
+                            $onLeftSide = $clause->foreignKey();
+                            if ($clause->foreignFunction() !== null) {
                                 /** @psalm-suppress PossiblyNullArgument */
-                                $onLeftSide = func($clause->getForeignFunction(), $onLeftSide);
+                                $onLeftSide = func($clause->foreignFunction(), $onLeftSide);
                             }
 
-                            if ($clause->getForeignCast() !== null) {
+                            if ($clause->foreignCast() !== null) {
                                 /** @psalm-suppress PossiblyNullArgument */
-                                $onLeftSide = alias(func('CAST', $onLeftSide), $clause->getForeignCast());
+                                $onLeftSide = alias(func('CAST', $onLeftSide), $clause->foreignCast());
                             }
 
                             if (is_string($onLeftSide)) {
@@ -341,7 +351,7 @@ final class Repository implements RepositoryInterface
                                     $onLeftSide,
                                     'eq',
                                     [
-                                        $row[$this->tableAliases[$tableKey]][$clause->getLocalKey()],
+                                        $row[$this->tableAliases[$tableKey]][$clause->localKey()],
                                     ]
                                 );
                             } else {
@@ -349,15 +359,15 @@ final class Repository implements RepositoryInterface
                                     $onLeftSide,
                                     'eq',
                                     [
-                                        $row[$this->tableAliases[$tableKey]][$clause->getLocalKey()],
+                                        $row[$this->tableAliases[$tableKey]][$clause->localKey()],
                                     ]
                                 );
                             }
                         }
 
                         $this->client
-                            ->getRepository($join->getEntity()
-                            ->getClass())
+                            ->repository($join->entity()
+                            ->class())
                             ->fetch(new Where(...$where), new Order(), self::SINGLE)
                             ->toPromise()
                             ->then($resolve, $reject);
@@ -367,21 +377,21 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
-            $tree[$join->getProperty()] = Observable::defer(
+            $tree[$join->property()] = Observable::defer(
                 function () use ($row, $join, $tableKey): Observable {
                     $where = [];
 
-                    foreach ($join->getClause() as $clause) {
+                    foreach ($join->clause() as $clause) {
                         $where[] = new Where\Field(
-                            $clause->getForeignKey(),
+                            $clause->foreignKey(),
                             'eq',
                             [
-                                $row[$this->tableAliases[$tableKey]][$clause->getLocalKey()],
+                                $row[$this->tableAliases[$tableKey]][$clause->localKey()],
                             ]
                         );
                     }
 
-                    return $this->client->getRepository($join->getEntity()->getClass())->fetch(new Where(...$where));
+                    return $this->client->repository($join->entity()->class())->fetch(new Where(...$where));
                 },
                 new ImmediateScheduler()
             );

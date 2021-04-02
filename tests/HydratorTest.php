@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
@@ -8,12 +10,13 @@ use WyriHaximus\React\SimpleORM\Hydrator;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 use WyriHaximus\TestUtilities\TestCase;
+
 use function ApiClients\Tools\Rx\observableFromArray;
 use function assert;
 use function bin2hex;
-use function date;
 use function random_bytes;
 use function React\Promise\resolve;
+use function Safe\date;
 
 /**
  * @internal
@@ -26,7 +29,7 @@ final class HydratorTest extends TestCase
         $title = 'tables.title';
 
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new AnnotationReader()))->getEntity(UserStub::class),
+            (new EntityInspector(new AnnotationReader()))->entity(UserStub::class),
             [
                 'id' => $id,
                 'name' => $title,
@@ -35,7 +38,7 @@ final class HydratorTest extends TestCase
         );
         assert($entity instanceof UserStub);
 
-        self::assertSame($id, $entity->getId());
+        self::assertSame($id, $entity->id());
         self::assertSame($title, $entity->getName());
     }
 
@@ -45,7 +48,7 @@ final class HydratorTest extends TestCase
         $title = 'tables.title';
 
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new AnnotationReader()))->getEntity(UserStub::class),
+            (new EntityInspector(new AnnotationReader()))->entity(UserStub::class),
             [
                 'doesnotexist' => resolve(true),
                 'id' => $id,
@@ -56,7 +59,7 @@ final class HydratorTest extends TestCase
         );
         assert($entity instanceof UserStub);
 
-        self::assertSame($id, $entity->getId());
+        self::assertSame($id, $entity->id());
         self::assertSame($title, $entity->getName());
     }
 
@@ -70,7 +73,7 @@ final class HydratorTest extends TestCase
         $publisherName = 'dasdsadas';
 
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
+            (new EntityInspector(new AnnotationReader()))->entity(BlogPostStub::class),
             [
                 'doesnotexist' => resolve(true),
                 'id' => $id,
@@ -99,11 +102,11 @@ final class HydratorTest extends TestCase
         );
         assert($entity instanceof BlogPostStub);
 
-        self::assertSame($id, $entity->getId());
+        self::assertSame($id, $entity->id());
         self::assertSame($title, $entity->getTitle());
-        self::assertSame($authorId, $entity->getAuthor()->getId());
+        self::assertSame($authorId, $entity->getAuthor()->id());
         self::assertSame($authorName, $entity->getAuthor()->getName());
-        self::assertSame($publisherId, $entity->getPublisher()->getId());
+        self::assertSame($publisherId, $entity->getPublisher()->id());
         self::assertSame($publisherName, $entity->getPublisher()->getName());
         self::assertSame(133, $entity->getViews());
     }
@@ -118,7 +121,7 @@ final class HydratorTest extends TestCase
         $publisherName = 'dasdsadas';
 
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new AnnotationReader()))->getEntity(BlogPostStub::class),
+            (new EntityInspector(new AnnotationReader()))->entity(BlogPostStub::class),
             [
                 'id' => $id,
                 'author_id' => $authorId,
@@ -145,11 +148,11 @@ final class HydratorTest extends TestCase
         );
         assert($entity instanceof BlogPostStub);
 
-        self::assertSame($id, $entity->getId());
+        self::assertSame($id, $entity->id());
         self::assertSame($title, $entity->getTitle());
-        self::assertSame($authorId, $entity->getAuthor()->getId());
+        self::assertSame($authorId, $entity->getAuthor()->id());
         self::assertSame($authorName, $entity->getAuthor()->getName());
-        self::assertSame($publisherId, $entity->getPublisher()->getId());
+        self::assertSame($publisherId, $entity->getPublisher()->id());
         self::assertSame($publisherName, $entity->getPublisher()->getName());
         self::assertSame(133, $entity->getViews());
     }

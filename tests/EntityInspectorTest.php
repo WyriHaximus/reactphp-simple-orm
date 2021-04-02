@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
@@ -11,6 +13,7 @@ use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\NoSQLStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
+
 use function current;
 
 final class EntityInspectorTest extends AsyncTestCase
@@ -29,17 +32,17 @@ final class EntityInspectorTest extends AsyncTestCase
      */
     public function inspect(): void
     {
-        $inspectedEntity = $this->entityInspector->getEntity(UserStub::class);
+        $inspectedEntity = $this->entityInspector->entity(UserStub::class);
 
-        self::assertSame(UserStub::class, $inspectedEntity->getClass());
-        self::assertSame('users', $inspectedEntity->getTable());
+        self::assertSame(UserStub::class, $inspectedEntity->class());
+        self::assertSame('users', $inspectedEntity->table());
 
-        $fields = $inspectedEntity->getFields();
+        $fields = $inspectedEntity->fields();
         self::assertCount(2, $fields);
         self::assertArrayHasKey('id', $fields);
-        self::assertSame('string', $fields['id']->getType());
+        self::assertSame('string', $fields['id']->type());
         self::assertArrayHasKey('name', $fields);
-        self::assertSame('string', $fields['name']->getType());
+        self::assertSame('string', $fields['name']->type());
     }
 
     /**
@@ -47,61 +50,63 @@ final class EntityInspectorTest extends AsyncTestCase
      */
     public function inspectWithJoins(): void
     {
-        $inspectedEntity = $this->entityInspector->getEntity(BlogPostStub::class);
+        $inspectedEntity = $this->entityInspector->entity(BlogPostStub::class);
 
-        self::assertSame(BlogPostStub::class, $inspectedEntity->getClass());
-        self::assertSame('blog_posts', $inspectedEntity->getTable());
+        self::assertSame(BlogPostStub::class, $inspectedEntity->class());
+        self::assertSame('blog_posts', $inspectedEntity->table());
 
-        $fields = $inspectedEntity->getFields();
+        $fields = $inspectedEntity->fields();
         self::assertCount(10, $fields);
 
-        foreach ([
-            'id' => 'string',
-            'previous_blog_post_id' => 'string',
-            'next_blog_post_id' => 'string',
-            'author_id' => 'string',
-            'title' => 'string',
-            'contents' => 'string',
-            'views' => 'int',
-            'created' => DateTimeImmutable::class,
-            'modified' => DateTimeImmutable::class,
-        ] as $key => $type) {
+        foreach (
+            [
+                'id' => 'string',
+                'previous_blog_post_id' => 'string',
+                'next_blog_post_id' => 'string',
+                'author_id' => 'string',
+                'title' => 'string',
+                'contents' => 'string',
+                'views' => 'int',
+                'created' => DateTimeImmutable::class,
+                'modified' => DateTimeImmutable::class,
+            ] as $key => $type
+        ) {
             self::assertArrayHasKey($key, $fields, $key);
-            self::assertSame($type, $fields[$key]->getType(), $key);
+            self::assertSame($type, $fields[$key]->type(), $key);
         }
 
-        $joins = $inspectedEntity->getJoins();
+        $joins = $inspectedEntity->joins();
         self::assertCount(5, $joins);
 
         self::assertArrayHasKey('author', $joins);
-        self::assertSame(UserStub::class, $joins['author']->getEntity()->getClass());
-        self::assertSame('author_id', current($joins['author']->getClause())->getLocalKey());
-        self::assertNull(current($joins['author']->getClause())->getLocalCast());
-        self::assertNull(current($joins['author']->getClause())->getLocalFunction());
-        self::assertSame('id', current($joins['author']->getClause())->getForeignKey());
-        self::assertNull(current($joins['author']->getClause())->getForeignCast());
-        self::assertNull(current($joins['author']->getClause())->getForeignFunction());
-        self::assertSame('author', $joins['author']->getProperty());
+        self::assertSame(UserStub::class, $joins['author']->entity()->class());
+        self::assertSame('author_id', current($joins['author']->clause())->localKey()); /** @phpstan-ignore-line */
+        self::assertNull(current($joins['author']->clause())->localCast()); /** @phpstan-ignore-line */
+        self::assertNull(current($joins['author']->clause())->localFunction()); /** @phpstan-ignore-line */
+        self::assertSame('id', current($joins['author']->clause())->foreignKey()); /** @phpstan-ignore-line */
+        self::assertNull(current($joins['author']->clause())->foreignCast()); /** @phpstan-ignore-line */
+        self::assertNull(current($joins['author']->clause())->foreignFunction()); /** @phpstan-ignore-line */
+        self::assertSame('author', $joins['author']->property());
 
-        self::assertSame(CommentStub::class, $joins['comments']->getEntity()->getClass());
-        self::assertSame('id', current($joins['comments']->getClause())->getLocalKey());
-        self::assertSame('BIGINT', current($joins['comments']->getClause())->getLocalCast());
-        self::assertNull(current($joins['comments']->getClause())->getLocalFunction());
-        self::assertSame('blog_post_id', current($joins['comments']->getClause())->getForeignKey());
-        self::assertNull(current($joins['comments']->getClause())->getForeignCast());
-        self::assertNull(current($joins['comments']->getClause())->getForeignFunction());
-        self::assertSame('comments', $joins['comments']->getProperty());
+        self::assertSame(CommentStub::class, $joins['comments']->entity()->class());
+        self::assertSame('id', current($joins['comments']->clause())->localKey()); /** @phpstan-ignore-line */
+        self::assertSame('BIGINT', current($joins['comments']->clause())->localCast()); /** @phpstan-ignore-line */
+        self::assertNull(current($joins['comments']->clause())->localFunction()); /** @phpstan-ignore-line */
+        self::assertSame('blog_post_id', current($joins['comments']->clause())->foreignKey()); /** @phpstan-ignore-line */
+        self::assertNull(current($joins['comments']->clause())->foreignCast()); /** @phpstan-ignore-line */
+        self::assertNull(current($joins['comments']->clause())->foreignFunction()); /** @phpstan-ignore-line */
+        self::assertSame('comments', $joins['comments']->property());
 
-        self::assertArrayHasKey('author', $joins['comments']->getEntity()->getJoins());
-        self::assertSame(UserStub::class, $joins['comments']->getEntity()->getJoins()['author']->getEntity()->getClass());
-        self::assertCount(2, $joins['comments']->getEntity()->getJoins()['author']->getEntity()->getFields());
-        self::assertSame('author_id', current($joins['comments']->getEntity()->getJoins()['author']->getClause())->getLocalKey());
-        self::assertNull(current($joins['comments']->getEntity()->getJoins()['author']->getClause())->getLocalCast());
-        self::assertNull(current($joins['comments']->getEntity()->getJoins()['author']->getClause())->getLocalFunction());
-        self::assertSame('id', current($joins['comments']->getEntity()->getJoins()['author']->getClause())->getForeignKey());
-        self::assertNull(current($joins['comments']->getEntity()->getJoins()['author']->getClause())->getForeignCast());
-        self::assertNull(current($joins['comments']->getEntity()->getJoins()['author']->getClause())->getForeignFunction());
-        self::assertSame('author', $joins['comments']->getEntity()->getJoins()['author']->getProperty());
+        self::assertArrayHasKey('author', $joins['comments']->entity()->joins());
+        self::assertSame(UserStub::class, $joins['comments']->entity()->joins()['author']->entity()->class());
+        self::assertCount(2, $joins['comments']->entity()->joins()['author']->entity()->fields());
+        self::assertSame('author_id', current($joins['comments']->entity()->joins()['author']->clause())->localKey()); /** @phpstan-ignore-line */
+        self::assertNull(current($joins['comments']->entity()->joins()['author']->clause())->localCast()); /** @phpstan-ignore-line */
+        self::assertNull(current($joins['comments']->entity()->joins()['author']->clause())->localFunction()); /** @phpstan-ignore-line */
+        self::assertSame('id', current($joins['comments']->entity()->joins()['author']->clause())->foreignKey()); /** @phpstan-ignore-line */
+        self::assertNull(current($joins['comments']->entity()->joins()['author']->clause())->foreignCast()); /** @phpstan-ignore-line */
+        self::assertNull(current($joins['comments']->entity()->joins()['author']->clause())->foreignFunction()); /** @phpstan-ignore-line */
+        self::assertSame('author', $joins['comments']->entity()->joins()['author']->property());
     }
 
     /**
@@ -112,6 +117,6 @@ final class EntityInspectorTest extends AsyncTestCase
         self::expectException(RuntimeException::class);
         self::expectExceptionMessage('Missing Table annotation on entity: ' . NoSQLStub::class);
 
-        $this->entityInspector->getEntity(NoSQLStub::class);
+        $this->entityInspector->entity(NoSQLStub::class);
     }
 }

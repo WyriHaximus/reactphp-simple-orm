@@ -23,7 +23,7 @@
     "react/stream": "^1.1",
     "reactivex/rxphp": "^2.0",
     "roave/better-reflection": "^4.0",
-    "thecodingmachine/safe": "^1.1",
+    "thecodingmachine/safe": "^1.3",
     "voryx/pgasync": "^2.0",
     "wyrihaximus/constants": "^1.5",
     "wyrihaximus/doctrine-annotation-autoloader": "^1.0",
@@ -33,11 +33,11 @@
     "robmorgan/phinx": "^0.12.1",
     "symfony/yaml": "^5.0",
     "vlucas/phpdotenv": "^3.6",
-    "wyrihaximus/async-test-utilities": "^2.1"
+    "wyrihaximus/async-test-utilities": "^3.4.23"
   },
   "config": {
     "platform": {
-      "php": "7.4"
+      "php": "7.4.7"
     },
     "sort-packages": true
   },

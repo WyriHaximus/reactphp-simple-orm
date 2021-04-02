@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
@@ -6,6 +8,7 @@ use GeneratedHydrator\Configuration;
 use Safe\DateTimeImmutable;
 use WyriHaximus\React\SimpleORM\Entity\Field;
 use Zend\Hydrator\HydratorInterface;
+
 use function array_key_exists;
 use function is_array;
 
@@ -21,14 +24,14 @@ final class Hydrator
      */
     public function hydrate(InspectedEntityInterface $inspectedEntity, array $data): EntityInterface
     {
-        $class = $inspectedEntity->getClass();
+        $class = $inspectedEntity->class();
         if (! array_key_exists($class, $this->hydrators)) {
             /**
              * @psalm-suppress MissingClosureReturnType
              * @psalm-suppress InvalidPropertyAssignmentValue
              * @psalm-suppress PropertyTypeCoercion
              */
-            $this->hydrators[$inspectedEntity->getClass()] = (static function (string $class) {
+            $this->hydrators[$inspectedEntity->class()] = (static function (string $class) {
                 $hydratorClass = (new Configuration($class))->createFactory()->getHydratorClass();
 
                 /** @psalm-suppress InvalidStringClass */
@@ -37,21 +40,21 @@ final class Hydrator
         }
 
         foreach ($data as $key => $value) {
-            if (! array_key_exists($key, $inspectedEntity->getFields())) {
+            if (! array_key_exists($key, $inspectedEntity->fields())) {
                 continue;
             }
 
-            $data[$key] = $this->castValueToCorrectType($inspectedEntity->getFields()[$key], $value);
+            $data[$key] = $this->castValueToCorrectType($inspectedEntity->fields()[$key], $value);
         }
 
-        foreach ($inspectedEntity->getJoins() as $join) {
-            if (! is_array($data[$join->getProperty()])) {
+        foreach ($inspectedEntity->joins() as $join) {
+            if (! is_array($data[$join->property()])) {
                 continue;
             }
 
-            $data[$join->getProperty()] = $this->hydrate(
-                $join->getEntity(),
-                $data[$join->getProperty()]
+            $data[$join->property()] = $this->hydrate(
+                $join->entity(),
+                $data[$join->property()]
             );
         }
 
@@ -69,7 +72,7 @@ final class Hydrator
      */
     public function extract(InspectedEntityInterface $inspectedEntity, EntityInterface $entity): array
     {
-        $class    = $inspectedEntity->getClass();
+        $class    = $inspectedEntity->class();
         $hydrator = $this->hydrators[$class];
 
         return $hydrator->extract($entity);
@@ -82,11 +85,11 @@ final class Hydrator
      */
     private function castValueToCorrectType(Field $field, $value)
     {
-        if ($field->getType() === 'int') {
+        if ($field->type() === 'int') {
             return (int) $value;
         }
 
-        if ($field->getType() === DateTimeImmutable::class) {
+        if ($field->type() === DateTimeImmutable::class) {
             return new DateTimeImmutable($value);
         }
 
