@@ -44,7 +44,7 @@ seeds:
 syntax-php: ## Lint PHP syntax
 	$(DOCKER_RUN) vendor/bin/parallel-lint --exclude vendor .
 
-cs-fix: ## Fix any automatically fixable code style issues ###
+cs-fix: ## Fix any automatically fixable code style issues
 	$(DOCKER_RUN) vendor/bin/phpcbf --parallel=$(THREADS) --cache=./var/.phpcs.cache.json --standard=./etc/qa/phpcs.xml || $(DOCKER_RUN) vendor/bin/phpcbf --parallel=$(THREADS) --cache=./var/.phpcs.cache.json --standard=./etc/qa/phpcs.xml || $(DOCKER_RUN) vendor/bin/phpcbf --parallel=$(THREADS) --cache=./var/.phpcs.cache.json --standard=./etc/qa/phpcs.xml -vvvv
 
 cs: ## Check the code for code style issues

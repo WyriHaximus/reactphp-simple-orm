@@ -7,6 +7,7 @@ namespace WyriHaximus\React\SimpleORM;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
 use WyriHaximus\React\SimpleORM\Query\Order;
+use WyriHaximus\React\SimpleORM\Query\SectionInterface;
 use WyriHaximus\React\SimpleORM\Query\Where;
 
 interface RepositoryInterface
@@ -19,8 +20,7 @@ interface RepositoryInterface
     /** @phpstan-ignore-next-line */
     public function page(int $page, ?Where $where = null, ?Order $order = null, int $perPage = self::DEFAULT_PER_PAGE): Observable;
 
-    /** @phpstan-ignore-next-line */
-    public function fetch(?Where $where = null, ?Order $order = null, int $limit = 0): Observable;
+    public function fetch(SectionInterface ...$sections): Observable;
 
     /**
      * @param array<string, mixed> $fields
