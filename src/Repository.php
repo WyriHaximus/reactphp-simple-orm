@@ -17,6 +17,7 @@ use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
 use Safe\DateTimeImmutable;
 use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
+use WyriHaximus\React\SimpleORM\Query\GroupBy;
 use WyriHaximus\React\SimpleORM\Query\Limit;
 use WyriHaximus\React\SimpleORM\Query\Order;
 use WyriHaximus\React\SimpleORM\Query\SectionInterface;
@@ -25,6 +26,7 @@ use WyriHaximus\React\SimpleORM\Query\Where\Expression;
 use WyriHaximus\React\SimpleORM\Query\Where\Field;
 
 use function array_key_exists;
+use function array_map;
 use function array_values;
 use function explode;
 use function is_scalar;
@@ -37,6 +39,7 @@ use function Safe\date;
 use function Safe\substr;
 use function spl_object_hash;
 use function strpos;
+use function WyriHaximus\iteratorOrArrayToArray;
 
 use const WyriHaximus\Constants\Boolean\TRUE_;
 use const WyriHaximus\Constants\Numeric\ONE;
@@ -184,6 +187,16 @@ final class Repository implements RepositoryInterface
                         $query = $query->orderBy($field, $by->order());
                     }
 
+                    break;
+                case $section instanceof GroupBy:
+                    /**
+                     * @psalm-suppress ArgumentTypeCoercion
+                     * @psalm-suppress UndefinedInterfaceMethod
+                     */
+                    $query = $query->groupBy(...array_map(
+                        fn (string $column): string => $this->translateFieldName($column),
+                        iteratorOrArrayToArray($section->columns())
+                    ));
                     break;
             }
         }
