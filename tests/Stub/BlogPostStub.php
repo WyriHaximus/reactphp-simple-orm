@@ -105,9 +105,9 @@ final class BlogPostStub implements EntityInterface
 
     protected int $views;
 
-    protected DateTimeImmutable $created;
+    protected string $created;
 
-    protected DateTimeImmutable $modified;
+    protected string $modified;
     //phpcs:enable
 
     public function id(): string
@@ -169,11 +169,11 @@ final class BlogPostStub implements EntityInterface
 
     public function getCreated(): DateTimeImmutable
     {
-        return $this->created;
+        return new DateTimeImmutable($this->created);
     }
 
     public function getModified(): DateTimeImmutable
     {
-        return $this->modified;
+        return new DateTimeImmutable($this->modified);
     }
 }
