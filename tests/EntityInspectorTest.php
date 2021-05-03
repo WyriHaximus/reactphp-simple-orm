@@ -6,7 +6,6 @@ namespace WyriHaximus\React\Tests\SimpleORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use RuntimeException;
-use Safe\DateTimeImmutable;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
@@ -67,8 +66,8 @@ final class EntityInspectorTest extends AsyncTestCase
                 'title' => 'string',
                 'contents' => 'string',
                 'views' => 'int',
-                'created' => DateTimeImmutable::class,
-                'modified' => DateTimeImmutable::class,
+                'created' => 'string',
+                'modified' => 'string',
             ] as $key => $type
         ) {
             self::assertArrayHasKey($key, $fields, $key);
