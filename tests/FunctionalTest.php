@@ -14,6 +14,7 @@ use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\SimpleORM\ClientInterface;
 use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
+use WyriHaximus\React\SimpleORM\Query\GroupBy;
 use WyriHaximus\React\SimpleORM\Query\Limit;
 use WyriHaximus\React\SimpleORM\Query\Where;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
@@ -582,6 +583,17 @@ final class FunctionalTest extends AsyncTestCase
         $repository = $this->client->repository(BlogPostStub::class);
 
         $count = $this->await($repository->count(new Where(new Where\Field('author_id', 'eq', ['fb175cbc-04cc-41c7-8e35-6b817ac016ca']))), $this->loop, self::AWAIT_TIMEOUT);
+        self::assertSame(1, $count);
+    }
+
+    /**
+     * @test
+     */
+    public function groupBy(): void
+    {
+        $repository = $this->client->repository(BlogPostStub::class);
+
+        $count = $this->await($repository->fetch(new GroupBy('id', 'author_id'))->count()->toPromise(), $this->loop, self::AWAIT_TIMEOUT);
         self::assertSame(1, $count);
     }
 }
