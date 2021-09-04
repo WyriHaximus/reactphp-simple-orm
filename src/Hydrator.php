@@ -31,7 +31,11 @@ final class Hydrator
              * @psalm-suppress InvalidPropertyAssignmentValue
              * @psalm-suppress PropertyTypeCoercion
              */
-            $this->hydrators[$inspectedEntity->class()] = (static function (string $class) {
+            $this->hydrators[$inspectedEntity->class()] = (static function (string $class): object {
+                /**
+                 * @phpstan-ignore-next-line
+                 * @psalm-suppress ArgumentTypeCoercion
+                 */
                 $hydratorClass = (new Configuration($class))->createFactory()->getHydratorClass();
 
                 /** @psalm-suppress InvalidStringClass */
@@ -63,6 +67,7 @@ final class Hydrator
          * @psalm-suppress InvalidMethodCall
          * @psalm-suppress InvalidStringClass
          * @psalm-suppress LessSpecificReturnStatement
+         * @phpstan-ignore-next-line
          */
         return $this->hydrators[$class]->hydrate($data, new $class());
     }

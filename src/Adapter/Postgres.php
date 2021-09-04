@@ -30,10 +30,10 @@ final class Postgres implements AdapterInterface
         $this->engine = new PostgresEngine();
     }
 
-    public function query(ExpressionInterface $query): Observable
+    public function query(ExpressionInterface $expression): Observable
     {
-        $params = $query->params($this->engine);
-        $sql    = $query->sql($this->engine);
+        $params = $expression->params($this->engine);
+        $sql    = $expression->sql($this->engine);
         if (strpos($sql, '?') !== FALSE_) {
             $chunks    = explode('?', $sql);
             $sqlChunks = [];
