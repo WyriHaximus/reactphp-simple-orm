@@ -21,7 +21,7 @@ else
 		-v "`pwd`:`pwd`" \
 		-v "${COMPOSER_CACHE_DIR}:/home/app/.composer/cache" \
 		-w "`pwd`" \
-		"ghcr.io/wyrihaximusnet/php:${PHP_VERSION}-nts-alpine3.12${SLIM_DOCKER_IMAGE}-dev"
+		"ghcr.io/wyrihaximusnet/php:${PHP_VERSION}-nts-alpine${SLIM_DOCKER_IMAGE}-dev"
 endif
 
 ifneq (,$(findstring icrosoft,$(shell cat /proc/version)))

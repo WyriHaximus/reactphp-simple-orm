@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "php": "^7.4",
+    "php": "^8 || ^7.4",
     "api-clients/rx": "^2.3.0",
     "doctrine/annotations": "^1.10",
     "latitude/latitude": "^4.1",
@@ -34,7 +34,24 @@
     "vlucas/phpdotenv": "^5.4",
     "wyrihaximus/async-test-utilities": "^4.2"
   },
+  "autoload": {
+    "psr-4": {
+      "WyriHaximus\\React\\SimpleORM\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "WyriHaximus\\React\\Tests\\SimpleORM\\": "tests/"
+    }
+  },
   "config": {
+    "allow-plugins": {
+      "composer/package-versions-deprecated": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "ergebnis/composer-normalize": true,
+      "icanhazstring/composer-unused": true,
+      "infection/extension-installer": true
+    },
     "platform": {
       "php": "7.4.7"
     },
@@ -46,16 +63,6 @@
       "react/event-loop",
       "react/stream"
     ]
-  },
-  "autoload": {
-    "psr-4": {
-      "WyriHaximus\\React\\SimpleORM\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "WyriHaximus\\React\\Tests\\SimpleORM\\": "tests/"
-    }
   },
   "scripts": {
     "post-install-cmd": [
