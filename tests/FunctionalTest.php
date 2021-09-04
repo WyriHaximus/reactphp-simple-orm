@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace WyriHaximus\React\Tests\SimpleORM;
 
 use PgAsync\Client as PgClient;
-use React\EventLoop\Factory;
-use React\EventLoop\LoopInterface;
+use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 use Safe\DateTimeImmutable;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
@@ -35,8 +34,6 @@ final class FunctionalTest extends AsyncTestCase
 {
     private const AWAIT_TIMEOUT = 66.6;
 
-    private LoopInterface $loop;
-
     private ClientInterface $client;
 
     private QueryCountMiddleware $counter;
@@ -51,7 +48,6 @@ final class FunctionalTest extends AsyncTestCase
 
         $this->counter = new QueryCountMiddleware(1);
 
-        $this->loop   = Factory::create();
         $this->client = Client::create(
             new Postgres(
                 new PgClient(
@@ -62,7 +58,7 @@ final class FunctionalTest extends AsyncTestCase
                         'password' => getenv('PHINX_DB_PASSWORD'),
                         'database' => getenv('PHINX_DB_DATABASE'),
                     ],
-                    $this->loop
+                    Loop::get()
                 )
             ),
             $this->counter
@@ -78,7 +74,6 @@ final class FunctionalTest extends AsyncTestCase
             3,
             $this->await(
                 $this->client->repository(UserStub::class)->count(),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -101,7 +96,6 @@ final class FunctionalTest extends AsyncTestCase
             3,
             $this->await(
                 $this->client->repository(UserStub::class)->fetch()->toArray()->toPromise(),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -124,7 +118,6 @@ final class FunctionalTest extends AsyncTestCase
             2,
             $this->await(
                 $this->client->repository(BlogPostStub::class)->count(),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -147,7 +140,6 @@ final class FunctionalTest extends AsyncTestCase
             2,
             $this->await(
                 $this->client->repository(BlogPostStub::class)->fetch()->toArray()->toPromise(),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -172,7 +164,6 @@ final class FunctionalTest extends AsyncTestCase
                 $this->client->repository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getComments()->toArray()->toPromise();
                 }),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -197,7 +188,6 @@ final class FunctionalTest extends AsyncTestCase
                 $this->client->repository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): string {
                     return $blogPost->getAuthor()->id();
                 }),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -222,7 +212,6 @@ final class FunctionalTest extends AsyncTestCase
                 $this->client->repository(BlogPostStub::class)->fetch(new Limit(1))->toPromise()->then(static function (BlogPostStub $blogPost): string {
                     return $blogPost->getAuthor()->id();
                 }),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -255,7 +244,6 @@ final class FunctionalTest extends AsyncTestCase
                         $this->client->repository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                             return $blogPost->getComments()->toArray()->toPromise();
                         }),
-                        $this->loop,
                         self::AWAIT_TIMEOUT
                     )
                 )
@@ -282,7 +270,6 @@ final class FunctionalTest extends AsyncTestCase
                 $this->client->repository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getNextBlogPost();
                 }),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -306,7 +293,6 @@ final class FunctionalTest extends AsyncTestCase
                 $this->client->repository(BlogPostStub::class)->fetch()->take(1)->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getPreviousBlogPost();
                 }),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -333,7 +319,6 @@ final class FunctionalTest extends AsyncTestCase
                 })->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getComments()->toArray()->toPromise();
                 }),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -360,7 +345,6 @@ final class FunctionalTest extends AsyncTestCase
                 })->toPromise()->then(static function (BlogPostStub $blogPost): string {
                     return $blogPost->getAuthor()->id();
                 }),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -392,7 +376,6 @@ final class FunctionalTest extends AsyncTestCase
                         })->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                             return $blogPost->getComments()->toArray()->toPromise();
                         }),
-                        $this->loop,
                         self::AWAIT_TIMEOUT
                     )
                 )
@@ -423,7 +406,6 @@ final class FunctionalTest extends AsyncTestCase
                 })->then(static function (BlogPostStub $blogPost): string {
                     return $blogPost->getAuthor()->id();
                 }),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -449,7 +431,6 @@ final class FunctionalTest extends AsyncTestCase
                 })->toPromise()->then(static function (BlogPostStub $blogPost): PromiseInterface {
                     return $blogPost->getNextBlogPost();
                 }),
-                $this->loop,
                 self::AWAIT_TIMEOUT
             )
         );
@@ -474,7 +455,6 @@ final class FunctionalTest extends AsyncTestCase
 
         $user = $this->await(
             $this->client->repository(UserStub::class)->create($fields),
-            $this->loop,
             self::AWAIT_TIMEOUT
         );
 
@@ -513,7 +493,6 @@ final class FunctionalTest extends AsyncTestCase
             })->then(static function (BlogPostStub $blogPost) use ($repository): PromiseInterface {
                 return $repository->update($blogPost);
             }),
-            $this->loop,
             self::AWAIT_TIMEOUT
         );
 
@@ -549,7 +528,7 @@ final class FunctionalTest extends AsyncTestCase
             $userId = $user->id();
 
             return $user->getZelf();
-        }), $this->loop, self::AWAIT_TIMEOUT);
+        }), self::AWAIT_TIMEOUT);
 
         self::assertNotNull($userId);
         self::assertNotNull($self);
@@ -570,7 +549,7 @@ final class FunctionalTest extends AsyncTestCase
     {
         $repository = $this->client->repository(BlogPostStub::class);
 
-        $count = $this->await($repository->count(), $this->loop, self::AWAIT_TIMEOUT);
+        $count = $this->await($repository->count(), self::AWAIT_TIMEOUT);
         self::assertSame(2, $count);
     }
 
@@ -581,7 +560,7 @@ final class FunctionalTest extends AsyncTestCase
     {
         $repository = $this->client->repository(BlogPostStub::class);
 
-        $count = $this->await($repository->count(new Where(new Where\Field('author_id', 'eq', ['fb175cbc-04cc-41c7-8e35-6b817ac016ca']))), $this->loop, self::AWAIT_TIMEOUT);
+        $count = $this->await($repository->count(new Where(new Where\Field('author_id', 'eq', ['fb175cbc-04cc-41c7-8e35-6b817ac016ca']))), self::AWAIT_TIMEOUT);
         self::assertSame(1, $count);
     }
 }
