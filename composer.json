@@ -11,7 +11,7 @@
   ],
   "require": {
     "php": "^7.4",
-    "api-clients/rx": "^2.2.1",
+    "api-clients/rx": "^2.3.0",
     "doctrine/annotations": "^1.10",
     "latitude/latitude": "^4.1",
     "ocramius/generated-hydrator": "^4.1",
