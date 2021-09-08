@@ -4,29 +4,30 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a76e5037f991468e859448e9a400db71",
+    "content-hash": "2716071e97bd328e487422210e674ea7",
     "packages": [
         {
             "name": "api-clients/rx",
-            "version": "2.2.1",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-api-clients/rx.git",
-                "reference": "c38d42768ebdb6e396066bc03055c3c9117bc6e9"
+                "reference": "0e8c4ed930482d50d0107e30d7e8230d2e517f0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-api-clients/rx/zipball/c38d42768ebdb6e396066bc03055c3c9117bc6e9",
-                "reference": "c38d42768ebdb6e396066bc03055c3c9117bc6e9",
+                "url": "https://api.github.com/repos/php-api-clients/rx/zipball/0e8c4ed930482d50d0107e30d7e8230d2e517f0e",
+                "reference": "0e8c4ed930482d50d0107e30d7e8230d2e517f0e",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.0",
-                "react/promise": "^2.4",
+                "php": "^8 || ^7.4",
+                "react/event-loop": "^1.2",
+                "react/promise": "^2.7",
                 "reactivex/rxphp": "^2.0"
             },
             "require-dev": {
-                "api-clients/test-utilities": "^3.0.1"
+                "api-clients/test-utilities": "^3.1.0"
             },
             "type": "library",
             "autoload": {
@@ -48,11 +49,18 @@
                     "email": "ceesjank@gmail.com"
                 }
             ],
+            "description": "RxPHP utilities",
             "support": {
                 "issues": "https://github.com/php-api-clients/rx/issues",
-                "source": "https://github.com/php-api-clients/rx/tree/master"
+                "source": "https://github.com/php-api-clients/rx/tree/2.3.0"
             },
-            "time": "2017-10-04T20:00:12+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/WyriHaximus",
+                    "type": "github"
+                }
+            ],
+            "time": "2021-09-07T23:00:55+00:00"
         },
         {
             "name": "brick/math",
