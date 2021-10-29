@@ -2302,23 +2302,23 @@
         },
         {
             "name": "voryx/event-loop",
-            "version": "3.0.1",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voryx/event-loop.git",
-                "reference": "9430954760aca7eabac7239a8eef2583cb34dbee"
+                "reference": "9a55c228b930acdabc023f9a1ba5a347d30a1f77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voryx/event-loop/zipball/9430954760aca7eabac7239a8eef2583cb34dbee",
-                "reference": "9430954760aca7eabac7239a8eef2583cb34dbee",
+                "url": "https://api.github.com/repos/voryx/event-loop/zipball/9a55c228b930acdabc023f9a1ba5a347d30a1f77",
+                "reference": "9a55c228b930acdabc023f9a1ba5a347d30a1f77",
                 "shasum": ""
             },
             "require": {
                 "react/event-loop": "^1.0 || ^0.5 || ^0.4.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6"
+                "phpunit/phpunit": "^9.5 | ^8"
             },
             "type": "library",
             "autoload": {
@@ -2356,32 +2356,33 @@
             ],
             "support": {
                 "issues": "https://github.com/voryx/event-loop/issues",
-                "source": "https://github.com/voryx/event-loop/tree/3.0.1"
+                "source": "https://github.com/voryx/event-loop/tree/3.0.2"
             },
-            "time": "2020-12-07T04:30:05+00:00"
+            "time": "2021-10-21T13:43:50+00:00"
         },
         {
             "name": "voryx/pgasync",
-            "version": "2.0.4",
+            "version": "2.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voryx/PgAsync.git",
-                "reference": "61658fed8c897c3c9ba218847851c3b6afa224a5"
+                "reference": "17accd97268f785c80b94996330be98085711d1e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voryx/PgAsync/zipball/61658fed8c897c3c9ba218847851c3b6afa224a5",
-                "reference": "61658fed8c897c3c9ba218847851c3b6afa224a5",
+                "url": "https://api.github.com/repos/voryx/PgAsync/zipball/17accd97268f785c80b94996330be98085711d1e",
+                "reference": "17accd97268f785c80b94996330be98085711d1e",
                 "shasum": ""
             },
             "require": {
                 "evenement/evenement": "^2.0 | ^3.0",
+                "php": ">=7.0.0",
                 "react/socket": "^1.0 || ^0.8 || ^0.7",
                 "reactivex/rxphp": "^2.0",
                 "voryx/event-loop": "^3.0 || ^2.0.2"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.7",
+                "phpunit/phpunit": "^8 || ^5.7",
                 "react/dns": "^1.0"
             },
             "type": "library",
@@ -2419,9 +2420,9 @@
             ],
             "support": {
                 "issues": "https://github.com/voryx/PgAsync/issues",
-                "source": "https://github.com/voryx/PgAsync/tree/master"
+                "source": "https://github.com/voryx/PgAsync/tree/2.0.5"
             },
-            "time": "2019-08-19T20:34:34+00:00"
+            "time": "2021-10-28T23:36:21+00:00"
         },
         {
             "name": "webmozart/assert",
