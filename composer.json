@@ -30,7 +30,7 @@
   },
   "require-dev": {
     "robmorgan/phinx": "^0.12.9",
-    "symfony/yaml": "^5.0",
+    "symfony/yaml": "^5.3",
     "vlucas/phpdotenv": "^5.4",
     "wyrihaximus/async-test-utilities": "^4.0"
   },
