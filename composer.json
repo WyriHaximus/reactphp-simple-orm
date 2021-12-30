@@ -32,7 +32,7 @@
     "robmorgan/phinx": "^0.12.9",
     "symfony/yaml": "^5.4",
     "vlucas/phpdotenv": "^5.4",
-    "wyrihaximus/async-test-utilities": "^4.0"
+    "wyrihaximus/async-test-utilities": "^4.1"
   },
   "config": {
     "platform": {
