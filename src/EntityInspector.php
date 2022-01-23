@@ -16,6 +16,7 @@ use WyriHaximus\React\SimpleORM\Entity\Join;
 
 use function array_key_exists;
 use function current;
+use function method_exists;
 use function WyriHaximus\iteratorOrArrayToArray;
 
 final class EntityInspector
@@ -74,9 +75,13 @@ final class EntityInspector
                 continue;
             }
 
-            $roaveProperty = (new BetterReflection())
-                ->classReflector()
-                ->reflect($class->getName())->getProperty($property->getName());
+            $roaveProperty = (static function (BetterReflection $br, string $class): \Roave\BetterReflection\Reflection\ReflectionClass {
+                if (method_exists($br, 'classReflector')) {
+                    return $br->classReflector()->reflect($class);
+                }
+
+                return $br->reflector()->reflectClass($class);
+            })(new BetterReflection(), $class->getName())->getProperty($property->getName());
 
             if ($roaveProperty === null) {
                 continue;
