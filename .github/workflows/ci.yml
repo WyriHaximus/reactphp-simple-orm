@@ -74,7 +74,7 @@ jobs:
       fail-fast: false
       matrix:
         php: ${{ fromJson(needs.supported-versions-matrix.outputs.version) }}
-        postgres: [11, 12, 13]
+        postgres: [12, 13]
         composer: [lowest, current, highest]
         check: ${{ fromJson(needs.supported-checks-matrix.outputs.check) }}
     needs:
