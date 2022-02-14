@@ -18,7 +18,7 @@
     "ramsey/uuid": "^4.2.3",
     "react/dns": "^1.9",
     "react/event-loop": "^1.2",
-    "react/promise": "^2.7",
+    "react/promise": "^2.9",
     "react/stream": "^1.1",
     "reactivex/rxphp": "^2.0",
     "roave/better-reflection": "^5 || ^4.0",
