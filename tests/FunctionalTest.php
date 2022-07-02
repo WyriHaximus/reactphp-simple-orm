@@ -17,14 +17,13 @@ use WyriHaximus\React\SimpleORM\Query\Limit;
 use WyriHaximus\React\SimpleORM\Query\Where;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
+use WyriHaximus\React\Tests\SimpleORM\Stub\LogStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
 use function array_map;
 use function array_values;
 use function assert;
 use function bin2hex;
-use function exec;
-use function getenv;
 use function random_bytes;
 use function Safe\sleep;
 use function time;
@@ -42,9 +41,9 @@ final class FunctionalTest extends AsyncTestCase
     {
         parent::setUp();
 
-        exec('php ./vendor/bin/phinx rollback');
-        exec('php ./vendor/bin/phinx migrate');
-        exec('php ./vendor/bin/phinx seed:run -v');
+//        exec('php ./vendor/bin/phinx rollback');
+//        exec('php ./vendor/bin/phinx migrate');
+//        exec('php ./vendor/bin/phinx seed:run -v');
 
         $this->counter = new QueryCountMiddleware(1);
 
@@ -52,11 +51,11 @@ final class FunctionalTest extends AsyncTestCase
             new Postgres(
                 new PgClient(
                     [
-                        'host' => getenv('PHINX_DB_HOST'),
-                        'port' => 5432,
-                        'user'     => getenv('PHINX_DB_USER'),
-                        'password' => getenv('PHINX_DB_PASSWORD'),
-                        'database' => getenv('PHINX_DB_DATABASE'),
+                        'host' => 'localhost',
+                        'port' => 55432,
+                        'user'     => 'postgres',
+                        'password' => 'postgres',
+                        'database' => 'postgres',
                     ],
                     Loop::get()
                 )
@@ -562,5 +561,16 @@ final class FunctionalTest extends AsyncTestCase
 
         $count = $this->await($repository->count(new Where(new Where\Field('author_id', 'eq', ['fb175cbc-04cc-41c7-8e35-6b817ac016ca']))), self::AWAIT_TIMEOUT);
         self::assertSame(1, $count);
+    }
+
+    /**
+     * @test
+     */
+    public function streamLogs(): void
+    {
+        $repository = $this->client->repository(LogStub::class);
+
+        $rows = $this->await($repository->stream()->toArray()->toPromise(), self::AWAIT_TIMEOUT);
+        self::assertCount(256, $rows);
     }
 }
