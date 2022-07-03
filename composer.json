@@ -55,7 +55,14 @@
     "platform": {
       "php": "7.4.7"
     },
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "ergebnis/composer-normalize": true,
+      "composer/package-versions-deprecated": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "icanhazstring/composer-unused": true,
+      "infection/extension-installer": true
+    }
   },
   "extra": {
     "unused": [

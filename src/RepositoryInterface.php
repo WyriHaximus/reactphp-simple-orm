@@ -22,6 +22,8 @@ interface RepositoryInterface
 
     public function fetch(SectionInterface ...$sections): Observable;
 
+    public function stream(SectionInterface ...$sections): Observable;
+
     /**
      * @param array<string, mixed> $fields
      */

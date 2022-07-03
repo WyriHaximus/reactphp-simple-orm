@@ -15,6 +15,7 @@ use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
+use Rx\Subject\Subject;
 use Safe\DateTimeImmutable;
 use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
 use WyriHaximus\React\SimpleORM\Query\Limit;
@@ -46,6 +47,7 @@ final class Repository implements RepositoryInterface
 {
     private const DATE_TIME_TIMEZONE_FORMAT = 'Y-m-d H:i:s e';
     private const SINGLE                    = ONE;
+    private const STREAM_PER_PAGE           = 100;
 
     private InspectedEntityInterface $entity;
 
@@ -110,6 +112,50 @@ final class Repository implements RepositoryInterface
         }
 
         return $this->fetchAndHydrate($query);
+    }
+
+    /**
+     * @param array<SectionInterface> $sections
+     *
+     * @phpstan-ignore-next-line
+     */
+    public function stream(SectionInterface ...$sections): Observable
+    {
+        $stream = new Subject();
+        $query  = $this->buildSelectQuery(...$sections);
+
+        $page = function (int $offset) use (&$page, $query, $stream): void {
+            $q = clone $query;
+
+            $hasRows = false;
+            $this->fetchAndHydrate($q->limit(self::STREAM_PER_PAGE)->offset($offset))->subscribe(
+                /**
+                 * @psalm-suppress MissingClosureParamType
+                 */
+                static function ($value) use (&$hasRows, $stream): void {
+                    if ($stream->isDisposed()) {
+                        return;
+                    }
+
+                    $hasRows = true;
+                    $stream->onNext($value);
+                },
+                [$stream, 'onError'],
+                static function () use (&$hasRows, &$page, $stream, $offset): void {
+                    if (! $hasRows || $stream->isDisposed()) {
+                        $stream->onCompleted();
+
+                        return;
+                    }
+
+                    $page($offset + self::STREAM_PER_PAGE);
+                },
+            );
+        };
+
+        $page(ZERO);
+
+        return $stream;
     }
 
     /**
