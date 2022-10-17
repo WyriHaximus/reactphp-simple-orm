@@ -31,7 +31,7 @@
   "require-dev": {
     "robmorgan/phinx": "^0.12.11",
     "symfony/yaml": "^5.4",
-    "vlucas/phpdotenv": "^5.4",
+    "vlucas/phpdotenv": "^5.5",
     "wyrihaximus/async-test-utilities": "^4.2"
   },
   "autoload": {
