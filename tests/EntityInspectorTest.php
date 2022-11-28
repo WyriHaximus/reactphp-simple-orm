@@ -23,7 +23,7 @@ final class EntityInspectorTest extends AsyncTestCase
     {
         parent::setUp();
 
-        $this->entityInspector = new EntityInspector(new AnnotationReader());
+        $this->entityInspector = new EntityInspector(new Configuration(''), new AnnotationReader());
     }
 
     /**

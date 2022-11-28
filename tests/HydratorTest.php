@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WyriHaximus\React\Tests\SimpleORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use WyriHaximus\React\SimpleORM\Configuration;
 use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\SimpleORM\Hydrator;
 use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
@@ -29,7 +30,7 @@ final class HydratorTest extends TestCase
         $title = 'tables.title';
 
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new AnnotationReader()))->entity(UserStub::class),
+            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(UserStub::class),
             [
                 'id' => $id,
                 'name' => $title,
@@ -48,7 +49,7 @@ final class HydratorTest extends TestCase
         $title = 'tables.title';
 
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new AnnotationReader()))->entity(UserStub::class),
+            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(UserStub::class),
             [
                 'doesnotexist' => resolve(true),
                 'id' => $id,
@@ -73,7 +74,7 @@ final class HydratorTest extends TestCase
         $publisherName = 'dasdsadas';
 
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new AnnotationReader()))->entity(BlogPostStub::class),
+            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(BlogPostStub::class),
             [
                 'doesnotexist' => resolve(true),
                 'id' => $id,
@@ -121,7 +122,7 @@ final class HydratorTest extends TestCase
         $publisherName = 'dasdsadas';
 
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new AnnotationReader()))->entity(BlogPostStub::class),
+            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(BlogPostStub::class),
             [
                 'id' => $id,
                 'author_id' => $authorId,

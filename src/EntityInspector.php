@@ -21,13 +21,15 @@ use function WyriHaximus\iteratorOrArrayToArray;
 
 final class EntityInspector
 {
+    private Configuration $configuration;
     private Reader $annotationReader;
 
     /** @var InspectedEntityInterface[] */
     private array $entities = [];
 
-    public function __construct(Reader $annotationReader)
+    public function __construct(Configuration $configuration, Reader $annotationReader)
     {
+        $this->configuration    = $configuration;
         $this->annotationReader = $annotationReader;
     }
 
@@ -53,7 +55,7 @@ final class EntityInspector
             /** @psalm-suppress ArgumentTypeCoercion */
             $this->entities[$entity] = new InspectedEntity(
                 $entity,
-                $tableAnnotation->table(),
+                $this->configuration->tablePrefix() . $tableAnnotation->table(),
                 iteratorOrArrayToArray($this->fields($class, $joins)), /** @phpstan-ignore-line */
                 $joins
             );

@@ -12,6 +12,7 @@ use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\SimpleORM\ClientInterface;
+use WyriHaximus\React\SimpleORM\Configuration;
 use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
 use WyriHaximus\React\SimpleORM\Query\Limit;
 use WyriHaximus\React\SimpleORM\Query\Where;
@@ -60,6 +61,7 @@ final class FunctionalTest extends AsyncTestCase
                     Loop::get()
                 )
             ),
+            new Configuration(''),
             $this->counter
         );
     }
