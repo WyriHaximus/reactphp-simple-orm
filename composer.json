@@ -29,7 +29,7 @@
     "wyrihaximus/iterator-or-array-to-array": "^1.2"
   },
   "require-dev": {
-    "robmorgan/phinx": "^0.12.11",
+    "robmorgan/phinx": "^0.13.4",
     "symfony/yaml": "^5.4",
     "vlucas/phpdotenv": "^5.4",
     "wyrihaximus/async-test-utilities": "^4.2"
