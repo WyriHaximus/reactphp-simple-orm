@@ -22,7 +22,7 @@
     "react/stream": "^1.1",
     "reactivex/rxphp": "^2.0",
     "roave/better-reflection": "^6 || ^5 || ^4.0",
-    "thecodingmachine/safe": "^1.3",
+    "thecodingmachine/safe": "^2 || ^1.3",
     "voryx/pgasync": "^2.0",
     "wyrihaximus/constants": "^1.5",
     "wyrihaximus/doctrine-annotation-autoloader": "^1.0",
@@ -46,23 +46,16 @@
   },
   "config": {
     "allow-plugins": {
+      "ergebnis/composer-normalize": true,
       "composer/package-versions-deprecated": true,
       "dealerdirect/phpcodesniffer-composer-installer": true,
-      "ergebnis/composer-normalize": true,
       "icanhazstring/composer-unused": true,
       "infection/extension-installer": true
     },
     "platform": {
       "php": "7.4.7"
     },
-    "sort-packages": true,
-    "allow-plugins": {
-      "ergebnis/composer-normalize": true,
-      "composer/package-versions-deprecated": true,
-      "dealerdirect/phpcodesniffer-composer-installer": true,
-      "icanhazstring/composer-unused": true,
-      "infection/extension-installer": true
-    }
+    "sort-packages": true
   },
   "extra": {
     "unused": [
