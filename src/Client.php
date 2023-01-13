@@ -28,20 +28,20 @@ final class Client implements ClientInterface
 
     private QueryFactory $queryFactory;
 
-    public static function create(AdapterInterface $adapter, MiddlewareInterface ...$middleware): self
+    public static function create(AdapterInterface $adapter, Configuration $configuration, MiddlewareInterface ...$middleware): self
     {
-        return new self($adapter, new AnnotationReader(), ...$middleware);
+        return new self($adapter, $configuration, new AnnotationReader(), ...$middleware);
     }
 
-    public static function createWithAnnotationReader(AdapterInterface $adapter, Reader $annotationReader, MiddlewareInterface ...$middleware): self
+    public static function createWithAnnotationReader(AdapterInterface $adapter, Configuration $configuration, Reader $annotationReader, MiddlewareInterface ...$middleware): self
     {
-        return new self($adapter, $annotationReader, ...$middleware);
+        return new self($adapter, $configuration, $annotationReader, ...$middleware);
     }
 
-    private function __construct(AdapterInterface $adapter, Reader $annotationReader, MiddlewareInterface ...$middleware)
+    private function __construct(AdapterInterface $adapter, Configuration $configuration, Reader $annotationReader, MiddlewareInterface ...$middleware)
     {
         $this->adapter         = $adapter;
-        $this->entityInspector = new EntityInspector($annotationReader);
+        $this->entityInspector = new EntityInspector($configuration, $annotationReader);
         $this->queryFactory    = new QueryFactory($adapter->engine());
 
         $this->middlewareRunner = new MiddlewareRunner(...$middleware);

@@ -12,6 +12,7 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\ClientInterface;
+use WyriHaximus\React\SimpleORM\Configuration;
 use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\SimpleORM\Query\Order;
 use WyriHaximus\React\SimpleORM\Query\Where;
@@ -53,7 +54,7 @@ final class RepositoryTest extends AsyncTestCase
         assert($client instanceof ClientInterface);
 
         $repository = new Repository(
-            (new EntityInspector(new AnnotationReader()))->entity(UserStub::class),
+            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(UserStub::class),
             $client,
             new QueryFactory()
         );
@@ -79,7 +80,7 @@ final class RepositoryTest extends AsyncTestCase
         assert($client instanceof ClientInterface);
 
         $repository = new Repository(
-            (new EntityInspector(new AnnotationReader()))->entity(UserStub::class),
+            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(UserStub::class),
             $client,
             new QueryFactory()
         );
@@ -113,7 +114,7 @@ final class RepositoryTest extends AsyncTestCase
         assert($client instanceof ClientInterface);
 
         $repository = new Repository(
-            (new EntityInspector(new AnnotationReader()))->entity(BlogPostStub::class),
+            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(BlogPostStub::class),
             $client,
             new QueryFactory()
         );
@@ -167,7 +168,7 @@ final class RepositoryTest extends AsyncTestCase
         assert($client instanceof ClientInterface);
 
         $repository = new Repository(
-            (new EntityInspector(new AnnotationReader()))->entity(BlogPostStub::class),
+            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(BlogPostStub::class),
             $client,
             new QueryFactory()
         );
@@ -194,7 +195,7 @@ final class RepositoryTest extends AsyncTestCase
         assert($client instanceof ClientInterface);
 
         $this->client->repository(CommentStub::class)->shouldBeCalled()->willReturn(
-            new Repository((new EntityInspector(new AnnotationReader()))->entity(CommentStub::class), $client, new QueryFactory())
+            new Repository((new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(CommentStub::class), $client, new QueryFactory())
         );
 
         $this->client->query(Argument::that(static function (ExpressionInterface $expression): bool {
@@ -342,7 +343,7 @@ final class RepositoryTest extends AsyncTestCase
         ]));
 
         $repository = new Repository(
-            (new EntityInspector(new AnnotationReader()))->entity(BlogPostStub::class),
+            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(BlogPostStub::class),
             $client,
             new QueryFactory()
         );
