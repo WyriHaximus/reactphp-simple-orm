@@ -10,29 +10,28 @@
     }
   ],
   "require": {
-    "php": "^8 || ^7.4",
-    "api-clients/rx": "^2.3.0",
+    "php": "^8.2",
     "doctrine/annotations": "^1.13",
+    "eventsauce/object-hydrator": "^1.4",
     "latitude/latitude": "^4.1",
-    "ocramius/generated-hydrator": "^4.1",
     "ramsey/uuid": "^4.2.3",
     "react/dns": "^1.9",
     "react/event-loop": "^1.3",
-    "react/promise": "^2.9",
+    "react/promise": "^3.1",
     "react/stream": "^1.1",
     "reactivex/rxphp": "^2.0",
-    "roave/better-reflection": "^6 || ^5 || ^4.0",
-    "thecodingmachine/safe": "^2 || ^1.3",
+    "roave/better-reflection": "^4.0 || ^5 || ^6",
+    "thecodingmachine/safe": "^1.3 || ^2",
     "voryx/pgasync": "^2.0",
     "wyrihaximus/constants": "^1.5",
     "wyrihaximus/doctrine-annotation-autoloader": "^1.0",
-    "wyrihaximus/iterator-or-array-to-array": "^1.2"
+    "wyrihaximus/react-event-loop-rx-scheduler-hook-up": "^0.1.1"
   },
   "require-dev": {
     "robmorgan/phinx": "^0.12.11",
     "symfony/yaml": "^5.4",
     "vlucas/phpdotenv": "^5.4",
-    "wyrihaximus/async-test-utilities": "^4.2"
+    "wyrihaximus/async-test-utilities": "^7.2"
   },
   "autoload": {
     "psr-4": {
@@ -46,14 +45,14 @@
   },
   "config": {
     "allow-plugins": {
-      "ergebnis/composer-normalize": true,
       "composer/package-versions-deprecated": true,
       "dealerdirect/phpcodesniffer-composer-installer": true,
+      "ergebnis/composer-normalize": true,
       "icanhazstring/composer-unused": true,
       "infection/extension-installer": true
     },
     "platform": {
-      "php": "7.4.7"
+      "php": "8.2.13"
     },
     "sort-packages": true
   },
@@ -66,10 +65,12 @@
   },
   "scripts": {
     "post-install-cmd": [
-      "composer normalize"
+      "composer normalize",
+      "composer update --lock --no-scripts"
     ],
     "post-update-cmd": [
-      "composer normalize"
+      "composer normalize",
+      "composer update --lock --no-scripts"
     ]
   }
 }
