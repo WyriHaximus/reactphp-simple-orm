@@ -1,2 +1,4 @@
+.idea/
+var/
 vendor/
-.env
+etc/qa/.phpunit.result.cache

@@ -1,9 +1,11 @@
 parameters:
+	level: max
 	ergebnis:
-		classesAllowedToBeExtended:
-			- Exception
-			- Psr\Log\AbstractLogger
-			- WyriHaximus\TestUtilities\TestCase
+		noExtends:
+			classesAllowedToBeExtended:
+				- Exception
+				- Psr\Log\AbstractLogger
+				- WyriHaximus\TestUtilities\TestCase
 
 includes:
 	- ../../vendor/wyrihaximus/async-test-utilities/rules.neon

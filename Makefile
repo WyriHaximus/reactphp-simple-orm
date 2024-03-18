@@ -3,9 +3,11 @@ SHELL=bash
 
 .PHONY: *
 
-COMPOSER_CACHE_DIR=$(shell composer config --global cache-dir -q || echo ${HOME}/.composer-php/cache)
 COMPOSER_SHOW_EXTENSION_LIST=$(shell composer show -t | grep -o "\-\-\(ext-\).\+" | sort | uniq | cut -d- -f4- | tr -d '\n' | grep . | sed  '/^$$/d' | xargs | sed -e 's/ /, /g' | tr -cd '[:alnum:],' | sed 's/.$$//')
 SLIM_DOCKER_IMAGE=$(shell php -r 'echo count(array_intersect(["gd", "vips"], explode(",", "${COMPOSER_SHOW_EXTENSION_LIST}"))) > 0 ? "" : "-slim";')
+COMPOSER_CACHE_DIR=$(shell composer config --global cache-dir -q || echo ${HOME}/.composer-php/cache)
+PHP_VERSION:=$(shell docker run --rm -v "`pwd`:`pwd`" jess/jq jq -r -c '.config.platform.php' "`pwd`/composer.json" | php -r "echo str_replace('|', '.', explode('.', implode('|', explode('.', stream_get_contents(STDIN), 2)), 2)[0]);")
+COMPOSER_CONTAINER_CACHE_DIR=$(shell docker run --rm -it "ghcr.io/wyrihaximusnet/php:${PHP_VERSION}-nts-alpine${SLIM_DOCKER_IMAGE}-dev" composer config --global cache-dir -q || echo ${HOME}/.composer-php/cache)
 
 ifneq ("$(wildcard /.you-are-in-a-wyrihaximus.net-php-docker-image)","")
     IN_DOCKER=TRUE
@@ -16,10 +18,9 @@ endif
 ifeq ("$(IN_DOCKER)","TRUE")
 	DOCKER_RUN:=
 else
-	PHP_VERSION:=$(shell docker run --rm -v "`pwd`:`pwd`" jess/jq jq -r -c '.config.platform.php' "`pwd`/composer.json" | php -r "echo str_replace('|', '.', explode('.', implode('|', explode('.', stream_get_contents(STDIN), 2)), 2)[0]);")
 	DOCKER_RUN:=docker run --rm -it \
 		-v "`pwd`:`pwd`" \
-		-v "${COMPOSER_CACHE_DIR}:/home/app/.composer/cache" \
+		-v "${COMPOSER_CACHE_DIR}:${COMPOSER_CONTAINER_CACHE_DIR}" \
 		-w "`pwd`" \
 		"ghcr.io/wyrihaximusnet/php:${PHP_VERSION}-nts-alpine${SLIM_DOCKER_IMAGE}-dev"
 endif
@@ -51,7 +52,7 @@ cs: ## Check the code for code style issues
 	$(DOCKER_RUN) vendor/bin/phpcs --parallel=$(THREADS) --cache=./var/.phpcs.cache.json --standard=./etc/qa/phpcs.xml
 
 stan: ## Run static analysis (PHPStan)
-	$(DOCKER_RUN) vendor/bin/phpstan analyse src tests --level max --ansi -c ./etc/qa/phpstan.neon
+	$(DOCKER_RUN) vendor/bin/phpstan analyse src tests --ansi -c ./etc/qa/phpstan.neon
 
 psalm: ## Run static analysis (Psalm)
 	$(DOCKER_RUN) vendor/bin/psalm --threads=$(THREADS) --shepherd --stats --config=./etc/qa/psalm.xml
@@ -60,16 +61,23 @@ unit-testing: ## Run tests
 	$(DOCKER_RUN) vendor/bin/phpunit --colors=always -c ./etc/qa/phpunit.xml --coverage-text --coverage-html ./var/tests-unit-coverage-html --coverage-clover ./var/tests-unit-clover-coverage.xml
 	$(DOCKER_RUN) test -n "$(COVERALLS_REPO_TOKEN)" && test -n "$(COVERALLS_RUN_LOCALLY)" && test -f ./var/tests-unit-clover-coverage.xml && vendor/bin/php-coveralls -v --coverage_clover ./build/logs/clover.xml --json_path ./var/tests-unit-clover-coverage-upload.json || true
 
+unit-testing-raw: ## Run tests ###
+	php vendor/phpunit/phpunit/phpunit --colors=always -c ./etc/qa/phpunit.xml --coverage-text --coverage-html ./var/tests-unit-coverage-html --coverage-clover ./var/tests-unit-clover-coverage.xml
+	test -n "$(COVERALLS_REPO_TOKEN)" && test -n "$(COVERALLS_RUN_LOCALLY)" && test -f ./var/tests-unit-clover-coverage.xml && ./vendor/bin/php-coveralls -v --coverage_clover ./build/logs/clover.xml --json_path ./var/tests-unit-clover-coverage-upload.json || true
+
 mutation-testing: ## Run mutation testing
-	$(DOCKER_RUN) vendor/bin/infection --ansi --min-msi=100 --min-covered-msi=100 --threads=$(THREADS) --ignore-msi-with-no-mutations || (cat ./var/infection.log && false)
+	$(DOCKER_RUN) vendor/bin/roave-infection-static-analysis-plugin --ansi --log-verbosity=all --threads=$(THREADS) --psalm-config etc/qa/psalm.xml || (cat ./var/infection.log && false)
+
+mutation-testing-raw: ## Run mutation testing ###
+	php vendor/roave/infection-static-analysis-plugin/bin/roave-infection-static-analysis-plugin --ansi --log-verbosity=all --threads=$(THREADS) --psalm-config etc/qa/psalm.xml || (cat ./var/infection.log && false)
 
 composer-require-checker: ## Ensure we require every package used in this package directly
 	$(DOCKER_RUN) vendor/bin/composer-require-checker --ignore-parse-errors --ansi -vvv --config-file=./etc/qa/composer-require-checker.json
 
 composer-unused: ## Ensure we don't require any package we don't use in this package directly
-	$(DOCKER_RUN) composer unused --ansi
+	$(DOCKER_RUN) vendor/bin/composer-unused --ansi
 
-composer-install: ## Install dependencies ###
+composer-install: ## Install dependencies
 	$(DOCKER_RUN) composer install --no-progress --ansi --no-interaction --prefer-dist -o
 
 backward-compatibility-check: ## Check code for backwards incompatible changes
