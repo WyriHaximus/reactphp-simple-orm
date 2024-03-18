@@ -58,7 +58,7 @@ final class Hydrator
 
             $data[$join->property()] = $this->hydrate(
                 $join->entity(),
-                $data[$join->property()]
+                $data[$join->property()],
             );
         }
 
@@ -72,9 +72,7 @@ final class Hydrator
         return $this->hydrators[$class]->hydrate($data, new $class());
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function extract(InspectedEntityInterface $inspectedEntity, EntityInterface $entity): array
     {
         $class    = $inspectedEntity->class();
@@ -83,12 +81,7 @@ final class Hydrator
         return $hydrator->extract($entity);
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    private function castValueToCorrectType(Field $field, $value)
+    private function castValueToCorrectType(Field $field, mixed $value): mixed
     {
         if ($field->type() === 'int') {
             return (int) $value;

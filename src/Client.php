@@ -11,20 +11,16 @@ use Latitude\QueryBuilder\QueryFactory;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
 
-use function ApiClients\Tools\Rx\unwrapObservableFromPromise;
 use function array_key_exists;
 use function React\Promise\resolve;
 
 final class Client implements ClientInterface
 {
-    private AdapterInterface $adapter;
-
     private EntityInspector $entityInspector;
 
-    /** @var array<string, Repository> */
     private array $repositories = [];
 
-    private MiddlewareRunner $middlewareRunner;
+    private Connection $connection;
 
     private QueryFactory $queryFactory;
 
@@ -38,19 +34,23 @@ final class Client implements ClientInterface
         return new self($adapter, $configuration, $annotationReader, ...$middleware);
     }
 
-    private function __construct(AdapterInterface $adapter, Configuration $configuration, Reader $annotationReader, MiddlewareInterface ...$middleware)
+    private function __construct(private AdapterInterface $adapter, Configuration $configuration, Reader $annotationReader, MiddlewareInterface ...$middleware)
     {
-        $this->adapter         = $adapter;
         $this->entityInspector = new EntityInspector($configuration, $annotationReader);
         $this->queryFactory    = new QueryFactory($adapter->engine());
 
-        $this->middlewareRunner = new MiddlewareRunner(...$middleware);
+        $this->connection = new Connection($this->adapter, new MiddlewareRunner(...$middleware));
     }
 
+    /**
+     * @template T
+     * @param class-string<T> $entity
+     * @return RepositoryInterface<T>
+     */
     public function repository(string $entity): RepositoryInterface
     {
         if (! array_key_exists($entity, $this->repositories)) {
-            $this->repositories[$entity] = new Repository($this->entityInspector->entity($entity), $this, $this->queryFactory);
+            $this->repositories[$entity] = new Repository($this->entityInspector->entity($entity), $this, $this->queryFactory, $this->connection);
         }
 
         return $this->repositories[$entity];
@@ -58,11 +58,6 @@ final class Client implements ClientInterface
 
     public function query(ExpressionInterface $query): Observable
     {
-        return unwrapObservableFromPromise($this->middlewareRunner->query(
-            $query,
-            function (ExpressionInterface $query): PromiseInterface {
-                return resolve($this->adapter->query($query));
-            }
-        ));
+        return $this->connection->query($query);
     }
 }

@@ -11,7 +11,7 @@ use Rx\Subject\Subject;
 use Throwable;
 use WyriHaximus\React\SimpleORM\MiddlewareInterface;
 
-use function hrtime;
+use function Safe\hrtime;
 use function React\Promise\resolve;
 
 final class QueryCountMiddleware implements MiddlewareInterface
@@ -28,11 +28,8 @@ final class QueryCountMiddleware implements MiddlewareInterface
 
     private int $completedCount = self::ZERO;
 
-    private int $slowQueryTime;
-
-    public function __construct(int $slowQueryTime)
+    public function __construct(private int $slowQueryTime)
     {
-        $this->slowQueryTime = $slowQueryTime;
     }
 
     public function query(ExpressionInterface $query, callable $next): PromiseInterface
@@ -87,9 +84,7 @@ final class QueryCountMiddleware implements MiddlewareInterface
         });
     }
 
-    /**
-     * @return iterable<string, int>
-     */
+    /** @return iterable<string, int> */
     public function counters(): iterable
     {
         yield 'initiated' => $this->initiatedCount;

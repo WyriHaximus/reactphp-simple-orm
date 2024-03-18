@@ -34,6 +34,9 @@ final class UserStub implements EntityInterface
 
     protected string $name;
 
+    /**
+     * @var PromiseInterface<UserStub>
+     */
     protected PromiseInterface $zelf;
 
     public function id(): string
@@ -46,6 +49,9 @@ final class UserStub implements EntityInterface
         return $this->name;
     }
 
+    /**
+     * @return PromiseInterface<UserStub>
+     */
     public function getZelf(): PromiseInterface
     {
         return $this->zelf;

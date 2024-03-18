@@ -14,9 +14,7 @@ final class Order implements SectionInterface
         $this->orders = $orders;
     }
 
-    /**
-     * @return iterable<OrderInterface>
-     */
+    /** @return iterable<OrderInterface> */
     public function orders(): iterable
     {
         yield from $this->orders;

@@ -8,9 +8,7 @@ use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\EntityInterface;
 use WyriHaximus\React\SimpleORM\Tools\WithFieldsTrait;
 
-/**
- * @Table("logs")
- */
+/** @Table("logs") */
 final class LogStub implements EntityInterface
 {
     use WithFieldsTrait;

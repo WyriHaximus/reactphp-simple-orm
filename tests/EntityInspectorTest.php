@@ -26,9 +26,7 @@ final class EntityInspectorTest extends AsyncTestCase
         $this->entityInspector = new EntityInspector(new Configuration(''), new AnnotationReader());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function inspect(): void
     {
         $inspectedEntity = $this->entityInspector->entity(UserStub::class);
@@ -44,9 +42,7 @@ final class EntityInspectorTest extends AsyncTestCase
         self::assertSame('string', $fields['name']->type());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function inspectWithJoins(): void
     {
         $inspectedEntity = $this->entityInspector->entity(BlogPostStub::class);
@@ -108,9 +104,7 @@ final class EntityInspectorTest extends AsyncTestCase
         self::assertSame('author', $joins['comments']->entity()->joins()['author']->property());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function inspectWithoutTable(): void
     {
         self::expectException(RuntimeException::class);

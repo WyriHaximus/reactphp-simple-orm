@@ -10,14 +10,15 @@ use PgAsync\Client as PgClient;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionClass;
+use Rx\Observable;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use WyriHaximus\React\SimpleORM\Annotation\Table;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
-use function ApiClients\Tools\Rx\observableFromArray;
 use function Latitude\QueryBuilder\field;
+use function React\Async\await;
 
 final class ClientTest extends AsyncTestCase
 {
@@ -40,11 +41,11 @@ final class ClientTest extends AsyncTestCase
     {
         $this->annotationReader->getClassAnnotation(
             Argument::type(ReflectionClass::class),
-            Table::class
+            Table::class,
         )->shouldBeCalled()->willReturn(new Table(['users']));
 
         $this->annotationReader->getClassAnnotations(
-            Argument::type(ReflectionClass::class)
+            Argument::type(ReflectionClass::class),
         )->shouldBeCalled()->willReturn([
             new Table(['users']),
         ]);
@@ -57,15 +58,15 @@ final class ClientTest extends AsyncTestCase
         $query = (new QueryFactory())->select()->from('table')->where(field('id')->eq(1))->asExpression();
 
         $this->pgClient->executeStatement('SELECT * FROM "table" WHERE "id" = $1', [1])->shouldBeCalled()->willReturn(
-            observableFromArray([
+            Observable::fromArray([
                 [
                     'id' => 1,
                     'title' => 'Title',
                 ],
-            ])
+            ]),
         );
 
-        $rows = $this->await($this->client->query($query)->toArray()->toPromise());
+        $rows = await($this->client->query($query)->toArray()->toPromise());
 
         self::assertCount(1, $rows);
     }

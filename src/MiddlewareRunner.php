@@ -11,9 +11,7 @@ use function array_key_exists;
 
 use const WyriHaximus\Constants\Numeric\ZERO;
 
-/**
- * @internal
- */
+/** @internal */
 
 final class MiddlewareRunner
 {

@@ -16,9 +16,7 @@ final class Table
 {
     private string $table;
 
-    /**
-     * @param string[] $table
-     */
+    /** @param string[] $table */
     public function __construct(array $table)
     {
         $this->table = current($table); /** @phpstan-ignore-line */

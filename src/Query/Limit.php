@@ -6,11 +6,8 @@ namespace WyriHaximus\React\SimpleORM\Query;
 
 final class Limit implements SectionInterface
 {
-    private int $limit;
-
-    public function __construct(int $limit)
+    public function __construct(private int $limit)
     {
-        $this->limit = $limit;
     }
 
     public function limit(): int

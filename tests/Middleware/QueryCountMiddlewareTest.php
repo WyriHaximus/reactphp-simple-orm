@@ -8,18 +8,13 @@ use Exception;
 use Latitude\QueryBuilder\QueryFactory;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
+use Rx\Observable;
 use Rx\Subject\Subject;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
 
-use function ApiClients\Tools\Rx\observableFromArray;
-use function ApiClients\Tools\Rx\unwrapObservableFromPromise;
-use function Safe\sleep;
-use function WyriHaximus\iteratorOrArrayToArray;
+use function sleep;
 
-/**
- * @internal
- */
 final class QueryCountMiddlewareTest extends AsyncTestCase
 {
     public function testCountingSuccess(): void
@@ -32,13 +27,13 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->counters()));
+        ], [...$middleware->counters()]);
 
         $deferred = new Deferred();
 
-        unwrapObservableFromPromise($middleware->query((new QueryFactory())->select()->asExpression(), static function () use ($deferred): PromiseInterface {
+        Observable::fromPromise($middleware->query((new QueryFactory())->select()->asExpression(), static function () use ($deferred): PromiseInterface {
             return $deferred->promise();
-        }))->subscribe(static function (): void {
+        }))->mergeAll()->subscribe(static function (): void {
         }, static function (): void {
         });
 
@@ -48,9 +43,9 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->counters()));
+        ], [...$middleware->counters()]);
 
-        $deferred->resolve(observableFromArray([[]]));
+        $deferred->resolve(Observable::fromArray([[]]));
 
         self::assertSame([
             'initiated' => 1,
@@ -58,7 +53,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 1,
-        ], iteratorOrArrayToArray($middleware->counters()));
+        ], [...$middleware->counters()]);
 
         $middleware->resetCounters();
 
@@ -68,7 +63,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->counters()));
+        ], [...$middleware->counters()]);
     }
 
     public function testCountingError(): void
@@ -81,13 +76,13 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->counters()));
+        ], [...$middleware->counters()]);
 
         $deferred = new Deferred();
 
-        unwrapObservableFromPromise($middleware->query((new QueryFactory())->select()->asExpression(), static function () use ($deferred): PromiseInterface {
+        Observable::fromPromise($middleware->query((new QueryFactory())->select()->asExpression(), static function () use ($deferred): PromiseInterface {
             return $deferred->promise();
-        }))->subscribe(static function (): void {
+        }))->mergeAll()->subscribe(static function (): void {
         }, static function (): void {
         });
 
@@ -97,7 +92,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->counters()));
+        ], [...$middleware->counters()]);
 
         $subject = new Subject();
         $deferred->resolve($subject);
@@ -109,7 +104,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 1,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->counters()));
+        ], [...$middleware->counters()]);
 
         $middleware->resetCounters();
 
@@ -119,7 +114,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->counters()));
+        ], [...$middleware->counters()]);
     }
 
     public function testCountingErrorSlow(): void
@@ -132,13 +127,13 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->counters()));
+        ], [...$middleware->counters()]);
 
         $deferred = new Deferred();
 
-        unwrapObservableFromPromise($middleware->query((new QueryFactory())->select()->asExpression(), static function () use ($deferred): PromiseInterface {
+        Observable::fromPromise($middleware->query((new QueryFactory())->select()->asExpression(), static function () use ($deferred): PromiseInterface {
             return $deferred->promise();
-        }))->subscribe(static function (): void {
+        }))->mergeAll()->subscribe(static function (): void {
         }, static function (): void {
         });
 
@@ -148,9 +143,9 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->counters()));
+        ], [...$middleware->counters()]);
 
-        sleep(2);
+        sleep(2); /** @phpstan-ignore-line We're using blocking sleep here on purpose */
 
         $subject = new Subject();
         $deferred->resolve($subject);
@@ -162,7 +157,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 1,
             'slow' => 1,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->counters()));
+        ], [...$middleware->counters()]);
 
         $middleware->resetCounters();
 
@@ -172,6 +167,6 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'errored' => 0,
             'slow' => 0,
             'completed' => 0,
-        ], iteratorOrArrayToArray($middleware->counters()));
+        ], [...$middleware->counters()]);
     }
 }

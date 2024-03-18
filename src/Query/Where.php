@@ -14,9 +14,7 @@ final class Where implements SectionInterface
         $this->wheres = $wheres;
     }
 
-    /**
-     * @return iterable<WhereInterface>
-     */
+    /** @return iterable<WhereInterface> */
     public function wheres(): iterable
     {
         yield from $this->wheres;

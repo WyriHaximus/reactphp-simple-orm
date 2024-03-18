@@ -9,26 +9,12 @@ use WyriHaximus\React\SimpleORM\Entity\Join;
 
 final class InspectedEntity implements InspectedEntityInterface
 {
-    private string $class;
-
-    private string $table;
-
-    /** @var Field[] */
-    private array $fields = [];
-
-    /** @var Join[] */
-    private array $joins = [];
-
     /**
      * @param Field[] $fields
      * @param Join[]  $joins
      */
-    public function __construct(string $class, string $table, array $fields, array $joins)
+    public function __construct(private string $class, private string $table, private array $fields = [], private array $joins = [])
     {
-        $this->class  = $class;
-        $this->table  = $table;
-        $this->fields = $fields;
-        $this->joins  = $joins;
     }
 
     public function class(): string
@@ -41,17 +27,13 @@ final class InspectedEntity implements InspectedEntityInterface
         return $this->table;
     }
 
-    /**
-     * @return Field[]
-     */
+    /** @return Field[] */
     public function fields(): array
     {
         return $this->fields;
     }
 
-    /**
-     * @return Join[]
-     */
+    /** @return Join[] */
     public function joins(): array
     {
         return $this->joins;
