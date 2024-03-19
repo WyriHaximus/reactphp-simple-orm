@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\Reader;
 use Latitude\QueryBuilder\ExpressionInterface;
 use Latitude\QueryBuilder\QueryFactory;
-use React\Promise\PromiseInterface;
 use Rx\Observable;
 
 use function array_key_exists;
-use function React\Promise\resolve;
 
 final class Client implements ClientInterface
 {
@@ -26,26 +22,23 @@ final class Client implements ClientInterface
 
     public static function create(AdapterInterface $adapter, Configuration $configuration, MiddlewareInterface ...$middleware): self
     {
-        return new self($adapter, $configuration, new AnnotationReader(), ...$middleware);
+        return new self($adapter, $configuration, ...$middleware);
     }
 
-    public static function createWithAnnotationReader(AdapterInterface $adapter, Configuration $configuration, Reader $annotationReader, MiddlewareInterface ...$middleware): self
+    private function __construct(private AdapterInterface $adapter, Configuration $configuration, MiddlewareInterface ...$middleware)
     {
-        return new self($adapter, $configuration, $annotationReader, ...$middleware);
-    }
-
-    private function __construct(private AdapterInterface $adapter, Configuration $configuration, Reader $annotationReader, MiddlewareInterface ...$middleware)
-    {
-        $this->entityInspector = new EntityInspector($configuration, $annotationReader);
+        $this->entityInspector = new EntityInspector($configuration);
         $this->queryFactory    = new QueryFactory($adapter->engine());
 
         $this->connection = new Connection($this->adapter, new MiddlewareRunner(...$middleware));
     }
 
     /**
-     * @template T
      * @param class-string<T> $entity
+     *
      * @return RepositoryInterface<T>
+     *
+     * @template T
      */
     public function repository(string $entity): RepositoryInterface
     {

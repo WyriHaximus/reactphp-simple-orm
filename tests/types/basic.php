@@ -1,12 +1,15 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
+
+use WyriHaximus\React\SimpleORM\Client;
+use WyriHaximus\React\Tests\SimpleORM\Stub\NoSQLStub;
 
 use function PHPStan\Testing\assertType;
 
 /** @phpstan-ignore-next-line */
-$client = \WyriHaximus\React\SimpleORM\Client::create();
-$repository = $client->repository(\WyriHaximus\React\Tests\SimpleORM\Stub\NoSQLStub::class);
+$client     = Client::create();
+$repository = $client->repository(NoSQLStub::class);
 
 assertType('WyriHaximus\React\SimpleORM\RepositoryInterface<WyriHaximus\React\Tests\SimpleORM\Stub\NoSQLStub>', $repository);
 assertType('React\Promise\PromiseInterface<int>', $repository->count());

@@ -13,7 +13,7 @@ use ReflectionClass;
 use Rx\Observable;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Adapter\Postgres;
-use WyriHaximus\React\SimpleORM\Annotation\Table;
+use WyriHaximus\React\SimpleORM\Attribute\Table;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 

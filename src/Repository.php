@@ -17,7 +17,7 @@ use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
 use Rx\Subject\Subject;
 use Safe\DateTimeImmutable;
-use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
+use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
 use WyriHaximus\React\SimpleORM\Query\Limit;
 use WyriHaximus\React\SimpleORM\Query\Order;
 use WyriHaximus\React\SimpleORM\Query\SectionInterface;
@@ -35,9 +35,9 @@ use function Latitude\QueryBuilder\field;
 use function Latitude\QueryBuilder\func;
 use function Latitude\QueryBuilder\on;
 use function Safe\date;
-use function substr;
 use function spl_object_hash;
 use function strpos;
+use function substr;
 
 use const WyriHaximus\Constants\Boolean\TRUE_;
 use const WyriHaximus\Constants\Numeric\ONE;
@@ -66,14 +66,11 @@ final class Repository implements RepositoryInterface
         private ClientInterface $client,
         private QueryFactory $queryFactory,
         private Connection $connection,
-    )
-    {
+    ) {
         $this->hydrator = new Hydrator();
     }
 
-    /**
-     * @return PromiseInterface<int>
-     */
+    /** @return PromiseInterface<int> */
     public function count(Where|null $where = null): PromiseInterface
     {
         $query = $this->queryFactory->select(alias(func('COUNT', '*'), 'count'))->from(alias($this->entity->table(), 't0'));
@@ -88,9 +85,7 @@ final class Repository implements RepositoryInterface
         });
     }
 
-    /**
-     * @return Observable<T>
-     */
+    /** @return Observable<T> */
     public function page(int $page, Where|null $where = null, Order|null $order = null, int $perPage = RepositoryInterface::DEFAULT_PER_PAGE): Observable
     {
         $query = $this->buildSelectQuery($where ?? new Where(), $order ?? new Order());
@@ -99,9 +94,7 @@ final class Repository implements RepositoryInterface
         return $this->fetchAndHydrate($query);
     }
 
-    /**
-     * @return Observable<T>
-     */
+    /** @return Observable<T> */
     public function fetch(SectionInterface ...$sections): Observable
     {
         $query = $this->buildSelectQuery(...$sections);
@@ -116,9 +109,7 @@ final class Repository implements RepositoryInterface
         return $this->fetchAndHydrate($query);
     }
 
-    /**
-     * @return Observable<T>
-     */
+    /** @return Observable<T> */
     public function stream(SectionInterface ...$sections): Observable
     {
         $stream = new Subject();
@@ -183,9 +174,7 @@ final class Repository implements RepositoryInterface
         });
     }
 
-    /**
-     * @return PromiseInterface<T>
-     */
+    /** @return PromiseInterface<T> */
     public function update(EntityInterface $entity): PromiseInterface
     {
         $fields             = $this->hydrator->extract($this->entity, $entity);
@@ -202,9 +191,7 @@ final class Repository implements RepositoryInterface
         });
     }
 
-    /**
-     * @return PromiseInterface<null>
-     */
+    /** @return PromiseInterface<null> */
     public function delete(EntityInterface $entity): PromiseInterface
     {
         return $this->connection->query(
@@ -305,27 +292,27 @@ final class Repository implements RepositoryInterface
 
             $clauses = null;
             foreach ($join->clause() as $clause) {
-                $onLeftSide = $this->tableAliases[$tableKey] . '.' . $clause->foreignKey();
-                if ($clause->foreignFunction() !== null) {
+                $onLeftSide = $this->tableAliases[$tableKey] . '.' . $clause->foreignKey;
+                if ($clause->foreignFunction !== null) {
                     /** @psalm-suppress PossiblyNullOperand */
-                    $onLeftSide = $clause->foreignFunction() . '(' . $onLeftSide . ')';
+                    $onLeftSide = $clause->foreignFunction . '(' . $onLeftSide . ')';
                 }
 
-                if ($clause->foreignCast() !== null) {
+                if ($clause->foreignCast !== null) {
                     /** @psalm-suppress PossiblyNullOperand */
-                    $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $clause->foreignCast() . ')';
+                    $onLeftSide = 'CAST(' . $onLeftSide . ' AS ' . $clause->foreignCast . ')';
                 }
 
                 $onRightSide =
-                    $this->tableAliases[spl_object_hash($entity) . '___' . $rootProperty] . '.' . $clause->localKey();
-                if ($clause->localFunction() !== null) {
+                    $this->tableAliases[spl_object_hash($entity) . '___' . $rootProperty] . '.' . $clause->localKey;
+                if ($clause->localFunction !== null) {
                     /** @psalm-suppress PossiblyNullOperand */
-                    $onRightSide = $clause->localFunction() . '(' . $onRightSide . ')';
+                    $onRightSide = $clause->localFunction . '(' . $onRightSide . ')';
                 }
 
-                if ($clause->localCast() !== null) {
+                if ($clause->localCast !== null) {
                     /** @psalm-suppress PossiblyNullOperand */
-                    $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $clause->localCast() . ')';
+                    $onRightSide = 'CAST(' . $onRightSide . ' AS ' . $clause->localCast . ')';
                 }
 
                 if ($clauses === null) {
@@ -360,9 +347,7 @@ final class Repository implements RepositoryInterface
         return $query;
     }
 
-    /**
-     * @return Observable<T>
-     */
+    /** @return Observable<T> */
     private function fetchAndHydrate(QueryInterface $query): Observable
     {
         return $this->connection->query(
@@ -414,7 +399,7 @@ final class Repository implements RepositoryInterface
                 $tree[$join->property()] = new LazyPromise(function () use ($row, $join, $tableKey): PromiseInterface {
                     return new Promise(function (callable $resolve, callable $reject) use ($row, $join, $tableKey): void {
                         foreach ($join->clause() as $clause) {
-                            if ($row[$this->tableAliases[$tableKey]][$clause->localKey()] === null) {
+                            if ($row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
                                 $resolve(null);
 
                                 return;
@@ -424,15 +409,15 @@ final class Repository implements RepositoryInterface
                         $where = [];
 
                         foreach ($join->clause() as $clause) {
-                            $onLeftSide = $clause->foreignKey();
-                            if ($clause->foreignFunction() !== null) {
+                            $onLeftSide = $clause->foreignKey;
+                            if ($clause->foreignFunction !== null) {
                                 /** @psalm-suppress PossiblyNullArgument */
-                                $onLeftSide = func($clause->foreignFunction(), $onLeftSide);
+                                $onLeftSide = func($clause->foreignFunction, $onLeftSide);
                             }
 
-                            if ($clause->foreignCast() !== null) {
+                            if ($clause->foreignCast !== null) {
                                 /** @psalm-suppress PossiblyNullArgument */
-                                $onLeftSide = alias(func('CAST', $onLeftSide), $clause->foreignCast());
+                                $onLeftSide = alias(func('CAST', $onLeftSide), $clause->foreignCast);
                             }
 
                             if (is_string($onLeftSide)) {
@@ -440,7 +425,7 @@ final class Repository implements RepositoryInterface
                                     $onLeftSide,
                                     'eq',
                                     [
-                                        $row[$this->tableAliases[$tableKey]][$clause->localKey()],
+                                        $row[$this->tableAliases[$tableKey]][$clause->localKey],
                                     ],
                                 );
                             } else {
@@ -448,7 +433,7 @@ final class Repository implements RepositoryInterface
                                     $onLeftSide,
                                     'eq',
                                     [
-                                        $row[$this->tableAliases[$tableKey]][$clause->localKey()],
+                                        $row[$this->tableAliases[$tableKey]][$clause->localKey],
                                     ],
                                 );
                             }
@@ -472,10 +457,10 @@ final class Repository implements RepositoryInterface
 
                     foreach ($join->clause() as $clause) {
                         $where[] = new Where\Field(
-                            $clause->foreignKey(),
+                            $clause->foreignKey,
                             'eq',
                             [
-                                $row[$this->tableAliases[$tableKey]][$clause->localKey()],
+                                $row[$this->tableAliases[$tableKey]][$clause->localKey],
                             ],
                         );
                     }
