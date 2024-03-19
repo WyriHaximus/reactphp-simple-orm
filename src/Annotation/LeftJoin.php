@@ -24,9 +24,7 @@ final class LeftJoin implements JoinInterface
 
     private bool $lazy = self::IS_NOT_LAZY;
 
-    /**
-     * @param string[]|array[]|bool[] $leftJoin
-     */
+    /** @param string[]|array[]|bool[] $leftJoin */
     public function __construct(array $leftJoin)
     {
         /** @psalm-suppress RawObjectIteration */
@@ -54,9 +52,7 @@ final class LeftJoin implements JoinInterface
         return $this->lazy;
     }
 
-    /**
-     * @return Clause[]
-     */
+    /** @return Clause[] */
     public function clause(): array
     {
         return $this->clause;

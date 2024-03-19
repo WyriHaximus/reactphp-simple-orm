@@ -24,9 +24,7 @@ final class Clause
     private ?string $foreign_function = null;
     //phpcs:enable
 
-    /**
-     * @param string[]|null[] $clause
-     */
+    /** @param string[]|null[] $clause */
     public function __construct(array $clause)
     {
         /** @psalm-suppress RawObjectIteration */
@@ -54,7 +52,7 @@ final class Clause
     }
 
     /** @phpstan-ignore-next-line */
-    public function localCast(): ?string
+    public function localCast(): string|null
     {
         //phpcs:disable
         return $this->local_cast;
@@ -62,7 +60,7 @@ final class Clause
     }
 
     /** @phpstan-ignore-next-line */
-    public function foreignCast(): ?string
+    public function foreignCast(): string|null
     {
         //phpcs:disable
         return $this->foreign_cast;
@@ -70,7 +68,7 @@ final class Clause
     }
 
     /** @phpstan-ignore-next-line */
-    public function localFunction(): ?string
+    public function localFunction(): string|null
     {
         //phpcs:disable
         return $this->local_function;
@@ -78,7 +76,7 @@ final class Clause
     }
 
     /** @phpstan-ignore-next-line */
-    public function foreignFunction(): ?string
+    public function foreignFunction(): string|null
     {
         //phpcs:disable
         return $this->foreign_function;

@@ -6,11 +6,8 @@ namespace WyriHaximus\React\SimpleORM;
 
 final class Configuration
 {
-    private string $tablePrefix = '';
-
-    public function __construct(string $tablePrefix)
+    public function __construct(private string $tablePrefix = '')
     {
-        $this->tablePrefix = $tablePrefix;
     }
 
     public function tablePrefix(): string

@@ -11,19 +11,9 @@ use WyriHaximus\React\SimpleORM\Query\WhereInterface;
 
 final class Expression implements WhereInterface
 {
-    private ExpressionInterface $expression;
-    private string $criteria;
-    /** @var mixed[]  */
-    private array $criteriaArguments = [];
-
-    /**
-     * @param mixed[] $criteriaArguments
-     */
-    public function __construct(ExpressionInterface $expression, string $criteria, array $criteriaArguments)
+    /** @param mixed[] $criteriaArguments */
+    public function __construct(private ExpressionInterface $expression, private string $criteria, private array $criteriaArguments = [])
     {
-        $this->expression        = $expression;
-        $this->criteria          = $criteria;
-        $this->criteriaArguments = $criteriaArguments;
     }
 
     public function expression(): ExpressionInterface

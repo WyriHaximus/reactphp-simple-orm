@@ -17,20 +17,14 @@ use WyriHaximus\React\SimpleORM\Entity\Join;
 use function array_key_exists;
 use function current;
 use function method_exists;
-use function WyriHaximus\iteratorOrArrayToArray;
 
 final class EntityInspector
 {
-    private Configuration $configuration;
-    private Reader $annotationReader;
-
     /** @var InspectedEntityInterface[] */
     private array $entities = [];
 
-    public function __construct(Configuration $configuration, Reader $annotationReader)
+    public function __construct(private Configuration $configuration, private Reader $annotationReader)
     {
-        $this->configuration    = $configuration;
-        $this->annotationReader = $annotationReader;
     }
 
     public function entity(string $entity): InspectedEntityInterface
@@ -51,13 +45,13 @@ final class EntityInspector
              * @phpstan-ignore-next-line
              * @psalm-suppress ArgumentTypeCoercion
              */
-            $joins = iteratorOrArrayToArray($this->joins($class));
+            $joins = [...$this->joins($class)];
             /** @psalm-suppress ArgumentTypeCoercion */
             $this->entities[$entity] = new InspectedEntity(
                 $entity,
                 $this->configuration->tablePrefix() . $tableAnnotation->table(),
-                iteratorOrArrayToArray($this->fields($class, $joins)), /** @phpstan-ignore-line */
-                $joins
+                [...$this->fields($class, $joins)], /** @phpstan-ignore-line */
+                $joins,
             );
         }
 
@@ -99,7 +93,7 @@ final class EntityInspector
                     }
 
                     return (string) current($property->getDocBlockTypes());
-                })($roaveProperty)
+                })($roaveProperty),
             );
         }
     }
@@ -123,7 +117,7 @@ final class EntityInspector
                 $annotation->type(),
                 $annotation->property(),
                 $annotation->lazy(),
-                ...$annotation->clause()
+                ...$annotation->clause(),
             );
         }
     }

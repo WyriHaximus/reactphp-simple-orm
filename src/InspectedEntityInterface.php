@@ -13,13 +13,9 @@ interface InspectedEntityInterface
 
     public function table(): string;
 
-    /**
-     * @return Field[]
-     */
+    /** @return Field[] */
     public function fields(): array;
 
-    /**
-     * @return Join[]
-     */
+    /** @return Join[] */
     public function joins(): array;
 }

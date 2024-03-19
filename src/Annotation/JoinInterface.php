@@ -17,8 +17,6 @@ interface JoinInterface
 
     public function lazy(): bool;
 
-    /**
-     * @return Clause[]
-     */
+    /** @return Clause[] */
     public function clause(): array;
 }

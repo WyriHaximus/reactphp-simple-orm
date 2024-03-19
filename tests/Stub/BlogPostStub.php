@@ -83,10 +83,16 @@ final class BlogPostStub implements EntityInterface
 
     protected ?string $previous_blog_post_id = null;
 
+    /**
+     * @var PromiseInterface<BlogPostStub>
+     */
     protected PromiseInterface $previous_blog_post;
 
     protected ?string $next_blog_post_id = null;
 
+    /**
+     * @var PromiseInterface<BlogPostStub>
+     */
     protected PromiseInterface $next_blog_post;
 
     protected string $author_id;
@@ -115,6 +121,9 @@ final class BlogPostStub implements EntityInterface
         return $this->id;
     }
 
+    /**
+     * @return PromiseInterface<BlogPostStub>
+     */
     public function getPreviousBlogPost(): PromiseInterface
     {
         //phpcs:disable
@@ -122,6 +131,9 @@ final class BlogPostStub implements EntityInterface
         //phpcs:enable
     }
 
+    /**
+     * @return PromiseInterface<BlogPostStub>
+     */
     public function getNextBlogPost(): PromiseInterface
     {
         //phpcs:disable

@@ -35,7 +35,7 @@ use function Latitude\QueryBuilder\field;
 use function Latitude\QueryBuilder\func;
 use function Latitude\QueryBuilder\on;
 use function Safe\date;
-use function Safe\substr;
+use function substr;
 use function spl_object_hash;
 use function strpos;
 
@@ -43,17 +43,15 @@ use const WyriHaximus\Constants\Boolean\TRUE_;
 use const WyriHaximus\Constants\Numeric\ONE;
 use const WyriHaximus\Constants\Numeric\ZERO;
 
+/**
+ * @template T
+ * @template-implements RepositoryInterface<T>
+ */
 final class Repository implements RepositoryInterface
 {
     private const DATE_TIME_TIMEZONE_FORMAT = 'Y-m-d H:i:s e';
-    private const SINGLE                    = ONE;
+    private const SINGLE                    = 1;
     private const STREAM_PER_PAGE           = 100;
-
-    private InspectedEntityInterface $entity;
-
-    private ClientInterface $client;
-
-    private QueryFactory $queryFactory;
 
     private Hydrator $hydrator;
 
@@ -63,31 +61,37 @@ final class Repository implements RepositoryInterface
     /** @var string[] */
     private array $tableAliases = [];
 
-    public function __construct(InspectedEntityInterface $entity, ClientInterface $client, QueryFactory $queryFactory)
+    public function __construct(
+        private InspectedEntityInterface $entity,
+        private ClientInterface $client,
+        private QueryFactory $queryFactory,
+        private Connection $connection,
+    )
     {
-        $this->entity       = $entity;
-        $this->client       = $client;
-        $this->queryFactory = $queryFactory;
-        $this->hydrator     = new Hydrator();
+        $this->hydrator = new Hydrator();
     }
 
-    /** @phpstan-ignore-next-line */
-    public function count(?Where $where = null): PromiseInterface
+    /**
+     * @return PromiseInterface<int>
+     */
+    public function count(Where|null $where = null): PromiseInterface
     {
         $query = $this->queryFactory->select(alias(func('COUNT', '*'), 'count'))->from(alias($this->entity->table(), 't0'));
         if ($where instanceof Where) {
             $query = $this->applyWhereToQuery($where, $query);
         }
 
-        return $this->client->query(
-            $query->asExpression()
+        return $this->connection->query(
+            $query->asExpression(),
         )->take(self::SINGLE)->toPromise()->then(static function (array $row): int {
             return (int) $row['count'];
         });
     }
 
-    /** @phpstan-ignore-next-line */
-    public function page(int $page, ?Where $where = null, ?Order $order = null, int $perPage = RepositoryInterface::DEFAULT_PER_PAGE): Observable
+    /**
+     * @return Observable<T>
+     */
+    public function page(int $page, Where|null $where = null, Order|null $order = null, int $perPage = RepositoryInterface::DEFAULT_PER_PAGE): Observable
     {
         $query = $this->buildSelectQuery($where ?? new Where(), $order ?? new Order());
         $query = $query->limit($perPage)->offset(--$page * $perPage);
@@ -96,9 +100,7 @@ final class Repository implements RepositoryInterface
     }
 
     /**
-     * @param array<SectionInterface> $sections
-     *
-     * @phpstan-ignore-next-line
+     * @return Observable<T>
      */
     public function fetch(SectionInterface ...$sections): Observable
     {
@@ -115,9 +117,7 @@ final class Repository implements RepositoryInterface
     }
 
     /**
-     * @param array<SectionInterface> $sections
-     *
-     * @phpstan-ignore-next-line
+     * @return Observable<T>
      */
     public function stream(SectionInterface ...$sections): Observable
     {
@@ -129,9 +129,7 @@ final class Repository implements RepositoryInterface
 
             $hasRows = false;
             $this->fetchAndHydrate($q->limit(self::STREAM_PER_PAGE)->offset($offset))->subscribe(
-                /**
-                 * @psalm-suppress MissingClosureParamType
-                 */
+                /** @psalm-suppress MissingClosureParamType */
                 static function ($value) use (&$hasRows, $stream): void {
                     if ($stream->isDisposed()) {
                         return;
@@ -160,6 +158,8 @@ final class Repository implements RepositoryInterface
 
     /**
      * @param array<string, mixed> $fields
+     *
+     * @return PromiseInterface<T>
      */
     public function create(array $fields): PromiseInterface
     {
@@ -170,8 +170,8 @@ final class Repository implements RepositoryInterface
 
         $fields = $this->prepareFields($fields);
 
-        return $this->client->query(
-            $this->queryFactory->insert($this->entity->table(), $fields)->asExpression()
+        return $this->connection->query(
+            $this->queryFactory->insert($this->entity->table(), $fields)->asExpression(),
         )->toPromise()->then(function () use ($id): PromiseInterface {
             return $this->fetch(new Where(
                 new Where\Field(
@@ -183,27 +183,33 @@ final class Repository implements RepositoryInterface
         });
     }
 
+    /**
+     * @return PromiseInterface<T>
+     */
     public function update(EntityInterface $entity): PromiseInterface
     {
         $fields             = $this->hydrator->extract($this->entity, $entity);
         $fields['modified'] = new DateTimeImmutable();
         $fields             = $this->prepareFields($fields);
 
-        return $this->client->query(
+        return $this->connection->query(
             $this->queryFactory->update($this->entity->table(), $fields)->
-            where(field('id')->eq($entity->id()))->asExpression()
+            where(field('id')->eq($entity->id))->asExpression(),
         )->toPromise()->then(function () use ($entity): PromiseInterface {
             return $this->fetch(new Where(
-                new Where\Field('id', 'eq', [$entity->id()]),
+                new Where\Field('id', 'eq', [$entity->id]),
             ), new Limit(ONE))->toPromise();
         });
     }
 
+    /**
+     * @return PromiseInterface<null>
+     */
     public function delete(EntityInterface $entity): PromiseInterface
     {
-        return $this->client->query(
+        return $this->connection->query(
             $this->queryFactory->delete($this->entity->table())->
-            where(field('id')->eq($entity->id()))->asExpression()
+            where(field('id')->eq($entity->id))->asExpression(),
         )->toPromise();
     }
 
@@ -336,9 +342,9 @@ final class Repository implements RepositoryInterface
                 $query = $query->innerJoin(
                     alias(
                         $join->entity()->table(),
-                        $this->tableAliases[$tableKey]
+                        $this->tableAliases[$tableKey],
                     ),
-                    $clauses
+                    $clauses,
                 );
             }
 
@@ -354,10 +360,13 @@ final class Repository implements RepositoryInterface
         return $query;
     }
 
+    /**
+     * @return Observable<T>
+     */
     private function fetchAndHydrate(QueryInterface $query): Observable
     {
-        return $this->client->query(
-            $query->asExpression()
+        return $this->connection->query(
+            $query->asExpression(),
         )->map(function (array $row): array {
             return $this->inflate($row);
         })->map(function (array $row): array {
@@ -368,9 +377,9 @@ final class Repository implements RepositoryInterface
     }
 
     /**
-     * @param mixed[] $row
+     * @param array<string, mixed> $row
      *
-     * @return mixed[]
+     * @return array<string, array<string, mixed>>
      */
     private function inflate(array $row): array
     {
@@ -385,9 +394,9 @@ final class Repository implements RepositoryInterface
     }
 
     /**
-     * @param mixed[] $row
+     * @param array<string, array<string, mixed>> $row
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     private function buildTree(array $row, InspectedEntityInterface $entity, string $tableKeySuffix = 'root'): array
     {
@@ -402,10 +411,6 @@ final class Repository implements RepositoryInterface
             }
 
             if ($join->type() === 'inner' && ($join->lazy() === JoinInterface::IS_LAZY || $entity->class() === $join->entity()->class())) {
-                /**
-                 * @phpstan-ignore-next-line
-                 * @psalm-suppress DeprecatedClass
-                 */
                 $tree[$join->property()] = new LazyPromise(function () use ($row, $join, $tableKey): PromiseInterface {
                     return new Promise(function (callable $resolve, callable $reject) use ($row, $join, $tableKey): void {
                         foreach ($join->clause() as $clause) {
@@ -436,7 +441,7 @@ final class Repository implements RepositoryInterface
                                     'eq',
                                     [
                                         $row[$this->tableAliases[$tableKey]][$clause->localKey()],
-                                    ]
+                                    ],
                                 );
                             } else {
                                 $where[] = new Where\Expression(
@@ -444,7 +449,7 @@ final class Repository implements RepositoryInterface
                                     'eq',
                                     [
                                         $row[$this->tableAliases[$tableKey]][$clause->localKey()],
-                                    ]
+                                    ],
                                 );
                             }
                         }
@@ -471,13 +476,13 @@ final class Repository implements RepositoryInterface
                             'eq',
                             [
                                 $row[$this->tableAliases[$tableKey]][$clause->localKey()],
-                            ]
+                            ],
                         );
                     }
 
                     return $this->client->repository($join->entity()->class())->fetch(new Where(...$where));
                 },
-                new ImmediateScheduler()
+                new ImmediateScheduler(),
             );
         }
 
@@ -495,9 +500,9 @@ final class Repository implements RepositoryInterface
     }
 
     /**
-     * @param mixed[] $fields
+     * @param array<string, mixed> $fields
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     private function prepareFields(array $fields): array
     {
@@ -505,7 +510,7 @@ final class Repository implements RepositoryInterface
             if ($value instanceof DateTimeInterface) {
                 $fields[$key] = $value = date(
                     self::DATE_TIME_TIMEZONE_FORMAT,
-                    (int) $value->format('U')
+                    (int) $value->format('U'),
                 );
             }
 

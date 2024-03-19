@@ -24,9 +24,7 @@ final class InnerJoin implements JoinInterface
 
     private bool $lazy = self::IS_NOT_LAZY;
 
-    /**
-     * @param string[]|array[]|bool[] $innerJoin
-     */
+    /** @param string[]|array[]|bool[] $innerJoin */
     public function __construct(array $innerJoin)
     {
         /** @psalm-suppress RawObjectIteration */
@@ -54,9 +52,7 @@ final class InnerJoin implements JoinInterface
         return $this->lazy;
     }
 
-    /**
-     * @return Clause[]
-     */
+    /** @return Clause[] */
     public function clause(): array
     {
         return $this->clause;

@@ -10,19 +10,9 @@ use WyriHaximus\React\SimpleORM\Query\WhereInterface;
 
 final class Field implements WhereInterface
 {
-    private string $field;
-    private string $criteria;
-    /** @var mixed[]  */
-    private array $criteriaArguments = [];
-
-    /**
-     * @param mixed[] $criteriaArguments
-     */
-    public function __construct(string $field, string $criteria, array $criteriaArguments)
+    /** @param mixed[] $criteriaArguments */
+    public function __construct(private string $field, private string $criteria, private array $criteriaArguments = [])
     {
-        $this->field             = $field;
-        $this->criteria          = $criteria;
-        $this->criteriaArguments = $criteriaArguments;
     }
 
     public function field(): string

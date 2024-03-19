@@ -9,9 +9,7 @@ use WyriHaximus\React\SimpleORM\Entity\Join;
 
 final class LazyInspectedEntity implements InspectedEntityInterface
 {
-    private string $class;
-
-    private ?string $table = null;
+    private string|null $table = null;
 
     /** @var Field[] */
     private array $fields = [];
@@ -19,11 +17,10 @@ final class LazyInspectedEntity implements InspectedEntityInterface
     /** @var Join[] */
     private array $joins = [];
 
-    private ?EntityInspector $entityInspector = null;
+    private EntityInspector|null $entityInspector = null;
 
-    public function __construct(EntityInspector $entityInspector, string $class)
+    public function __construct(EntityInspector $entityInspector, private string $class)
     {
-        $this->class           = $class;
         $this->entityInspector = $entityInspector;
     }
 
@@ -32,9 +29,7 @@ final class LazyInspectedEntity implements InspectedEntityInterface
         return $this->class;
     }
 
-    /**
-     * @psalm-suppress InvalidNullableReturnType
-     */
+    /** @psalm-suppress InvalidNullableReturnType */
     public function table(): string
     {
         if ($this->table === null) {
@@ -48,9 +43,7 @@ final class LazyInspectedEntity implements InspectedEntityInterface
         return $this->table;
     }
 
-    /**
-     * @return Field[]
-     */
+    /** @return Field[] */
     public function fields(): array
     {
         if ($this->table === null) {
@@ -60,9 +53,7 @@ final class LazyInspectedEntity implements InspectedEntityInterface
         return $this->fields;
     }
 
-    /**
-     * @return Join[]
-     */
+    /** @return Join[] */
     public function joins(): array
     {
         if ($this->table === null) {

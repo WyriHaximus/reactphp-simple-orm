@@ -10,6 +10,7 @@ use Latitude\QueryBuilder\ExpressionInterface;
 use Latitude\QueryBuilder\QueryFactory;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use Rx\Observable;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\ClientInterface;
 use WyriHaximus\React\SimpleORM\Configuration;
@@ -21,13 +22,16 @@ use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
-use function ApiClients\Tools\Rx\observableFromArray;
 use function assert;
+use function React\Async\await;
 use function Safe\date;
 use function strpos;
 
 final class RepositoryTest extends AsyncTestCase
 {
+    /**
+     * @var ObjectProphecy<ClientInterface>
+     */
     private ObjectProphecy $client;
 
     protected function setUp(): void
@@ -46,20 +50,19 @@ final class RepositoryTest extends AsyncTestCase
             self::assertStringContainsString('COUNT(*) AS "count"', $query);
 
             return true;
-        }))->shouldBeCalled()->willReturn(observableFromArray([
+        }))->shouldBeCalled()->willReturn(Observable::fromArray([
             ['count' => '123'],
         ]));
 
         $client = $this->client->reveal();
-        assert($client instanceof ClientInterface);
 
         $repository = new Repository(
             (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(UserStub::class),
             $client,
-            new QueryFactory()
+            new QueryFactory(),
         );
 
-        self::assertSame(123, $this->await($repository->count()));
+        self::assertSame(123, await($repository->count()));
     }
 
     public function testCountWithContraints(): void
@@ -72,20 +75,19 @@ final class RepositoryTest extends AsyncTestCase
             self::assertStringContainsString('WHERE "t0"."field" = ?', $query);
 
             return true;
-        }))->shouldBeCalled()->willReturn(observableFromArray([
+        }))->shouldBeCalled()->willReturn(Observable::fromArray([
             ['count' => '123'],
         ]));
 
         $client = $this->client->reveal();
-        assert($client instanceof ClientInterface);
 
         $repository = new Repository(
             (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(UserStub::class),
             $client,
-            new QueryFactory()
+            new QueryFactory(),
         );
 
-        self::assertSame(123, $this->await($repository->count(
+        self::assertSame(123, await($repository->count(
             new Where(
                 new Where\Field('field', 'eq', ['values']),
             ),
@@ -105,21 +107,20 @@ final class RepositoryTest extends AsyncTestCase
             self::assertStringNotContainsString('LEFT JOIN comments', $query);
 
             return true;
-        }))->shouldBeCalled()->willReturn(observableFromArray([
+        }))->shouldBeCalled()->willReturn(Observable::fromArray([
             ['count' => '123'],
             ['count' => '456'],
         ]));
 
         $client = $this->client->reveal();
-        assert($client instanceof ClientInterface);
 
         $repository = new Repository(
             (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(BlogPostStub::class),
             $client,
-            new QueryFactory()
+            new QueryFactory(),
         );
 
-        self::assertSame(123, $this->await($repository->count()));
+        self::assertSame(123, await($repository->count()));
     }
 
     public function testFetchWithJoins(): void
@@ -147,7 +148,7 @@ final class RepositoryTest extends AsyncTestCase
             self::assertStringNotContainsString('FROM "comments"', $query);
 
             return true;
-        }))->shouldBeCalled()->willReturn(observableFromArray([
+        }))->shouldBeCalled()->willReturn(Observable::fromArray([
             [
                 't0___id' => '98ce9eaf-b38b-4a51-93ed-131ffac4051e',
                 't0___title' => 'blog_post_title',
@@ -165,15 +166,14 @@ final class RepositoryTest extends AsyncTestCase
         ]));
 
         $client = $this->client->reveal();
-        assert($client instanceof ClientInterface);
 
         $repository = new Repository(
             (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(BlogPostStub::class),
             $client,
-            new QueryFactory()
+            new QueryFactory(),
         );
 
-        $blogPost = $this->await($repository->fetch(new Where(
+        $blogPost = await($repository->fetch(new Where(
             new Where\Field('id', 'eq', ['98ce9eaf-b38b-4a51-93ed-131ffac4051e']),
         ), new Order(
             new Order\Desc('id'),
@@ -192,10 +192,9 @@ final class RepositoryTest extends AsyncTestCase
     public function testFetchWithJoinsLazyLoadComments(): void
     {
         $client = $this->client->reveal();
-        assert($client instanceof ClientInterface);
 
         $this->client->repository(CommentStub::class)->shouldBeCalled()->willReturn(
-            new Repository((new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(CommentStub::class), $client, new QueryFactory())
+            new Repository((new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(CommentStub::class), $client, new QueryFactory()),
         );
 
         $this->client->query(Argument::that(static function (ExpressionInterface $expression): bool {
@@ -224,7 +223,7 @@ final class RepositoryTest extends AsyncTestCase
             self::assertStringNotContainsString('FROM "comments"', $query);
 
             return true;
-        }))->shouldBeCalled()->willReturn(observableFromArray([
+        }))->shouldBeCalled()->willReturn(Observable::fromArray([
             [
                 't0___id' => '99d00028-28d6-4194-b377-a0039b278c4d',
                 't0___author_id' => '3fbf8eec-8a3f-4b01-ba9a-355f6650644b',
@@ -258,7 +257,7 @@ final class RepositoryTest extends AsyncTestCase
             self::assertStringContainsString('"t0"."blog_post_id" = ?', $query);
 
             return true;
-        }))->shouldBeCalled()->willReturn(observableFromArray([
+        }))->shouldBeCalled()->willReturn(Observable::fromArray([
             [
                 't0___id' => '99d00028-28d6-4194-b377-a0039b278c4d',
                 't0___author_id' => 'd45e8a1b-b962-4c1b-a7e7-c867fa06ffa7',
@@ -345,10 +344,10 @@ final class RepositoryTest extends AsyncTestCase
         $repository = new Repository(
             (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(BlogPostStub::class),
             $client,
-            new QueryFactory()
+            new QueryFactory(),
         );
 
-        $blogPost = $this->await($repository->fetch(new Where(
+        $blogPost = await($repository->fetch(new Where(
             new Where\Field('id', 'eq', ['99d00028-28d6-4194-b377-a0039b278c4d']),
         ), new Order(
             new Order\Desc('id'),
@@ -363,7 +362,7 @@ final class RepositoryTest extends AsyncTestCase
         self::assertSame('publisher_name', $blogPost->getPublisher()->getName());
 
         /** @var CommentStub[] $comments */
-        $comments = $this->await($blogPost->getComments()->toArray()->toPromise());
+        $comments = await($blogPost->getComments()->toArray()->toPromise());
 
         self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[0]->id());
         self::assertSame('d45e8a1b-b962-4c1b-a7e7-c867fa06ffa7', $comments[0]->getAuthor()->id());

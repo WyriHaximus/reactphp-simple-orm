@@ -20,13 +20,10 @@ use const WyriHaximus\Constants\Numeric\ZERO;
 
 final class Postgres implements AdapterInterface
 {
-    private PgClient $client;
-
     private EngineInterface $engine;
 
-    public function __construct(PgClient $client)
+    public function __construct(private PgClient $client)
     {
-        $this->client = $client;
         $this->engine = new PostgresEngine();
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WyriHaximus\React\Tests\SimpleORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Rx\Observable;
 use WyriHaximus\React\SimpleORM\Configuration;
 use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\SimpleORM\Hydrator;
@@ -12,16 +13,13 @@ use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 use WyriHaximus\TestUtilities\TestCase;
 
-use function ApiClients\Tools\Rx\observableFromArray;
 use function assert;
 use function bin2hex;
 use function random_bytes;
 use function React\Promise\resolve;
 use function Safe\date;
 
-/**
- * @internal
- */
+/** @internal */
 final class HydratorTest extends TestCase
 {
     public function testHydrate(): void
@@ -35,7 +33,7 @@ final class HydratorTest extends TestCase
                 'id' => $id,
                 'name' => $title,
                 'zelf' => resolve(true),
-            ]
+            ],
         );
         assert($entity instanceof UserStub);
 
@@ -56,7 +54,7 @@ final class HydratorTest extends TestCase
                 'name' => $title,
                 'zelf' => resolve(true),
                 'alsodoesnotexist' => resolve(true),
-            ]
+            ],
         );
         assert($entity instanceof UserStub);
 
@@ -97,9 +95,9 @@ final class HydratorTest extends TestCase
                     'name' => $publisherName,
                     'zelf' => resolve(true),
                 ],
-                'comments' => observableFromArray([]),
+                'comments' => Observable::fromArray([]),
                 'alsodoesnotexist' => resolve(true),
-            ]
+            ],
         );
         assert($entity instanceof BlogPostStub);
 
@@ -144,8 +142,8 @@ final class HydratorTest extends TestCase
                     'name' => $publisherName,
                     'zelf' => resolve(true),
                 ],
-                'comments' => observableFromArray([]),
-            ]
+                'comments' => Observable::fromArray([]),
+            ],
         );
         assert($entity instanceof BlogPostStub);
 

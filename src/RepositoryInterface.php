@@ -10,26 +10,49 @@ use WyriHaximus\React\SimpleORM\Query\Order;
 use WyriHaximus\React\SimpleORM\Query\SectionInterface;
 use WyriHaximus\React\SimpleORM\Query\Where;
 
+/**
+ * @template T
+ */
 interface RepositoryInterface
 {
     public const DEFAULT_PER_PAGE = 50;
 
-    /** @phpstan-ignore-next-line */
-    public function count(?Where $where = null): PromiseInterface;
+    /**
+     * @return PromiseInterface<int>
+     * @phpstan-ignore-next-line
+     *
+     */
+    public function count(Where $where = null): PromiseInterface;
 
-    /** @phpstan-ignore-next-line */
-    public function page(int $page, ?Where $where = null, ?Order $order = null, int $perPage = self::DEFAULT_PER_PAGE): Observable;
+    /**
+     * @return Observable<T>
+     * @phpstan-ignore-next-line
+     */
+    public function page(int $page, Where $where = null, Order $order = null, int $perPage = self::DEFAULT_PER_PAGE): Observable;
 
+    /**
+     * @return Observable<T>
+     */
     public function fetch(SectionInterface ...$sections): Observable;
 
+    /**
+     * @return Observable<T>
+     */
     public function stream(SectionInterface ...$sections): Observable;
 
     /**
      * @param array<string, mixed> $fields
+     * @return PromiseInterface<T>
      */
     public function create(array $fields): PromiseInterface;
 
+    /**
+     * @return PromiseInterface<T>
+     */
     public function update(EntityInterface $entity): PromiseInterface;
 
+    /**
+     * @return PromiseInterface<null>
+     */
     public function delete(EntityInterface $entity): PromiseInterface;
 }
