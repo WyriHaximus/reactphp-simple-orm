@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
-use Doctrine\Common\Annotations\Reader;
 use ReflectionClass;
 use Roave\BetterReflection\BetterReflection;
 use Roave\BetterReflection\Reflection\ReflectionProperty;
 use RuntimeException;
-use WyriHaximus\React\SimpleORM\Annotation\JoinInterface;
-use WyriHaximus\React\SimpleORM\Annotation\Table;
+use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
+use WyriHaximus\React\SimpleORM\Attribute\Table;
 use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\Join;
 
 use function array_key_exists;
+use function count;
 use function current;
 use function method_exists;
 
@@ -23,34 +23,27 @@ final class EntityInspector
     /** @var InspectedEntityInterface[] */
     private array $entities = [];
 
-    public function __construct(private Configuration $configuration, private Reader $annotationReader)
+    public function __construct(private Configuration $configuration)
     {
     }
 
     public function entity(string $entity): InspectedEntityInterface
     {
         if (! array_key_exists($entity, $this->entities)) {
-            /**
-             * @phpstan-ignore-next-line
-             * @psalm-suppress ArgumentTypeCoercion
-             */
             $class           = new ReflectionClass($entity);
-            $tableAnnotation = $this->annotationReader->getClassAnnotation($class, Table::class);
+            $tableAttributes = $class->getAttributes(Table::class);
 
-            if ($tableAnnotation instanceof Table === false) {
+            if (count($tableAttributes) === 0) {
                 throw new RuntimeException('Missing Table annotation on entity: ' . $entity);
             }
 
-            /**
-             * @phpstan-ignore-next-line
-             * @psalm-suppress ArgumentTypeCoercion
-             */
-            $joins = [...$this->joins($class)];
-            /** @psalm-suppress ArgumentTypeCoercion */
+            $tableAttribute = current($tableAttributes)->newInstance();
+
+            $joins                   = [...$this->joins($class)];
             $this->entities[$entity] = new InspectedEntity(
                 $entity,
-                $this->configuration->tablePrefix() . $tableAnnotation->table(),
-                [...$this->fields($class, $joins)], /** @phpstan-ignore-line */
+                $this->configuration->tablePrefix() . $tableAttribute->table,
+                [...$this->fields($class, $joins)],
                 $joins,
             );
         }
@@ -105,20 +98,25 @@ final class EntityInspector
      */
     private function joins(ReflectionClass $class): iterable
     {
-        $annotations = $this->annotationReader->getClassAnnotations($class);
-
-        foreach ($annotations as $annotation) {
+        foreach ($class->getAttributes() as $attribute) {
+            $annotation = $attribute->newInstance();
             if ($annotation instanceof JoinInterface === false) {
                 continue;
             }
 
-            yield $annotation->property() => new Join(
-                new LazyInspectedEntity($this, $annotation->entity()),
-                $annotation->type(),
-                $annotation->property(),
-                $annotation->lazy(),
-                ...$annotation->clause(),
-            );
+            yield from $this->join($annotation);
         }
+    }
+
+    /** @return iterable<string, Join> */
+    private function join(JoinInterface $join): iterable
+    {
+        yield $join->property => new Join(
+            new LazyInspectedEntity($this, $join->entity),
+            $join->type,
+            $join->property,
+            $join->lazy,
+            ...$join->clause,
+        );
     }
 }

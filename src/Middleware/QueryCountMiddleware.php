@@ -11,8 +11,8 @@ use Rx\Subject\Subject;
 use Throwable;
 use WyriHaximus\React\SimpleORM\MiddlewareInterface;
 
-use function Safe\hrtime;
 use function React\Promise\resolve;
+use function Safe\hrtime;
 
 final class QueryCountMiddleware implements MiddlewareInterface
 {

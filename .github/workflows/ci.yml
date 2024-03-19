@@ -16,4 +16,4 @@ jobs:
     name: Continuous Integration
     uses: WyriHaximus/github-workflows/.github/workflows/package.yaml@main
     with:
-      services: "{\"postgres\":{\"image\":\"postgres:\$\{\{ matrix.postgres \}\}\",\"env\":{\"POSTGRES_PASSWORD\":\"postgres\"},\"options\":\"--health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5\"}}"
+      services: "{\"postgres\":{\"image\":\"postgres:${{ matrix.postgres }}\",\"env\":{\"POSTGRES_PASSWORD\":\"postgres\"},\"options\":\"--health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5\"}}"

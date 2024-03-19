@@ -7,74 +7,72 @@ namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
 use Safe\DateTimeImmutable;
-use WyriHaximus\React\SimpleORM\Annotation\Clause;
-use WyriHaximus\React\SimpleORM\Annotation\InnerJoin;
-use WyriHaximus\React\SimpleORM\Annotation\LeftJoin;
-use WyriHaximus\React\SimpleORM\Annotation\Table;
+use WyriHaximus\React\SimpleORM\Attribute\Clause;
+use WyriHaximus\React\SimpleORM\Attribute\InnerJoin;
+use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
+use WyriHaximus\React\SimpleORM\Attribute\LeftJoin;
+use WyriHaximus\React\SimpleORM\Attribute\Table;
 use WyriHaximus\React\SimpleORM\EntityInterface;
 use WyriHaximus\React\SimpleORM\Tools\WithFieldsTrait;
 
-/**
- * @Table("blog_posts")
- * @LeftJoin(
-        nonExistingProperty="fake",
-        entity=CommentStub::class,
-        clause={
-            @Clause(
-                local_key="id",
-                local_cast="BIGINT",
-                foreign_key="blog_post_id",
-            )
-        },
-        property="comments",
-        lazy=LeftJoin::IS_LAZY
- * )
- * @InnerJoin(
-        entity=UserStub::class,
-        clause={
-            @Clause(
-                local_key="author_id",
-                foreign_key="id",
-            )
-        },
-        property="author",
-        lazy=InnerJoin::IS_NOT_LAZY
- * )
- * @InnerJoin(
-        entity=UserStub::class,
-        clause={
-            @Clause(
-                local_key="publisher_id",
-                foreign_key="id",
-            )
-        },
-        property="publisher",
-        lazy=InnerJoin::IS_NOT_LAZY
- * )
- * @InnerJoin(
-        entity=BlogPostStub::class,
-        clause={
-            @Clause(
-                local_key="previous_blog_post_id",
-                foreign_key="id",
-           )
-        },
-        property="previous_blog_post",
-        lazy=InnerJoin::IS_LAZY
- * )
- * @InnerJoin(
-        entity=BlogPostStub::class,
-        clause={
-            @Clause(
-                local_key="next_blog_post_id",
-                foreign_key="id",
-            )
-        },
-        property="next_blog_post",
-       lazy=InnerJoin::IS_NOT_LAZY
- * )
- */
-final class BlogPostStub implements EntityInterface
+#[Table('blog_posts')]
+#[LeftJoin(
+    entity: CommentStub::class,
+    clause: [
+        new Clause(
+            localKey: 'id',
+            localCast: 'BIGINT',
+            foreignKey: 'blog_post_id',
+        ),
+    ],
+    property: 'comments',
+    lazy: JoinInterface::IS_LAZY,
+)]
+#[InnerJoin(
+    entity: UserStub::class,
+    clause: [
+        new Clause(
+            localKey: 'author_id',
+            foreignKey: 'id',
+        ),
+    ],
+    property: 'author',
+    lazy: JoinInterface::IS_LAZY,
+)]
+#[InnerJoin(
+    entity: UserStub::class,
+    clause: [
+        new Clause(
+            localKey: 'publisher_id',
+            foreignKey: 'id',
+        ),
+    ],
+    property: 'publisher',
+    lazy: JoinInterface::IS_LAZY,
+)]
+#[InnerJoin(
+    entity: BlogPostStub::class,
+    clause: [
+        new Clause(
+            localKey: 'previous_blog_post_id',
+            foreignKey: 'id',
+        ),
+    ],
+    property: 'previous_blog_post',
+    lazy: JoinInterface::IS_LAZY,
+)]
+#[InnerJoin(
+    entity: BlogPostStub::class,
+    clause: [
+        new Clause(
+            localKey: 'next_blog_post_id',
+            foreignKey: 'id',
+        ),
+    ],
+    property: 'next_blog_post',
+    lazy: JoinInterface::IS_LAZY,
+)]
+final readonly class BlogPostStub implements EntityInterface
 {
     use WithFieldsTrait;
 
@@ -121,9 +119,7 @@ final class BlogPostStub implements EntityInterface
         return $this->id;
     }
 
-    /**
-     * @return PromiseInterface<BlogPostStub>
-     */
+    /** @return PromiseInterface<BlogPostStub> */
     public function getPreviousBlogPost(): PromiseInterface
     {
         //phpcs:disable
@@ -131,9 +127,7 @@ final class BlogPostStub implements EntityInterface
         //phpcs:enable
     }
 
-    /**
-     * @return PromiseInterface<BlogPostStub>
-     */
+    /** @return PromiseInterface<BlogPostStub> */
     public function getNextBlogPost(): PromiseInterface
     {
         //phpcs:disable

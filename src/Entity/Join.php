@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Entity;
 
-use WyriHaximus\React\SimpleORM\Annotation\Clause;
+use WyriHaximus\React\SimpleORM\Attribute\Clause;
 use WyriHaximus\React\SimpleORM\InspectedEntityInterface;
 
 final class Join

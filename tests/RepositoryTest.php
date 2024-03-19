@@ -29,9 +29,7 @@ use function strpos;
 
 final class RepositoryTest extends AsyncTestCase
 {
-    /**
-     * @var ObjectProphecy<ClientInterface>
-     */
+    /** @var ObjectProphecy<ClientInterface> */
     private ObjectProphecy $client;
 
     protected function setUp(): void

@@ -6,10 +6,12 @@ namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
 use WyriHaximus\React\SimpleORM\EntityInterface;
 
-final class NoSQLStub implements EntityInterface
+final readonly class NoSQLStub implements EntityInterface
 {
-    public function id(): string
+    public string $id;
+
+    public function __construct()
     {
-        return '';
+        $this->id = '';
     }
 }
