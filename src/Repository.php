@@ -53,8 +53,6 @@ final class Repository implements RepositoryInterface
     private const SINGLE                    = 1;
     private const STREAM_PER_PAGE           = 100;
 
-    private Hydrator $hydrator;
-
     /** @var ExpressionInterface[] */
     private array $fields = [];
 
@@ -66,8 +64,8 @@ final class Repository implements RepositoryInterface
         private ClientInterface $client,
         private QueryFactory $queryFactory,
         private Connection $connection,
+        private Hydrator $hydrator,
     ) {
-        $this->hydrator = new Hydrator();
     }
 
     /** @return PromiseInterface<int> */
@@ -177,7 +175,7 @@ final class Repository implements RepositoryInterface
     /** @return PromiseInterface<T> */
     public function update(EntityInterface $entity): PromiseInterface
     {
-        $fields             = $this->hydrator->extract($this->entity, $entity);
+        $fields             = $this->hydrator->extract($entity);
         $fields['modified'] = new DateTimeImmutable();
         $fields             = $this->prepareFields($fields);
 
@@ -285,13 +283,13 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
-            $tableKey = spl_object_hash($join->entity()) . '___' . $join->property();
+            $tableKey = spl_object_hash($join->entity) . '___' . $join->property;
             if (! array_key_exists($tableKey, $this->tableAliases)) {
                 $this->tableAliases[$tableKey] = 't' . $i++;
             }
 
             $clauses = null;
-            foreach ($join->clause() as $clause) {
+            foreach ($join->clause as $clause) {
                 $onLeftSide = $this->tableAliases[$tableKey] . '.' . $clause->foreignKey;
                 if ($clause->foreignFunction !== null) {
                     /** @psalm-suppress PossiblyNullOperand */
@@ -328,20 +326,20 @@ final class Repository implements RepositoryInterface
                 /** @psalm-suppress PossiblyNullArgument */
                 $query = $query->innerJoin(
                     alias(
-                        $join->entity()->table(),
+                        $join->entity->table(),
                         $this->tableAliases[$tableKey],
                     ),
                     $clauses,
                 );
             }
 
-            foreach ($join->entity()->fields() as $field) {
+            foreach ($join->entity->fields() as $field) {
                 $this->fields[$this->tableAliases[$tableKey] . '___' . $field->name()] = alias($this->tableAliases[$tableKey] . '.' . $field->name(), $this->tableAliases[$tableKey] . '___' . $field->name());
             }
 
-            unset($this->fields[$entity->table() . '___' . $join->property()]);
+            unset($this->fields[$entity->table() . '___' . $join->property]);
 
-            $query = $this->buildJoins($query, $join->entity(), $i, $join->property());
+            $query = $this->buildJoins($query, $join->entity, $i, $join->property);
         }
 
         return $query;

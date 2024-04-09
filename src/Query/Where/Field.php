@@ -8,11 +8,14 @@ use Latitude\QueryBuilder\Builder\CriteriaBuilder;
 use Latitude\QueryBuilder\CriteriaInterface;
 use WyriHaximus\React\SimpleORM\Query\WhereInterface;
 
-final class Field implements WhereInterface
+final readonly class Field implements WhereInterface
 {
     /** @param mixed[] $criteriaArguments */
-    public function __construct(private string $field, private string $criteria, private array $criteriaArguments = [])
-    {
+    public function __construct(
+        private string $field,
+        private string $criteria,
+        private array $criteriaArguments = [], /** @phpstan-ignore-line */
+    ) {
     }
 
     public function field(): string

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
+use EventSauce\ObjectHydrator\MapFrom;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
-use Safe\DateTimeImmutable;
 use WyriHaximus\React\SimpleORM\Attribute\Clause;
 use WyriHaximus\React\SimpleORM\Attribute\InnerJoin;
 use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
@@ -21,8 +21,8 @@ use WyriHaximus\React\SimpleORM\Tools\WithFieldsTrait;
     clause: [
         new Clause(
             localKey: 'id',
-            localCast: 'BIGINT',
             foreignKey: 'blog_post_id',
+            localCast: 'BIGINT',
         ),
     ],
     property: 'comments',
@@ -76,110 +76,30 @@ final readonly class BlogPostStub implements EntityInterface
 {
     use WithFieldsTrait;
 
-    //phpcs:disable
-    protected string $id;
-
-    protected ?string $previous_blog_post_id = null;
-
     /**
-     * @var PromiseInterface<BlogPostStub>
+     * @param PromiseInterface<BlogPostStub> $previousBlogPost
+     * @param PromiseInterface<BlogPostStub> $nextBlogPost
      */
-    protected PromiseInterface $previous_blog_post;
-
-    protected ?string $next_blog_post_id = null;
-
-    /**
-     * @var PromiseInterface<BlogPostStub>
-     */
-    protected PromiseInterface $next_blog_post;
-
-    protected string $author_id;
-
-    protected string $publisher_id;
-
-    protected string $title;
-
-    protected string $contents;
-
-    protected UserStub $author;
-
-    protected UserStub $publisher;
-
-    protected Observable $comments;
-
-    protected int $views;
-
-    protected string $created;
-
-    protected string $modified;
-    //phpcs:enable
-
-    public function id(): string
-    {
-        return $this->id;
-    }
-
-    /** @return PromiseInterface<BlogPostStub> */
-    public function getPreviousBlogPost(): PromiseInterface
-    {
-        //phpcs:disable
-        return $this->previous_blog_post;
-        //phpcs:enable
-    }
-
-    /** @return PromiseInterface<BlogPostStub> */
-    public function getNextBlogPost(): PromiseInterface
-    {
-        //phpcs:disable
-        return $this->next_blog_post;
-        //phpcs:enable
-    }
-
-    public function getAuthor(): UserStub
-    {
-        return $this->author;
-    }
-
-    public function getPublisher(): UserStub
-    {
-        return $this->publisher;
-    }
-
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    public function getContents(): string
-    {
-        return $this->contents;
-    }
-
-    public function getComments(): Observable
-    {
-        return $this->comments;
-    }
-
-    public function getViews(): int
-    {
-        return $this->views;
-    }
-
-    public function withViews(int $views): self
-    {
-        $clone        = clone $this;
-        $clone->views = $views;
-
-        return $clone;
-    }
-
-    public function getCreated(): DateTimeImmutable
-    {
-        return new DateTimeImmutable($this->created);
-    }
-
-    public function getModified(): DateTimeImmutable
-    {
-        return new DateTimeImmutable($this->modified);
+    public function __construct( /** @phpstan-ignore-line */
+        public string $id,
+        #[MapFrom('previous_blog_post_id')]
+        public string|null $previousBlogPostId,
+        public PromiseInterface $previousBlogPost,
+        #[MapFrom('next_blog_post_id')]
+        public string|null $nextBlogPostId,
+        public PromiseInterface $nextBlogPost,
+        #[MapFrom('author_id')]
+        public string $authorId,
+        #[MapFrom('publisher_id')]
+        public string $publisherId,
+        public string $title,
+        public string $contents,
+        public UserStub $author,
+        public UserStub $publisher,
+        public Observable $comments,
+        public int $views,
+        public string $created,
+        public string $modified,
+    ) {
     }
 }

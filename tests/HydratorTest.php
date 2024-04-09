@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Rx\Observable;
 use WyriHaximus\React\SimpleORM\Configuration;
 use WyriHaximus\React\SimpleORM\EntityInspector;
@@ -19,16 +18,18 @@ use function random_bytes;
 use function React\Promise\resolve;
 use function Safe\date;
 
-/** @internal */
 final class HydratorTest extends TestCase
 {
-    public function testHydrate(): void
+    /**
+     * @test
+     */
+    public function hydrate(): void
     {
         $id    = '03450173-fef3-42c0-83c4-dfcfa4a474ee';
         $title = 'tables.title';
 
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(UserStub::class),
+            (new EntityInspector(new Configuration('')))->entity(UserStub::class),
             [
                 'id' => $id,
                 'name' => $title,
@@ -37,17 +38,20 @@ final class HydratorTest extends TestCase
         );
         assert($entity instanceof UserStub);
 
-        self::assertSame($id, $entity->id());
-        self::assertSame($title, $entity->getName());
+        self::assertSame($id, $entity->id);
+        self::assertSame($title, $entity->name);
     }
 
-    public function testHydrateIgnoringNonExistingFields(): void
+    /**
+     * @test
+     */
+    public function hydrateIgnoringNonExistingFields(): void
     {
         $id    = '03450173-fef3-42c0-83c4-dfcfa4a474ee';
         $title = 'tables.title';
 
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(UserStub::class),
+            (new EntityInspector(new Configuration('')))->entity(UserStub::class),
             [
                 'doesnotexist' => resolve(true),
                 'id' => $id,
@@ -58,11 +62,14 @@ final class HydratorTest extends TestCase
         );
         assert($entity instanceof UserStub);
 
-        self::assertSame($id, $entity->id());
-        self::assertSame($title, $entity->getName());
+        self::assertSame($id, $entity->id);
+        self::assertSame($title, $entity->name);
     }
 
-    public function testHydrateWithJoins(): void
+    /**
+     * @test
+     */
+    public function hydrateWithJoins(): void
     {
         $id            = '6bda4f06-4b7e-4cd5-b779-66a1b76187f9';
         $title         = 'null';
@@ -72,14 +79,14 @@ final class HydratorTest extends TestCase
         $publisherName = 'dasdsadas';
 
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(BlogPostStub::class),
+            (new EntityInspector(new Configuration('')))->entity(BlogPostStub::class),
             [
                 'doesnotexist' => resolve(true),
                 'id' => $id,
                 'author_id' => $authorId,
                 'publisher_id' => $publisherId,
                 'contents' => bin2hex(random_bytes(133)),
-                'views' => '133',
+                'views' => 133,
                 'created' => date('Y-m-d H:i:s e'),
                 'modified' => date('Y-m-d H:i:s e'),
                 'previous_blog_post' => resolve(null),
@@ -101,16 +108,19 @@ final class HydratorTest extends TestCase
         );
         assert($entity instanceof BlogPostStub);
 
-        self::assertSame($id, $entity->id());
-        self::assertSame($title, $entity->getTitle());
-        self::assertSame($authorId, $entity->getAuthor()->id());
-        self::assertSame($authorName, $entity->getAuthor()->getName());
-        self::assertSame($publisherId, $entity->getPublisher()->id());
-        self::assertSame($publisherName, $entity->getPublisher()->getName());
-        self::assertSame(133, $entity->getViews());
+        self::assertSame($id, $entity->id);
+        self::assertSame($title, $entity->title);
+        self::assertSame($authorId, $entity->author->id);
+        self::assertSame($authorName, $entity->author->name);
+        self::assertSame($publisherId, $entity->publisher->id);
+        self::assertSame($publisherName, $entity->publisher->name);
+        self::assertSame(133, $entity->views);
     }
 
-    public function testHydrateWithJoinsIgnoringNonExistingFields(): void
+    /**
+     * @test
+     */
+    public function hydrateWithJoinsIgnoringNonExistingFields(): void
     {
         $id            = '6bda4f06-4b7e-4cd5-b779-66a1b76187f9';
         $title         = 'null';
@@ -120,13 +130,13 @@ final class HydratorTest extends TestCase
         $publisherName = 'dasdsadas';
 
         $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new Configuration(''), new AnnotationReader()))->entity(BlogPostStub::class),
+            (new EntityInspector(new Configuration('')))->entity(BlogPostStub::class),
             [
                 'id' => $id,
                 'author_id' => $authorId,
                 'publisher_id' => $publisherId,
                 'contents' => bin2hex(random_bytes(133)),
-                'views' => '133',
+                'views' => 133,
                 'created' => date('Y-m-d H:i:s e'),
                 'modified' => date('Y-m-d H:i:s e'),
                 'previous_blog_post' => resolve(null),
@@ -147,12 +157,12 @@ final class HydratorTest extends TestCase
         );
         assert($entity instanceof BlogPostStub);
 
-        self::assertSame($id, $entity->id());
-        self::assertSame($title, $entity->getTitle());
-        self::assertSame($authorId, $entity->getAuthor()->id());
-        self::assertSame($authorName, $entity->getAuthor()->getName());
-        self::assertSame($publisherId, $entity->getPublisher()->id());
-        self::assertSame($publisherName, $entity->getPublisher()->getName());
-        self::assertSame(133, $entity->getViews());
+        self::assertSame($id, $entity->id);
+        self::assertSame($title, $entity->title);
+        self::assertSame($authorId, $entity->author->id);
+        self::assertSame($authorName, $entity->author->name);
+        self::assertSame($publisherId, $entity->publisher->id);
+        self::assertSame($publisherName, $entity->publisher->name);
+        self::assertSame(133, $entity->views);
     }
 }

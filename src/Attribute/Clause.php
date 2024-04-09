@@ -6,7 +6,7 @@ namespace WyriHaximus\React\SimpleORM\Attribute;
 
 final readonly class Clause
 {
-    public function __construct(
+    public function __construct( /** @phpstan-ignore-line */
         public string $localKey,
         public string $foreignKey,
         public string|null $localCast = null,
