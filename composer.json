@@ -29,7 +29,7 @@
     "robmorgan/phinx": "^0.12.11",
     "symfony/yaml": "^5.4",
     "vlucas/phpdotenv": "^5.4",
-    "wyrihaximus/async-test-utilities": "^7.2"
+    "wyrihaximus/async-test-utilities": "^8.0.1"
   },
   "autoload": {
     "psr-4": {

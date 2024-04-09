@@ -29,26 +29,11 @@ final readonly class UserStub implements EntityInterface
 {
     use WithFieldsTrait;
 
-    protected string $id;
-
-    protected string $name;
-
-    /** @var PromiseInterface<UserStub> */
-    protected PromiseInterface $zelf;
-
-    public function id(): string
-    {
-        return $this->id;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /** @return PromiseInterface<UserStub> */
-    public function getZelf(): PromiseInterface
-    {
-        return $this->zelf;
+    /** @param PromiseInterface<UserStub> $zelf */
+    public function __construct(
+        public string $id,
+        public string $name,
+        public PromiseInterface $zelf,
+    ) {
     }
 }

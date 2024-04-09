@@ -14,11 +14,14 @@ final class Client implements ClientInterface
 {
     private EntityInspector $entityInspector;
 
+    /** @var array<RepositoryInterface> */
     private array $repositories = [];
 
     private Connection $connection;
 
     private QueryFactory $queryFactory;
+
+    private Hydrator $hydrator;
 
     public static function create(AdapterInterface $adapter, Configuration $configuration, MiddlewareInterface ...$middleware): self
     {
@@ -31,6 +34,7 @@ final class Client implements ClientInterface
         $this->queryFactory    = new QueryFactory($adapter->engine());
 
         $this->connection = new Connection($this->adapter, new MiddlewareRunner(...$middleware));
+        $this->hydrator   = new Hydrator();
     }
 
     /**
@@ -43,7 +47,13 @@ final class Client implements ClientInterface
     public function repository(string $entity): RepositoryInterface
     {
         if (! array_key_exists($entity, $this->repositories)) {
-            $this->repositories[$entity] = new Repository($this->entityInspector->entity($entity), $this, $this->queryFactory, $this->connection);
+            $this->repositories[$entity] = new Repository(
+                $this->entityInspector->entity($entity),
+                $this,
+                $this->queryFactory,
+                $this->connection,
+                $this->hydrator,
+            );
         }
 
         return $this->repositories[$entity];

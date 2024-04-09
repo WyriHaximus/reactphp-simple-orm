@@ -9,11 +9,14 @@ use Latitude\QueryBuilder\CriteriaInterface;
 use Latitude\QueryBuilder\ExpressionInterface;
 use WyriHaximus\React\SimpleORM\Query\WhereInterface;
 
-final class Expression implements WhereInterface
+final readonly class Expression implements WhereInterface
 {
-    /** @param mixed[] $criteriaArguments */
-    public function __construct(private ExpressionInterface $expression, private string $criteria, private array $criteriaArguments = [])
-    {
+    /** @param array<mixed> $criteriaArguments */
+    public function __construct(
+        private ExpressionInterface $expression,
+        private string $criteria,
+        private array $criteriaArguments = [], /** @phpstan-ignore-line */
+    ) {
     }
 
     public function expression(): ExpressionInterface

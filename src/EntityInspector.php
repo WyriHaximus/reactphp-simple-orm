@@ -23,10 +23,18 @@ final class EntityInspector
     /** @var InspectedEntityInterface[] */
     private array $entities = [];
 
-    public function __construct(private Configuration $configuration)
-    {
+    public function __construct(
+        private Configuration $configuration,
+    ) {
     }
 
+    /**
+     * @param class-string<T> $entity
+     *
+     * @return InspectedEntityInterface<T>
+     *
+     * @template T
+     */
     public function entity(string $entity): InspectedEntityInterface
     {
         if (! array_key_exists($entity, $this->entities)) {
@@ -42,7 +50,7 @@ final class EntityInspector
             $joins                   = [...$this->joins($class)];
             $this->entities[$entity] = new InspectedEntity(
                 $entity,
-                $this->configuration->tablePrefix() . $tableAttribute->table,
+                $this->configuration->tablePrefix . $tableAttribute->table,
                 [...$this->fields($class, $joins)],
                 $joins,
             );

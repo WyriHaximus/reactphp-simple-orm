@@ -7,39 +7,23 @@ namespace WyriHaximus\React\SimpleORM\Entity;
 use WyriHaximus\React\SimpleORM\Attribute\Clause;
 use WyriHaximus\React\SimpleORM\InspectedEntityInterface;
 
-final class Join
+final readonly class Join
 {
     /** @var array<Clause> */
-    private array $clause;
+    public array $clause;
 
-    public function __construct(private InspectedEntityInterface $entity, private string $type, private string $property, private bool $lazy, Clause ...$clause)
-    {
+    /**
+     * @param InspectedEntityInterface<T> $entity
+     *
+     * @template T
+     */
+    public function __construct(
+        public InspectedEntityInterface $entity,
+        public string $type,
+        public string $property,
+        public bool $lazy,
+        Clause ...$clause,
+    ) {
         $this->clause = $clause;
-    }
-
-    public function entity(): InspectedEntityInterface
-    {
-        return $this->entity;
-    }
-
-    public function type(): string
-    {
-        return $this->type;
-    }
-
-    public function property(): string
-    {
-        return $this->property;
-    }
-
-    public function lazy(): bool
-    {
-        return $this->lazy;
-    }
-
-    /** @return Clause[] */
-    public function clause(): array
-    {
-        return $this->clause;
     }
 }
