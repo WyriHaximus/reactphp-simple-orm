@@ -50,7 +50,7 @@ final class FunctionalTest extends AsyncTestCase
             new Postgres(
                 new PgClient(
                     [
-                        'host' => 'localhost',
+                        'host' => 'postgres',
                         'port' => 55432,
                         'user'     => 'postgres',
                         'password' => 'postgres',
