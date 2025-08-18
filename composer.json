@@ -19,7 +19,7 @@
     "react/stream": "^1.1",
     "reactivex/rxphp": "^2.0.12",
     "roave/better-reflection": "^6",
-    "thecodingmachine/safe": "^2",
+    "thecodingmachine/safe": "^2 || ^3",
     "voryx/pgasync": "^2.0",
     "wyrihaximus/constants": "^1.5",
     "wyrihaximus/doctrine-annotation-autoloader": "^1.0",
