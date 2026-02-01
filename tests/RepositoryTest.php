@@ -7,6 +7,8 @@ namespace WyriHaximus\React\Tests\SimpleORM;
 use Latitude\QueryBuilder\Engine\PostgresEngine;
 use Latitude\QueryBuilder\ExpressionInterface;
 use Latitude\QueryBuilder\QueryFactory;
+use Override;
+use PHPUnit\Framework\Attributes\Test;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Rx\Observable;
@@ -22,9 +24,8 @@ use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
 use function assert;
-use function React\Async\await;
 use function Safe\date;
-use function strpos;
+use function str_contains;
 
 final class RepositoryTest extends AsyncTestCase
 {
@@ -38,7 +39,9 @@ final class RepositoryTest extends AsyncTestCase
         $this->client = $this->prophesize(ClientInterface::class);
     }
 
-    public function testCount(): void
+    #[Test]
+    #[Override]
+    public function count(): void
     {
         $this->client->query(Argument::that(static function (ExpressionInterface $expression): bool {
             self::assertCount(0, $expression->params(new PostgresEngine()));
@@ -54,15 +57,16 @@ final class RepositoryTest extends AsyncTestCase
         $client = $this->client->reveal();
 
         $repository = new Repository(
-            (new EntityInspector(new Configuration('')))->entity(UserStub::class),
+            new EntityInspector(new Configuration(''))->entity(UserStub::class),
             $client,
             new QueryFactory(),
         );
 
-        self::assertSame(123, await($repository->count()));
+        self::assertSame(123, $repository->count());
     }
 
-    public function testCountWithContraints(): void
+    #[Test]
+    public function countWithContraints(): void
     {
         $this->client->query(Argument::that(static function (ExpressionInterface $expression): bool {
             self::assertCount(1, $expression->params(new PostgresEngine()));
@@ -79,19 +83,20 @@ final class RepositoryTest extends AsyncTestCase
         $client = $this->client->reveal();
 
         $repository = new Repository(
-            (new EntityInspector(new Configuration('')))->entity(UserStub::class),
+            new EntityInspector(new Configuration(''))->entity(UserStub::class),
             $client,
             new QueryFactory(),
         );
 
-        self::assertSame(123, await($repository->count(
+        self::assertSame(123, $repository->count(
             new Where(
                 new Where\Field('field', 'eq', ['values']),
             ),
-        )));
+        ));
     }
 
-    public function testCountWithJoins(): void
+    #[Test]
+    public function countWithJoins(): void
     {
         $this->client->repository(CommentStub::class)->shouldNotBeCalled();
 
@@ -112,15 +117,16 @@ final class RepositoryTest extends AsyncTestCase
         $client = $this->client->reveal();
 
         $repository = new Repository(
-            (new EntityInspector(new Configuration('')))->entity(BlogPostStub::class),
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
             $client,
             new QueryFactory(),
         );
 
-        self::assertSame(123, await($repository->count()));
+        self::assertSame(123, $repository->count());
     }
 
-    public function testFetchWithJoins(): void
+    #[Test]
+    public function fetchWithJoins(): void
     {
         $this->client->repository(CommentStub::class)->shouldNotBeCalled();
 
@@ -165,16 +171,16 @@ final class RepositoryTest extends AsyncTestCase
         $client = $this->client->reveal();
 
         $repository = new Repository(
-            (new EntityInspector(new Configuration('')))->entity(BlogPostStub::class),
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
             $client,
             new QueryFactory(),
         );
 
-        $blogPost = await($repository->fetch(new Where(
+        $blogPost = $repository->first(new Where(
             new Where\Field('id', 'eq', ['98ce9eaf-b38b-4a51-93ed-131ffac4051e']),
         ), new Order(
             new Order\Desc('id'),
-        ))->take(1)->toPromise());
+        ));
         assert($blogPost instanceof BlogPostStub);
 
         self::assertSame('98ce9eaf-b38b-4a51-93ed-131ffac4051e', $blogPost->id);
@@ -186,12 +192,13 @@ final class RepositoryTest extends AsyncTestCase
         self::assertSame('publisher_name', $blogPost->publisher->name);
     }
 
-    public function testFetchWithJoinsLazyLoadComments(): void
+    #[Test]
+    public function fetchWithJoinsLazyLoadComments(): void
     {
         $client = $this->client->reveal();
 
         $this->client->repository(CommentStub::class)->shouldBeCalled()->willReturn(
-            new Repository((new EntityInspector(new Configuration('')))->entity(CommentStub::class), $client, new QueryFactory()),
+            new Repository(new EntityInspector(new Configuration(''))->entity(CommentStub::class), $client, new QueryFactory()),
         );
 
         $this->client->query(Argument::that(static function (ExpressionInterface $expression): bool {
@@ -199,7 +206,7 @@ final class RepositoryTest extends AsyncTestCase
             self::assertSame(['99d00028-28d6-4194-b377-a0039b278c4d'], $expression->params(new PostgresEngine()));
             $query = $expression->sql(new PostgresEngine());
 
-            if (strpos($query, 'FROM "blog_posts"') === false) {
+            if (! str_contains($query, 'FROM "blog_posts"')) {
                 return false;
             }
 
@@ -242,7 +249,7 @@ final class RepositoryTest extends AsyncTestCase
             self::assertSame(['99d00028-28d6-4194-b377-a0039b278c4d'], $expression->params(new PostgresEngine()));
             $query = $expression->sql(new PostgresEngine());
 
-            if (strpos($query, 'FROM "comments"') === false) {
+            if (! str_contains($query, 'FROM "comments"')) {
                 return false;
             }
 
@@ -339,16 +346,16 @@ final class RepositoryTest extends AsyncTestCase
         ]));
 
         $repository = new Repository(
-            (new EntityInspector(new Configuration('')))->entity(BlogPostStub::class),
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
             $client,
             new QueryFactory(),
         );
 
-        $blogPost = await($repository->fetch(new Where(
+        $blogPost = $repository->first(new Where(
             new Where\Field('id', 'eq', ['99d00028-28d6-4194-b377-a0039b278c4d']),
         ), new Order(
             new Order\Desc('id'),
-        ))->take(1)->toPromise());
+        ));
         assert($blogPost instanceof BlogPostStub);
 
         self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $blogPost->id);
@@ -359,7 +366,7 @@ final class RepositoryTest extends AsyncTestCase
         self::assertSame('publisher_name', $blogPost->publisher->name);
 
         /** @var CommentStub[] $comments */
-        $comments = await($blogPost->comments->toArray()->toPromise());
+        $comments = $blogPost->comments;
 
         self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[0]->id);
         self::assertSame('d45e8a1b-b962-4c1b-a7e7-c867fa06ffa7', $comments[0]->author->id);

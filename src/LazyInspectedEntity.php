@@ -17,11 +17,8 @@ final class LazyInspectedEntity implements InspectedEntityInterface
     /** @var Join[] */
     private array $joins = [];
 
-    private EntityInspector|null $entityInspector = null;
-
-    public function __construct(EntityInspector $entityInspector, private string $class)
+    public function __construct(private EntityInspector|null $entityInspector, private readonly string $class)
     {
-        $this->entityInspector = $entityInspector;
     }
 
     public function class(): string
@@ -65,7 +62,7 @@ final class LazyInspectedEntity implements InspectedEntityInterface
 
     private function loadEntity(): void
     {
-        if ($this->entityInspector === null) {
+        if (! $this->entityInspector instanceof EntityInspector) {
             return;
         }
 

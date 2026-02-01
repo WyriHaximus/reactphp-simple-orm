@@ -6,11 +6,9 @@ namespace WyriHaximus\React\SimpleORM;
 
 use Latitude\QueryBuilder\ExpressionInterface;
 use React\Promise\PromiseInterface;
-use Rx\Observable;
 
 use function React\Promise\resolve;
 
-/** @internal */
 final readonly class Connection
 {
     public function __construct(
@@ -19,13 +17,12 @@ final readonly class Connection
     ) {
     }
 
-    public function query(ExpressionInterface $query): Observable
+    /** @return iterable<array<string, mixed>> */
+    public function query(ExpressionInterface $query): iterable
     {
-        return Observable::fromPromise($this->middlewareRunner->query(
+        yield from $this->middlewareRunner->query(
             $query,
-            function (ExpressionInterface $query): PromiseInterface {
-                return resolve($this->adapter->query($query));
-            },
-        ))->mergeAll();
+            fn (ExpressionInterface $query): PromiseInterface => resolve($this->adapter->query($query)),
+        );
     }
 }

@@ -1,4 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
+namespace og\seeds;
+
 use Phinx\Seed\AbstractSeed;
 use Ramsey\Uuid\Uuid;
 
@@ -11,8 +16,8 @@ class LogsSeed extends AbstractSeed
             $data[] = [
                 'id' => Uuid::getFactory()->uuid4(),
                 'message' => 'Message #' . $i,
-                'created' => (new DateTimeImmutable())->format('Y-m-d H:i:s e'),
-                'modified' => (new DateTimeImmutable())->format('Y-m-d H:i:s e'),
+                'created' => new DateTimeImmutable()->format('Y-m-d H:i:s e'),
+                'modified' => new DateTimeImmutable()->format('Y-m-d H:i:s e'),
             ];
         }
 

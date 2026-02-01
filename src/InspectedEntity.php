@@ -7,7 +7,7 @@ namespace WyriHaximus\React\SimpleORM;
 use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\Join;
 
-final class InspectedEntity implements InspectedEntityInterface
+final readonly class InspectedEntity implements InspectedEntityInterface
 {
     /**
      * @param Field[] $fields

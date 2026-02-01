@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Entity;
 
-final class Field
+final readonly class Field
 {
     public function __construct(private string $name, private string $type)
     {

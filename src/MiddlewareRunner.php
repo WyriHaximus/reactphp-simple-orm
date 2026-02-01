@@ -9,8 +9,6 @@ use React\Promise\PromiseInterface;
 
 use function array_key_exists;
 
-use const WyriHaximus\Constants\Numeric\ZERO;
-
 /** @internal */
 
 final class MiddlewareRunner
@@ -25,11 +23,11 @@ final class MiddlewareRunner
 
     public function query(ExpressionInterface $query, callable $last): PromiseInterface
     {
-        if (! array_key_exists(ZERO, $this->middleware)) {
+        if (! array_key_exists(0, $this->middleware)) {
             return $last($query);
         }
 
-        return $this->call($query, ZERO, $last);
+        return $this->call($query, 0, $last);
     }
 
     private function call(ExpressionInterface $query, int $position, callable $last): PromiseInterface
@@ -41,8 +39,6 @@ final class MiddlewareRunner
             return $this->middleware[$position]->query($query, $last);
         }
 
-        return $this->middleware[$position]->query($query, function (ExpressionInterface $query) use ($nextPosition, $last): PromiseInterface {
-            return $this->call($query, $nextPosition, $last);
-        });
+        return $this->middleware[$position]->query($query, fn (ExpressionInterface $query): PromiseInterface => $this->call($query, $nextPosition, $last));
     }
 }

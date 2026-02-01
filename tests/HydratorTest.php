@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
+use PHPUnit\Framework\Attributes\Test;
 use Rx\Observable;
 use WyriHaximus\React\SimpleORM\Configuration;
 use WyriHaximus\React\SimpleORM\EntityInspector;
@@ -20,16 +21,14 @@ use function Safe\date;
 
 final class HydratorTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function hydrate(): void
     {
         $id    = '03450173-fef3-42c0-83c4-dfcfa4a474ee';
         $title = 'tables.title';
 
-        $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new Configuration('')))->entity(UserStub::class),
+        $entity = new Hydrator()->hydrate(
+            new EntityInspector(new Configuration(''))->entity(UserStub::class),
             [
                 'id' => $id,
                 'name' => $title,
@@ -42,16 +41,14 @@ final class HydratorTest extends TestCase
         self::assertSame($title, $entity->name);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function hydrateIgnoringNonExistingFields(): void
     {
         $id    = '03450173-fef3-42c0-83c4-dfcfa4a474ee';
         $title = 'tables.title';
 
-        $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new Configuration('')))->entity(UserStub::class),
+        $entity = new Hydrator()->hydrate(
+            new EntityInspector(new Configuration(''))->entity(UserStub::class),
             [
                 'doesnotexist' => resolve(true),
                 'id' => $id,
@@ -66,9 +63,7 @@ final class HydratorTest extends TestCase
         self::assertSame($title, $entity->name);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function hydrateWithJoins(): void
     {
         $id            = '6bda4f06-4b7e-4cd5-b779-66a1b76187f9';
@@ -78,8 +73,8 @@ final class HydratorTest extends TestCase
         $publisherId   = 'a3fc1993-0930-4a9d-a2ad-3bf3a15ecee0';
         $publisherName = 'dasdsadas';
 
-        $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new Configuration('')))->entity(BlogPostStub::class),
+        $entity = new Hydrator()->hydrate(
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
             [
                 'doesnotexist' => resolve(true),
                 'id' => $id,
@@ -117,9 +112,7 @@ final class HydratorTest extends TestCase
         self::assertSame(133, $entity->views);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function hydrateWithJoinsIgnoringNonExistingFields(): void
     {
         $id            = '6bda4f06-4b7e-4cd5-b779-66a1b76187f9';
@@ -129,8 +122,8 @@ final class HydratorTest extends TestCase
         $publisherId   = 'a3fc1993-0930-4a9d-a2ad-3bf3a15ecee0';
         $publisherName = 'dasdsadas';
 
-        $entity = (new Hydrator())->hydrate(
-            (new EntityInspector(new Configuration('')))->entity(BlogPostStub::class),
+        $entity = new Hydrator()->hydrate(
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
             [
                 'id' => $id,
                 'author_id' => $authorId,

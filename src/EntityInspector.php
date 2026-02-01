@@ -24,7 +24,7 @@ final class EntityInspector
     private array $entities = [];
 
     public function __construct(
-        private Configuration $configuration,
+        private readonly Configuration $configuration,
     ) {
     }
 
@@ -80,7 +80,7 @@ final class EntityInspector
                 return $br->reflector()->reflectClass($class);
             })(new BetterReflection(), $class->getName())->getProperty($property->getName());
 
-            if ($roaveProperty === null) {
+            if (! $roaveProperty instanceof ReflectionProperty) {
                 continue;
             }
 

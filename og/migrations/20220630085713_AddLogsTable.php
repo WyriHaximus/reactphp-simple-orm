@@ -1,4 +1,8 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
+namespace og\migrations;
 
 use Phinx\Migration\AbstractMigration;
 

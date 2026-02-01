@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
+use Deprecated;
 use Latitude\QueryBuilder\ExpressionInterface;
-use Rx\Observable;
 
 interface ClientInterface
 {
@@ -18,6 +18,7 @@ interface ClientInterface
      */
     public function repository(string $entity): RepositoryInterface;
 
-    /** @deprecated This function will disappear at initial release */
-    public function query(ExpressionInterface $query): Observable;
+    /** @return iterable<array<string, mixed>> */
+    #[Deprecated(message: 'This function will disappear at initial release')]
+    public function query(ExpressionInterface $query): iterable;
 }

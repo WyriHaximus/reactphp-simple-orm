@@ -7,6 +7,7 @@ namespace WyriHaximus\React\Tests\SimpleORM;
 use Doctrine\Common\Annotations\Reader;
 use Latitude\QueryBuilder\QueryFactory;
 use PgAsync\Client as PgClient;
+use PHPUnit\Framework\Attributes\Test;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionClass;
@@ -37,7 +38,8 @@ final class ClientTest extends AsyncTestCase
         $this->client           = Client::createWithAnnotationReader(new Postgres($this->pgClient->reveal()), $this->annotationReader->reveal());
     }
 
-    public function testGetRepository(): void
+    #[Test]
+    public function getRepository(): void
     {
         $this->annotationReader->getClassAnnotation(
             Argument::type(ReflectionClass::class),
@@ -53,9 +55,10 @@ final class ClientTest extends AsyncTestCase
         $this->client->repository(UserStub::class);
     }
 
-    public function testFetch(): void
+    #[Test]
+    public function fetch(): void
     {
-        $query = (new QueryFactory())->select()->from('table')->where(field('id')->eq(1))->asExpression();
+        $query = new QueryFactory()->select()->from('table')->where(field('id')->eq(1))->asExpression();
 
         $this->pgClient->executeStatement('SELECT * FROM "table" WHERE "id" = $1', [1])->shouldBeCalled()->willReturn(
             Observable::fromArray([

@@ -6,6 +6,7 @@ namespace WyriHaximus\React\Tests\SimpleORM\Middleware;
 
 use Exception;
 use Latitude\QueryBuilder\QueryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use Rx\Observable;
@@ -17,7 +18,8 @@ use function sleep;
 
 final class QueryCountMiddlewareTest extends AsyncTestCase
 {
-    public function testCountingSuccess(): void
+    #[Test]
+    public function countingSuccess(): void
     {
         $middleware = new QueryCountMiddleware(1);
 
@@ -31,9 +33,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         $deferred = new Deferred();
 
-        Observable::fromPromise($middleware->query((new QueryFactory())->select()->asExpression(), static function () use ($deferred): PromiseInterface {
-            return $deferred->promise();
-        }))->mergeAll()->subscribe(static function (): void {
+        Observable::fromPromise($middleware->query(new QueryFactory()->select()->asExpression(), static fn (): PromiseInterface => $deferred->promise()))->mergeAll()->subscribe(static function (): void {
         }, static function (): void {
         });
 
@@ -66,7 +66,8 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
         ], [...$middleware->counters()]);
     }
 
-    public function testCountingError(): void
+    #[Test]
+    public function countingError(): void
     {
         $middleware = new QueryCountMiddleware(1);
 
@@ -80,9 +81,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         $deferred = new Deferred();
 
-        Observable::fromPromise($middleware->query((new QueryFactory())->select()->asExpression(), static function () use ($deferred): PromiseInterface {
-            return $deferred->promise();
-        }))->mergeAll()->subscribe(static function (): void {
+        Observable::fromPromise($middleware->query(new QueryFactory()->select()->asExpression(), static fn (): PromiseInterface => $deferred->promise()))->mergeAll()->subscribe(static function (): void {
         }, static function (): void {
         });
 
@@ -117,7 +116,8 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
         ], [...$middleware->counters()]);
     }
 
-    public function testCountingErrorSlow(): void
+    #[Test]
+    public function countingErrorSlow(): void
     {
         $middleware = new QueryCountMiddleware(1);
 
@@ -131,9 +131,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         $deferred = new Deferred();
 
-        Observable::fromPromise($middleware->query((new QueryFactory())->select()->asExpression(), static function () use ($deferred): PromiseInterface {
-            return $deferred->promise();
-        }))->mergeAll()->subscribe(static function (): void {
+        Observable::fromPromise($middleware->query(new QueryFactory()->select()->asExpression(), static fn (): PromiseInterface => $deferred->promise()))->mergeAll()->subscribe(static function (): void {
         }, static function (): void {
         });
 

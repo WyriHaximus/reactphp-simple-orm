@@ -6,29 +6,28 @@ namespace WyriHaximus\React\SimpleORM;
 
 use Latitude\QueryBuilder\ExpressionInterface;
 use Latitude\QueryBuilder\QueryFactory;
-use Rx\Observable;
 
 use function array_key_exists;
 
 final class Client implements ClientInterface
 {
-    private EntityInspector $entityInspector;
+    private readonly EntityInspector $entityInspector;
 
     /** @var array<RepositoryInterface> */
     private array $repositories = [];
 
-    private Connection $connection;
+    private readonly Connection $connection;
 
-    private QueryFactory $queryFactory;
+    private readonly QueryFactory $queryFactory;
 
-    private Hydrator $hydrator;
+    private readonly Hydrator $hydrator;
 
     public static function create(AdapterInterface $adapter, Configuration $configuration, MiddlewareInterface ...$middleware): self
     {
         return new self($adapter, $configuration, ...$middleware);
     }
 
-    private function __construct(private AdapterInterface $adapter, Configuration $configuration, MiddlewareInterface ...$middleware)
+    private function __construct(private readonly AdapterInterface $adapter, Configuration $configuration, MiddlewareInterface ...$middleware)
     {
         $this->entityInspector = new EntityInspector($configuration);
         $this->queryFactory    = new QueryFactory($adapter->engine());
@@ -59,7 +58,8 @@ final class Client implements ClientInterface
         return $this->repositories[$entity];
     }
 
-    public function query(ExpressionInterface $query): Observable
+    /** @return iterable<array<string, mixed>> */
+    public function query(ExpressionInterface $query): iterable
     {
         return $this->connection->query($query);
     }

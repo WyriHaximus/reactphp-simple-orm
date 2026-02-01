@@ -27,6 +27,6 @@ final readonly class Expression implements WhereInterface
     public function applyExpression(ExpressionInterface $expression): CriteriaInterface
     {
         /** @phpstan-ignore-next-line */
-        return (new CriteriaBuilder($expression))->{$this->criteria}(...$this->criteriaArguments);
+        return new CriteriaBuilder($expression)->{$this->criteria}(...$this->criteriaArguments);
     }
 }

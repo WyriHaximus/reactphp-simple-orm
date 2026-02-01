@@ -16,7 +16,7 @@ use function Safe\hrtime;
 
 final class QueryCountMiddleware implements MiddlewareInterface
 {
-    private const ZERO = 0;
+    private const int ZERO = 0;
 
     private int $initiatedCount = self::ZERO;
 
@@ -28,7 +28,7 @@ final class QueryCountMiddleware implements MiddlewareInterface
 
     private int $completedCount = self::ZERO;
 
-    public function __construct(private int $slowQueryTime)
+    public function __construct(private readonly int $slowQueryTime)
     {
     }
 
@@ -38,50 +38,48 @@ final class QueryCountMiddleware implements MiddlewareInterface
 
         $startTime = hrtime()[0];
 
-        return resolve($next($query))->then(function (Observable $observable) use ($startTime): PromiseInterface {
-            return resolve(Observable::defer(function () use ($observable, $startTime): Subject {
-                $handledInitialRow = false;
-                $subject           = new Subject();
-                $observable->subscribe(
-                    function (array $row) use ($subject, $startTime, &$handledInitialRow): void {
-                        $subject->onNext($row);
+        return resolve($next($query))->then(fn (Observable $observable): PromiseInterface => resolve(Observable::defer(function () use ($observable, $startTime): Subject {
+            $handledInitialRow = false;
+            $subject           = new Subject();
+            $observable->subscribe(
+                function (array $row) use ($subject, $startTime, &$handledInitialRow): void {
+                    $subject->onNext($row);
 
-                        if ($handledInitialRow === true) {
-                            return;
-                        }
+                    if ($handledInitialRow) {
+                        return;
+                    }
 
-                        $this->successfulCount++;
+                    $this->successfulCount++;
 
-                        if (hrtime()[0] - $startTime > $this->slowQueryTime) {
-                            $this->slowCount++;
-                        }
+                    if (hrtime()[0] - $startTime > $this->slowQueryTime) {
+                        $this->slowCount++;
+                    }
 
-                        $handledInitialRow = true;
-                    },
-                    function (Throwable $throwable) use ($startTime, $subject): void {
-                        $this->erroredCount++;
+                    $handledInitialRow = true;
+                },
+                function (Throwable $throwable) use ($startTime, $subject): void {
+                    $this->erroredCount++;
 
-                        if (hrtime()[0] - $startTime > $this->slowQueryTime) {
-                            $this->slowCount++;
-                        }
+                    if (hrtime()[0] - $startTime > $this->slowQueryTime) {
+                        $this->slowCount++;
+                    }
 
-                        $subject->onError($throwable);
-                    },
-                    function () use ($subject, &$handledInitialRow): void {
-                        $this->completedCount++;
-                        $subject->onCompleted();
+                    $subject->onError($throwable);
+                },
+                function () use ($subject, &$handledInitialRow): void {
+                    $this->completedCount++;
+                    $subject->onCompleted();
 
-                        if ($handledInitialRow === true) {
-                            return;
-                        }
+                    if ($handledInitialRow) {
+                        return;
+                    }
 
-                        $this->successfulCount++;
-                    },
-                );
+                    $this->successfulCount++;
+                },
+            );
 
-                return $subject;
-            }));
-        });
+            return $subject;
+        })));
     }
 
     /** @return iterable<string, int> */

@@ -13,6 +13,6 @@ namespace WyriHaximus\React\SimpleORM\Attribute;
  */
 interface JoinInterface
 {
-    public const IS_LAZY     = true;
-    public const IS_NOT_LAZY = false;
+    public const true IS_LAZY      = true;
+    public const false IS_NOT_LAZY = false;
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WyriHaximus\React\Tests\SimpleORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\Attributes\Test;
 use RuntimeException;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\EntityInspector;
@@ -26,7 +27,7 @@ final class EntityInspectorTest extends AsyncTestCase
         $this->entityInspector = new EntityInspector(new Configuration(''), new AnnotationReader());
     }
 
-    /** @test */
+    #[Test]
     public function inspect(): void
     {
         $inspectedEntity = $this->entityInspector->entity(UserStub::class);
@@ -42,7 +43,7 @@ final class EntityInspectorTest extends AsyncTestCase
         self::assertSame('string', $fields['name']->type());
     }
 
-    /** @test */
+    #[Test]
     public function inspectWithJoins(): void
     {
         $inspectedEntity = $this->entityInspector->entity(BlogPostStub::class);
@@ -104,7 +105,7 @@ final class EntityInspectorTest extends AsyncTestCase
         self::assertSame('author', $joins['comments']->entity()->joins()['author']->property());
     }
 
-    /** @test */
+    #[Test]
     public function inspectWithoutTable(): void
     {
         self::expectException(RuntimeException::class);

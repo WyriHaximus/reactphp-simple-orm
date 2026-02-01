@@ -6,11 +6,11 @@ namespace WyriHaximus\React\SimpleORM;
 
 use Latitude\QueryBuilder\EngineInterface;
 use Latitude\QueryBuilder\ExpressionInterface;
-use Rx\Observable;
 
 interface AdapterInterface
 {
-    public function query(ExpressionInterface $expression): Observable;
+    /** @return iterable<array<string, mixed>> */
+    public function query(ExpressionInterface $expression): iterable;
 
     public function engine(): EngineInterface;
 }
