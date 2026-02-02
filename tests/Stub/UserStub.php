@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
-use React\Promise\PromiseInterface;
 use WyriHaximus\React\SimpleORM\Attribute\Clause;
 use WyriHaximus\React\SimpleORM\Attribute\InnerJoin;
 use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
@@ -29,11 +28,11 @@ final readonly class UserStub implements EntityInterface
 {
     use WithFieldsTrait;
 
-    /** @param PromiseInterface<UserStub> $zelf */
+    /** @phpstan-ignore shipmonk.deadMethod */
     public function __construct(
         public string $id,
         public string $name,
-        public PromiseInterface $zelf,
+        public UserStub $zelf,
     ) {
     }
 }

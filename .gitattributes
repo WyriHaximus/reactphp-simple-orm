@@ -11,6 +11,7 @@
 *.webp binary
 *.bmp binary
 *.ttf binary
+*.blp binary
 
 # Ignoring files for distribution archieves
 .github/ export-ignore

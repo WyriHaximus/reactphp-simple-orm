@@ -18,7 +18,7 @@ trait WithFieldsTrait
                 continue;
             }
 
-            $clone->$key = $value; /** @phpstan-ignore-line */
+            $clone->$key = $value;
         }
 
         return $clone;

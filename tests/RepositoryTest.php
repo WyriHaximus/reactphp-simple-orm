@@ -11,7 +11,6 @@ use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\Test;
-use React\Promise\PromiseInterface;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\AdapterInterface;
 use WyriHaximus\React\SimpleORM\ClientInterface;
@@ -29,7 +28,6 @@ use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
 use function assert;
-use function React\Promise\resolve;
 use function Safe\date;
 use function str_contains;
 
@@ -51,9 +49,10 @@ final class RepositoryTest extends AsyncTestCase
             {
             }
 
-            public function query(ExpressionInterface $query, callable $next): PromiseInterface
+            /** @return iterable<array<string, mixed>> */
+            public function query(ExpressionInterface $query, callable $next): iterable
             {
-                return resolve($this->adapter->query($query));
+                yield from $this->adapter->query($query);
             }
         };
         $this->connection = new Connection($this->adapter, new MiddlewareRunner($middleware));
@@ -401,8 +400,8 @@ final class RepositoryTest extends AsyncTestCase
         self::assertSame('d45e8a1b-b962-4c1b-a7e7-c867fa06ffa7', $blogPost->publisher->id);
         self::assertSame('publisher_name', $blogPost->publisher->name);
 
-        /** @var CommentStub[] $comments */
-        $comments = $blogPost->comments;
+        /** @var array<CommentStub> $comments */
+        $comments = [...$blogPost->comments];
 
         self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[0]->id);
         self::assertSame('d45e8a1b-b962-4c1b-a7e7-c867fa06ffa7', $comments[0]->author->id);

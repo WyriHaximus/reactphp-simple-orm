@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace WyriHaximus\React\SimpleORM;
 
 use Latitude\QueryBuilder\ExpressionInterface;
-use React\Promise\PromiseInterface;
-
-use function React\Promise\resolve;
 
 final readonly class Connection
 {
@@ -22,7 +19,7 @@ final readonly class Connection
     {
         yield from $this->middlewareRunner->query(
             $query,
-            fn (ExpressionInterface $query): PromiseInterface => resolve($this->adapter->query($query)),
+            fn (ExpressionInterface $query): iterable => yield from $this->adapter->query($query),
         );
     }
 }

@@ -12,7 +12,7 @@ final readonly class LeftJoin implements JoinInterface
     public string $type;
 
     /** @param array<Clause> $clause */
-    public function __construct( /** @phpstan-ignore-line */
+    public function __construct(
         public string $entity,
         public array $clause,
         public string $property,

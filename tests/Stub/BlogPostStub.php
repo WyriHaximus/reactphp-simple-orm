@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
+use DateTimeImmutable;
 use EventSauce\ObjectHydrator\MapFrom;
-use React\Promise\PromiseInterface;
-use Rx\Observable;
 use WyriHaximus\React\SimpleORM\Attribute\Clause;
 use WyriHaximus\React\SimpleORM\Attribute\InnerJoin;
 use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
@@ -77,17 +76,18 @@ final readonly class BlogPostStub implements EntityInterface
     use WithFieldsTrait;
 
     /**
-     * @param PromiseInterface<BlogPostStub> $previousBlogPost
-     * @param PromiseInterface<BlogPostStub> $nextBlogPost
+     * @param iterable<CommentStub> $comments
+     *
+     * @phpstan-ignore shipmonk.deadMethod,ergebnis.noParameterWithNullableTypeDeclaration,ergebnis.noParameterWithNullableTypeDeclaration,ergebnis.noParameterWithNullableTypeDeclaration,ergebnis.noParameterWithNullableTypeDeclaration
      */
-    public function __construct( /** @phpstan-ignore-line */
+    public function __construct(
         public string $id,
         #[MapFrom('previous_blog_post_id')]
         public string|null $previousBlogPostId,
-        public PromiseInterface $previousBlogPost,
+        public BlogPostStub|null $previousBlogPost,
         #[MapFrom('next_blog_post_id')]
         public string|null $nextBlogPostId,
-        public PromiseInterface $nextBlogPost,
+        public BlogPostStub|null $nextBlogPost,
         #[MapFrom('author_id')]
         public string $authorId,
         #[MapFrom('publisher_id')]
@@ -96,10 +96,10 @@ final readonly class BlogPostStub implements EntityInterface
         public string $contents,
         public UserStub $author,
         public UserStub $publisher,
-        public Observable $comments,
+        public iterable $comments,
         public int $views,
-        public string $created,
-        public string $modified,
+        public DateTimeImmutable $created,
+        public DateTimeImmutable $modified,
     ) {
     }
 }

@@ -5,13 +5,9 @@ declare(strict_types=1);
 namespace WyriHaximus\React\SimpleORM\Middleware;
 
 use Latitude\QueryBuilder\ExpressionInterface;
-use React\Promise\PromiseInterface;
-use Rx\Observable;
-use Rx\Subject\Subject;
 use Throwable;
 use WyriHaximus\React\SimpleORM\MiddlewareInterface;
 
-use function React\Promise\resolve;
 use function Safe\hrtime;
 
 final class QueryCountMiddleware implements MiddlewareInterface
@@ -32,54 +28,35 @@ final class QueryCountMiddleware implements MiddlewareInterface
     {
     }
 
-    public function query(ExpressionInterface $query, callable $next): PromiseInterface
+    /** @return iterable<array<string, mixed>> */
+    public function query(ExpressionInterface $query, callable $next): iterable
     {
         $this->initiatedCount++;
+        $startTime         = hrtime()[0];
+        $handledInitialRow = false;
 
-        $startTime = hrtime()[0];
+        try {
+            foreach ($next($query) as $row) {
+                if (! $handledInitialRow && hrtime()[0] - $startTime > $this->slowQueryTime) {
+                    $this->slowCount++;
+                }
 
-        return resolve($next($query))->then(fn (Observable $observable): PromiseInterface => resolve(Observable::defer(function () use ($observable, $startTime): Subject {
-            $handledInitialRow = false;
-            $subject           = new Subject();
-            $observable->subscribe(
-                function (array $row) use ($subject, $startTime, &$handledInitialRow): void {
-                    $subject->onNext($row);
+                $handledInitialRow = true;
 
-                    if ($handledInitialRow) {
-                        return;
-                    }
+                yield $row;
+            }
 
-                    $this->successfulCount++;
+            $this->successfulCount++;
+            $this->completedCount++;
+        } catch (Throwable $throwable) {
+            $this->erroredCount++;
 
-                    if (hrtime()[0] - $startTime > $this->slowQueryTime) {
-                        $this->slowCount++;
-                    }
+            if (! $handledInitialRow && hrtime()[0] - $startTime > $this->slowQueryTime) {
+                $this->slowCount++;
+            }
 
-                    $handledInitialRow = true;
-                },
-                function (Throwable $throwable) use ($startTime, $subject): void {
-                    $this->erroredCount++;
-
-                    if (hrtime()[0] - $startTime > $this->slowQueryTime) {
-                        $this->slowCount++;
-                    }
-
-                    $subject->onError($throwable);
-                },
-                function () use ($subject, &$handledInitialRow): void {
-                    $this->completedCount++;
-                    $subject->onCompleted();
-
-                    if ($handledInitialRow) {
-                        return;
-                    }
-
-                    $this->successfulCount++;
-                },
-            );
-
-            return $subject;
-        })));
+            throw $throwable;
+        }
     }
 
     /** @return iterable<string, int> */

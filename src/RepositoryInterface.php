@@ -13,14 +13,9 @@ interface RepositoryInterface
 {
     public const int DEFAULT_PER_PAGE = 50;
 
-    /** @phpstan-ignore-next-line */
     public function count(Where|null $where = null): int;
 
-    /**
-     * @return iterable<T>
-     *
-     * @phpstan-ignore-next-line
-     */
+    /** @return iterable<T> */
     public function page(int $page, Where|null $where = null, Order|null $order = null, int $perPage = self::DEFAULT_PER_PAGE): iterable;
 
     /** @return iterable<T> */

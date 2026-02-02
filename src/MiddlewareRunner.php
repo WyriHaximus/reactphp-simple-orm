@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace WyriHaximus\React\SimpleORM;
 
 use Latitude\QueryBuilder\ExpressionInterface;
-use React\Promise\PromiseInterface;
 
 use function array_key_exists;
-
-/** @internal */
 
 final class MiddlewareRunner
 {
@@ -21,24 +18,28 @@ final class MiddlewareRunner
         $this->middleware = $middleware;
     }
 
-    public function query(ExpressionInterface $query, callable $last): PromiseInterface
+    /** @return iterable<array<string, mixed>> */
+    public function query(ExpressionInterface $query, callable $last): iterable
     {
         if (! array_key_exists(0, $this->middleware)) {
-            return $last($query);
+            yield from $last($query);
         }
 
-        return $this->call($query, 0, $last);
+        yield from $this->call($query, 0, $last);
     }
 
-    private function call(ExpressionInterface $query, int $position, callable $last): PromiseInterface
+    /** @return iterable<array<string, mixed>> */
+    private function call(ExpressionInterface $query, int $position, callable $last): iterable
     {
         $nextPosition = $position;
         $nextPosition++;
         // final request handler will be invoked without hooking into the promise
         if (! array_key_exists($nextPosition, $this->middleware)) {
-            return $this->middleware[$position]->query($query, $last);
+            yield from $this->middleware[$position]->query($query, $last);
+
+            return;
         }
 
-        return $this->middleware[$position]->query($query, fn (ExpressionInterface $query): PromiseInterface => $this->call($query, $nextPosition, $last));
+        yield from $this->middleware[$position]->query($query, fn (ExpressionInterface $query): iterable => yield from $this->call($query, $nextPosition, $last));
     }
 }

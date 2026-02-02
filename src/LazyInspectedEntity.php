@@ -26,17 +26,12 @@ final class LazyInspectedEntity implements InspectedEntityInterface
         return $this->class;
     }
 
-    /** @psalm-suppress InvalidNullableReturnType */
     public function table(): string
     {
         if ($this->table === null) {
             $this->loadEntity();
         }
 
-        /**
-         * @phpstan-ignore-next-line
-         * @psalm-suppress NullableReturnStatement
-         */
         return $this->table;
     }
 

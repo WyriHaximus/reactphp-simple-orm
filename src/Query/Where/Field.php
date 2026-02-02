@@ -14,7 +14,7 @@ final readonly class Field implements WhereInterface
     public function __construct(
         private string $field,
         private string $criteria,
-        private array $criteriaArguments = [], /** @phpstan-ignore-line */
+        private array $criteriaArguments = [],
     ) {
     }
 
@@ -25,7 +25,6 @@ final readonly class Field implements WhereInterface
 
     public function applyCriteria(CriteriaBuilder $criteria): CriteriaInterface
     {
-        /** @phpstan-ignore-next-line */
         return $criteria->{$this->criteria}(...$this->criteriaArguments);
     }
 }

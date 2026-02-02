@@ -84,7 +84,6 @@ final class EntityInspector
                 continue;
             }
 
-            /** @psalm-suppress PossiblyNullReference */
             yield $property->getName() => new Field(
                 $property->getName(),
                 (static function (ReflectionProperty $property): string {
