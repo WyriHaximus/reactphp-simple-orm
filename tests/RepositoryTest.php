@@ -27,7 +27,6 @@ use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
-use function assert;
 use function Safe\date;
 use function str_contains;
 
@@ -210,7 +209,7 @@ final class RepositoryTest extends AsyncTestCase
         ), new Order(
             new Order\Desc('id'),
         ));
-        assert($blogPost instanceof BlogPostStub);
+        self::assertInstanceOf(BlogPostStub::class, $blogPost);
 
         self::assertSame('98ce9eaf-b38b-4a51-93ed-131ffac4051e', $blogPost->id);
         self::assertSame('blog_post_title', $blogPost->title);

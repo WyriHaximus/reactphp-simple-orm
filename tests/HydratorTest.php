@@ -13,7 +13,6 @@ use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
 use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 use WyriHaximus\TestUtilities\TestCase;
 
-use function assert;
 use function bin2hex;
 use function random_bytes;
 use function React\Promise\resolve;
@@ -35,7 +34,7 @@ final class HydratorTest extends TestCase
                 'zelf' => resolve(true),
             ],
         );
-        assert($entity instanceof UserStub);
+        self::assertInstanceOf(UserStub::class, $entity);
 
         self::assertSame($id, $entity->id);
         self::assertSame($title, $entity->name);
@@ -57,7 +56,7 @@ final class HydratorTest extends TestCase
                 'alsodoesnotexist' => resolve(true),
             ],
         );
-        assert($entity instanceof UserStub);
+        self::assertInstanceOf(UserStub::class, $entity);
 
         self::assertSame($id, $entity->id);
         self::assertSame($title, $entity->name);
@@ -101,7 +100,7 @@ final class HydratorTest extends TestCase
                 'alsodoesnotexist' => resolve(true),
             ],
         );
-        assert($entity instanceof BlogPostStub);
+        self::assertInstanceOf(BlogPostStub::class, $entity);
 
         self::assertSame($id, $entity->id);
         self::assertSame($title, $entity->title);
@@ -148,7 +147,7 @@ final class HydratorTest extends TestCase
                 'comments' => Observable::fromArray([]),
             ],
         );
-        assert($entity instanceof BlogPostStub);
+        self::assertInstanceOf(BlogPostStub::class, $entity);
 
         self::assertSame($id, $entity->id);
         self::assertSame($title, $entity->title);
