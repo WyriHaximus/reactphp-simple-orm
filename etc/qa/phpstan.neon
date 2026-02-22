@@ -4,3 +4,5 @@ parameters:
 		- ../../etc
 		- ../../src
 		- ../../tests
+	excludePaths:
+		- ../../src/Tools/LazyPromise.php

@@ -470,8 +470,6 @@ final class FunctionalTest extends AsyncTestCase
         );
 
         self::assertInstanceOf(BlogPostStub::class, $originalBlogPost);
-        /** @phpstan-ignore staticMethod.alreadyNarrowedType */
-        self::assertInstanceOf(BlogPostStub::class, $updatedBlogPost);
 
         self::assertSame(167, $updatedBlogPost->views);
         self::assertSame($originalBlogPost->id, $updatedBlogPost->id);

@@ -14,7 +14,7 @@ interface ClientInterface
      *
      * @return RepositoryInterface<T>
      *
-     * @template T
+     * @template T of EntityInterface
      */
     public function repository(string $entity): RepositoryInterface;
 

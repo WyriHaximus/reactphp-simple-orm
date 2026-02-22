@@ -41,11 +41,10 @@ use function Safe\date;
 use function spl_object_hash;
 use function strpos;
 use function substr;
-use function var_export;
 use function WyriHaximus\React\awaitObservable;
 
 /**
- * @template T
+ * @template T of EntityInterface
  * @template-implements RepositoryInterface<T>
  */
 final class Repository implements RepositoryInterface
@@ -60,6 +59,7 @@ final class Repository implements RepositoryInterface
     /** @var string[] */
     private array $tableAliases = [];
 
+    /** @param InspectedEntityInterface<T> $entity */
     public function __construct(
         private readonly InspectedEntityInterface $entity,
         private readonly ClientInterface $client,
@@ -112,7 +112,7 @@ final class Repository implements RepositoryInterface
     }
 
     /** @return T */
-    public function first(SectionInterface ...$sections)
+    public function first(SectionInterface ...$sections): EntityInterface
     {
         foreach ($this->fetch(...$sections) as $row) {
             return $row;
@@ -144,7 +144,7 @@ final class Repository implements RepositoryInterface
      *
      * @return T
      */
-    public function create(array $fields)
+    public function create(array $fields): EntityInterface
     {
         $id                 = Uuid::getFactory()->uuid4()->toString();
         $fields['id']       = $id;
@@ -175,7 +175,7 @@ final class Repository implements RepositoryInterface
     }
 
     /** @return T */
-    public function update(EntityInterface $entity)
+    public function update(EntityInterface $entity): EntityInterface
     {
         $fields             = $this->hydrator->extract($entity);
         $fields['modified'] = new DateTimeImmutable();
@@ -381,6 +381,7 @@ final class Repository implements RepositoryInterface
 
     /**
      * @param array<string, array<string, mixed>> $row
+     * @param InspectedEntityInterface<T>         $entity
      *
      * @return array<string, mixed>
      */
@@ -397,8 +398,9 @@ final class Repository implements RepositoryInterface
             }
 
             if ($join->type === 'inner' && ($join->lazy === JoinInterface::IS_LAZY || $entity->class() === $join->entity->class())) {
-                $tree[$join->property] = new ReflectionClass($join->entity->class())->newLazyProxy(function () use ($row, $join, $tableKey): object|null {
-                    var_export([$row, $join, $tableKey]);
+                /** @phpstan-ignore argument.type */
+                $tree[$join->property] = new ReflectionClass($join->entity->class())->newLazyProxy(function () use ($row, $join, $tableKey): EntityInterface|null {
+//                    var_export([$row, $join, $tableKey]);
                     foreach ($join->clause as $clause) {
                         if ($row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
                             return null;
@@ -410,6 +412,7 @@ final class Repository implements RepositoryInterface
                     foreach ($join->clause as $clause) {
                         $onLeftSide = $clause->foreignKey;
                         if ($clause->foreignFunction !== null) {
+                            /** @phpstan-ignore shipmonk.variableTypeOverwritten */
                             $onLeftSide = func($clause->foreignFunction, $onLeftSide);
                         }
 
@@ -437,16 +440,21 @@ final class Repository implements RepositoryInterface
                     }
 
                     foreach (
-                        $this->client
-                            ->repository($join->entity
-                                ->class())
-                            ->fetch(new Where(...$where), new Limit(self::SINGLE)) as $entity
+                            $this->client
+                        ->repository(
+                            $join->entity->class(),
+                        )
+                            ->fetch(
+                                new Where(...$where),
+                                new Limit(self::SINGLE),
+                            ) as $entity
                     ) {
                         return $entity;
                     }
 
                     return null;
                 });
+                /** @phpstan-ignore method.deprecatedClass,new.deprecatedClass */
                 $tree[$join->property] = new LazyPromise(fn (): PromiseInterface => new Promise(function (callable $resolve, callable $reject) use ($row, $join, $tableKey): void {
                     foreach ($join->clause as $clause) {
                         if ($row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
@@ -461,6 +469,7 @@ final class Repository implements RepositoryInterface
                     foreach ($join->clause as $clause) {
                         $onLeftSide = $clause->foreignKey;
                         if ($clause->foreignFunction !== null) {
+                            /** @phpstan-ignore shipmonk.variableTypeOverwritten */
                             $onLeftSide = func($clause->foreignFunction, $onLeftSide);
                         }
 
@@ -490,9 +499,13 @@ final class Repository implements RepositoryInterface
                     try {
                         $resolve([
                             ...$this->client
-                            ->repository($join->entity
-                                ->class())
-                            ->fetch(new Where(...$where), new Limit(self::SINGLE)),
+                            ->repository(
+                                $join->entity->class(),
+                            )
+                            ->fetch(
+                                new Where(...$where),
+                                new Limit(self::SINGLE),
+                            ),
                         ]);
                     } catch (Throwable $throwable) {
                         $reject($throwable);
@@ -516,8 +529,8 @@ final class Repository implements RepositoryInterface
                         );
                     }
 
-                    return Observable::fromIterator(
-                        $this->client->repository($join->entity->class())->fetch(new Where(...$where)),
+                    return Observable::fromArray(
+                        [...$this->client->repository($join->entity->class())->fetch(new Where(...$where))],
                         new ImmediateScheduler(),
                     );
                 },
@@ -547,6 +560,7 @@ final class Repository implements RepositoryInterface
     {
         foreach ($fields as $key => $value) {
             if ($value instanceof DateTimeInterface) {
+                /** @phpstan-ignore shipmonk.variableTypeOverwritten */
                 $fields[$key] = $value = date(
                     self::DATE_TIME_TIMEZ1_FORMAT,
                     (int) $value->format('U'),

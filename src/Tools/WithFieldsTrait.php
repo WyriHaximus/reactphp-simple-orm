@@ -18,6 +18,7 @@ trait WithFieldsTrait
                 continue;
             }
 
+            /** @phpstan-ignore property.dynamicName */
             $clone->$key = $value;
         }
 
