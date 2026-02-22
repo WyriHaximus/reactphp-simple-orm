@@ -6,6 +6,7 @@ namespace WyriHaximus\React\SimpleORM\Attribute;
 
 use Attribute;
 
+/** @api */
 #[Attribute(Attribute::TARGET_CLASS)]
 final readonly class Table
 {

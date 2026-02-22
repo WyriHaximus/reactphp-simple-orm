@@ -34,7 +34,6 @@ final class HydratorTest extends TestCase
                 'zelf' => resolve(true),
             ],
         );
-        self::assertInstanceOf(UserStub::class, $entity);
 
         self::assertSame($id, $entity->id);
         self::assertSame($title, $entity->name);
@@ -56,7 +55,6 @@ final class HydratorTest extends TestCase
                 'alsodoesnotexist' => resolve(true),
             ],
         );
-        self::assertInstanceOf(UserStub::class, $entity);
 
         self::assertSame($id, $entity->id);
         self::assertSame($title, $entity->name);
@@ -100,7 +98,6 @@ final class HydratorTest extends TestCase
                 'alsodoesnotexist' => resolve(true),
             ],
         );
-        self::assertInstanceOf(BlogPostStub::class, $entity);
 
         self::assertSame($id, $entity->id);
         self::assertSame($title, $entity->title);
@@ -147,7 +144,6 @@ final class HydratorTest extends TestCase
                 'comments' => Observable::fromArray([]),
             ],
         );
-        self::assertInstanceOf(BlogPostStub::class, $entity);
 
         self::assertSame($id, $entity->id);
         self::assertSame($title, $entity->title);

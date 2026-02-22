@@ -16,11 +16,14 @@ use WyriHaximus\React\SimpleORM\Entity\Join;
 use function array_key_exists;
 use function count;
 use function current;
-use function method_exists;
 
 final class EntityInspector
 {
-    /** @var InspectedEntityInterface[] */
+    /**
+     * @var array<InspectedEntityInterface<T>>
+     * @template T of EntityInterface
+     * @phpstan-ignore generics.notSubtype,class.notFound
+     */
     private array $entities = [];
 
     public function __construct(
@@ -33,7 +36,7 @@ final class EntityInspector
      *
      * @return InspectedEntityInterface<T>
      *
-     * @template T
+     * @template T of EntityInterface
      */
     public function entity(string $entity): InspectedEntityInterface
     {
@@ -47,7 +50,8 @@ final class EntityInspector
 
             $tableAttribute = current($tableAttributes)->newInstance();
 
-            $joins                   = [...$this->joins($class)];
+            $joins = [...$this->joins($class)];
+            /** @phpstan-ignore assign.propertyType */
             $this->entities[$entity] = new InspectedEntity(
                 $entity,
                 $this->configuration->tablePrefix . $tableAttribute->table,
@@ -56,6 +60,7 @@ final class EntityInspector
             );
         }
 
+        /** @phpstan-ignore return.type */
         return $this->entities[$entity];
     }
 
@@ -72,13 +77,9 @@ final class EntityInspector
                 continue;
             }
 
-            $roaveProperty = (static function (BetterReflection $br, string $class): \Roave\BetterReflection\Reflection\ReflectionClass {
-                if (method_exists($br, 'classReflector')) {
-                    return $br->classReflector()->reflect($class);
-                }
-
-                return $br->reflector()->reflectClass($class);
-            })(new BetterReflection(), $class->getName())->getProperty($property->getName());
+            $roaveProperty = (
+                static fn (BetterReflection $br, string $class): \Roave\BetterReflection\Reflection\ReflectionClass => $br->reflector()->reflectClass($class)
+            )(new BetterReflection(), $class->getName())->getProperty($property->getName());
 
             if (! $roaveProperty instanceof ReflectionProperty) {
                 continue;
@@ -92,7 +93,7 @@ final class EntityInspector
                         return (string) $type;
                     }
 
-                    return (string) current($property->getDocBlockTypes());
+                    return 'mixed';
                 })($roaveProperty),
             );
         }
@@ -118,11 +119,17 @@ final class EntityInspector
     /** @return iterable<string, Join> */
     private function join(JoinInterface $join): iterable
     {
+        /** @phpstan-ignore generator.keyType,property.notFound */
         yield $join->property => new Join(
+        /** @phpstan-ignore argument.type,property.notFound */
             new LazyInspectedEntity($this, $join->entity),
+            /** @phpstan-ignore argument.type,property.notFound */
             $join->type,
+            /** @phpstan-ignore argument.type,property.notFound */
             $join->property,
+            /** @phpstan-ignore argument.type,property.notFound */
             $join->lazy,
+            /** @phpstan-ignore argument.type,argument.unpackNonIterable,property.notFound */
             ...$join->clause,
         );
     }

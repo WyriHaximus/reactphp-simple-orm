@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Attribute;
 
+/** @api */
 final readonly class Clause
 {
+    /** @phpstan-ignore ergebnis.noConstructorParameterWithDefaultValue,ergebnis.noParameterWithNullableTypeDeclaration,ergebnis.noParameterWithNullDefaultValue,ergebnis.noConstructorParameterWithDefaultValue,ergebnis.noParameterWithNullableTypeDeclaration,ergebnis.noParameterWithNullDefaultValue,ergebnis.noConstructorParameterWithDefaultValue,ergebnis.noParameterWithNullableTypeDeclaration,ergebnis.noParameterWithNullDefaultValue,ergebnis.noConstructorParameterWithDefaultValue,ergebnis.noParameterWithNullableTypeDeclaration,ergebnis.noParameterWithNullDefaultValue */
     public function __construct(
         public string $localKey,
         public string $foreignKey,

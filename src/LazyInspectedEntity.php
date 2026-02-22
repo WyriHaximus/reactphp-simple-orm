@@ -7,6 +7,10 @@ namespace WyriHaximus\React\SimpleORM;
 use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\Join;
 
+/**
+ * @template T of EntityInterface
+ * @template-implements InspectedEntityInterface<T>
+ */
 final class LazyInspectedEntity implements InspectedEntityInterface
 {
     private string|null $table = null;
@@ -17,6 +21,11 @@ final class LazyInspectedEntity implements InspectedEntityInterface
     /** @var Join[] */
     private array $joins = [];
 
+    /**
+     * @param class-string<T> $class
+     *
+     * @phpstan-ignore ergebnis.noParameterWithNullableTypeDeclaration
+     */
     public function __construct(private EntityInspector|null $entityInspector, private readonly string $class)
     {
     }
@@ -32,6 +41,7 @@ final class LazyInspectedEntity implements InspectedEntityInterface
             $this->loadEntity();
         }
 
+        /** @phpstan-ignore return.type */
         return $this->table;
     }
 

@@ -15,6 +15,7 @@ use function implode;
 use function str_contains;
 use function WyriHaximus\React\awaitObservable;
 
+/** @api */
 final readonly class Postgres implements AdapterInterface
 {
     private EngineInterface $engine;
@@ -44,6 +45,7 @@ final readonly class Postgres implements AdapterInterface
             $sql = implode('', $sqlChunks);
         }
 
+        /** @phpstan-ignore generator.valueType,argument.type */
         yield from awaitObservable($this->client->executeStatement($sql, $params));
     }
 

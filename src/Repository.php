@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
+use DateTimeImmutable;
 use DateTimeInterface;
 use Latitude\QueryBuilder\CriteriaInterface;
 use Latitude\QueryBuilder\ExpressionInterface;
@@ -17,7 +18,6 @@ use ReflectionClass;
 use RuntimeException;
 use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
-use Safe\DateTimeImmutable;
 use Throwable;
 use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
 use WyriHaximus\React\SimpleORM\Query\Limit;
@@ -26,10 +26,12 @@ use WyriHaximus\React\SimpleORM\Query\SectionInterface;
 use WyriHaximus\React\SimpleORM\Query\Where;
 use WyriHaximus\React\SimpleORM\Query\Where\Expression;
 use WyriHaximus\React\SimpleORM\Query\Where\Field;
+use WyriHaximus\React\SimpleORM\Tools\IncrementingInteger;
 use WyriHaximus\React\SimpleORM\Tools\LazyPromise;
 
 use function array_key_exists;
 use function array_values;
+use function date;
 use function explode;
 use function is_scalar;
 use function is_string;
@@ -37,7 +39,6 @@ use function Latitude\QueryBuilder\alias;
 use function Latitude\QueryBuilder\field;
 use function Latitude\QueryBuilder\func;
 use function Latitude\QueryBuilder\on;
-use function Safe\date;
 use function spl_object_hash;
 use function strpos;
 use function substr;
@@ -69,6 +70,7 @@ final class Repository implements RepositoryInterface
     ) {
     }
 
+    /** @phpstan-ignore ergebnis.noParameterWithNullDefaultValue,ergebnis.noParameterWithNullableTypeDeclaration */
     public function count(Where|null $where = null): int
     {
         $query = $this->queryFactory->select(alias(func('COUNT', '*'), 'count'))->from(alias($this->entity->table(), 't0'));
@@ -81,13 +83,18 @@ final class Repository implements RepositoryInterface
                 $query->asExpression(),
             ) as $row
         ) {
+            /** @phpstan-ignore cast.int */
             return (int) $row['count'];
         }
 
         throw new RuntimeException('Could not count rows');
     }
 
-    /** @return iterable<T> */
+    /**
+     * @return iterable<T>
+     *
+     * @phpstan-ignore ergebnis.noParameterWithNullDefaultValue,ergebnis.noParameterWithNullDefaultValue,ergebnis.noParameterWithNullableTypeDeclaration,ergebnis.noParameterWithNullableTypeDeclaration
+     */
     public function page(int $page, Where|null $where = null, Order|null $order = null, int $perPage = RepositoryInterface::DEFAULT_PER_PAGE): iterable
     {
         $query = $this->buildSelectQuery($where ?? new Where(), $order ?? new Order());
@@ -117,6 +124,8 @@ final class Repository implements RepositoryInterface
         foreach ($this->fetch(...$sections) as $row) {
             return $row;
         }
+
+        throw new RuntimeException('Could not find first item');
     }
 
     /** @return iterable<T> */
@@ -172,6 +181,8 @@ final class Repository implements RepositoryInterface
         ) {
             return $item;
         }
+
+        throw new RuntimeException('Could not create item');
     }
 
     /** @return T */
@@ -183,8 +194,13 @@ final class Repository implements RepositoryInterface
 
         foreach (
             $this->connection->query(
-                $this->queryFactory->update($this->entity->table(), $fields)->
-                where(field('id')->eq($entity->id))->asExpression(),
+                $this->queryFactory->update(
+                    $this->entity->table(),
+                    $fields,
+                )->where(
+                /** @phpstan-ignore property.notFound */
+                    field('id')->eq($entity->id),
+                )->asExpression(),
             ) as $underscore
         ) {
             break;
@@ -192,29 +208,37 @@ final class Repository implements RepositoryInterface
 
         foreach (
             $this->fetch(new Where(
+            /** @phpstan-ignore property.notFound */
                 new Where\Field('id', 'eq', [$entity->id]),
             ), new Limit(1)) as $updatedEnitty
         ) {
             return $updatedEnitty;
         }
+
+        throw new RuntimeException('Could not update item');
     }
 
+    /** @param T $entity */
     public function delete(EntityInterface $entity): null
     {
         $this->connection->query(
-            $this->queryFactory->delete($this->entity->table())->
-            where(field('id')->eq($entity->id))->asExpression(),
+            $this->queryFactory->delete(
+                $this->entity->table(),
+            )->where(
+                /** @phpstan-ignore property.notFound */
+                field('id')->eq($entity->id),
+            )->asExpression(),
         );
 
         return null;
     }
 
-    /** @param array<SectionInterface> $sections */
     private function buildSelectQuery(SectionInterface ...$sections): SelectQuery
     {
         $query = $this->buildBaseSelectQuery();
         $query = $query->columns(...array_values($this->fields));
         foreach ($sections as $section) {
+            /** @phpstan-ignore ergebnis.noSwitch */
             switch (true) {
                 case $section instanceof Where:
                     $query = $this->applyWhereToQuery($section, $query);
@@ -236,11 +260,17 @@ final class Repository implements RepositoryInterface
     {
         foreach ($constraints->wheres() as $i => $constraint) {
             if ($constraint instanceof Expression) {
-                $where = $constraint->expression();
-                $where = $constraint->applyExpression($where);
+                $where = $constraint->applyExpression(
+                    $constraint->expression(),
+                );
             } elseif ($constraint instanceof Field) {
-                $where = field($this->translateFieldName($constraint->field()));
-                $where = $constraint->applyCriteria($where);
+                $where = $constraint->applyCriteria(
+                    field(
+                        $this->translateFieldName(
+                            $constraint->field(),
+                        ),
+                    ),
+                );
             } else {
                 continue;
             }
@@ -258,13 +288,16 @@ final class Repository implements RepositoryInterface
 
     private function buildBaseSelectQuery(): SelectQuery
     {
-        $i                             = 0;
+        $i                             = new IncrementingInteger();
         $tableKey                      = spl_object_hash($this->entity) . '___root';
-        $this->tableAliases[$tableKey] = 't' . $i++;
+        $this->tableAliases[$tableKey] = 't' . $i->getNext();
         $query                         = $this->queryFactory->select()->from(alias($this->entity->table(), $this->tableAliases[$tableKey]));
 
         foreach ($this->entity->fields() as $field) {
-            $this->fields[$this->tableAliases[$tableKey] . '___' . $field->name()] = alias($this->tableAliases[$tableKey] . '.' . $field->name(), $this->tableAliases[$tableKey] . '___' . $field->name());
+            $this->fields[$this->tableAliases[$tableKey] . '___' . $field->name] = alias(
+                $this->tableAliases[$tableKey] . '.' . $field->name,
+                $this->tableAliases[$tableKey] . '___' . $field->name,
+            );
         }
 
         $query = $this->buildJoins($query, $this->entity, $i);
@@ -272,7 +305,8 @@ final class Repository implements RepositoryInterface
         return $query;
     }
 
-    private function buildJoins(SelectQuery $query, InspectedEntityInterface $entity, int &$i, string $rootProperty = 'root'): SelectQuery
+    /** @param InspectedEntityInterface<T> $entity */
+    private function buildJoins(SelectQuery $query, InspectedEntityInterface $entity, IncrementingInteger $i, string $rootProperty = 'root'): SelectQuery
     {
         foreach ($entity->joins() as $join) {
             if ($join->type !== 'inner') {
@@ -289,7 +323,7 @@ final class Repository implements RepositoryInterface
 
             $tableKey = spl_object_hash($join->entity) . '___' . $join->property;
             if (! array_key_exists($tableKey, $this->tableAliases)) {
-                $this->tableAliases[$tableKey] = 't' . $i++;
+                $this->tableAliases[$tableKey] = 't' . $i->getNext();
             }
 
             $clauses = null;
@@ -333,11 +367,12 @@ final class Repository implements RepositoryInterface
             }
 
             foreach ($join->entity->fields() as $field) {
-                $this->fields[$this->tableAliases[$tableKey] . '___' . $field->name()] = alias($this->tableAliases[$tableKey] . '.' . $field->name(), $this->tableAliases[$tableKey] . '___' . $field->name());
+                $this->fields[$this->tableAliases[$tableKey] . '___' . $field->name] = alias($this->tableAliases[$tableKey] . '.' . $field->name, $this->tableAliases[$tableKey] . '___' . $field->name);
             }
 
             unset($this->fields[$entity->table() . '___' . $join->property]);
 
+            /** @phpstan-ignore argument.type */
             $query = $this->buildJoins($query, $join->entity, $i, $join->property);
         }
 
@@ -392,6 +427,7 @@ final class Repository implements RepositoryInterface
 
         foreach ($entity->joins() as $join) {
             if ($join->type === 'inner' && $entity->class() !== $join->entity->class() && $join->lazy === false) {
+                /** @phpstan-ignore argument.type */
                 $tree[$join->property] = $this->buildTree($row, $join->entity, $join->property);
 
                 continue;

@@ -39,9 +39,9 @@ final class EntityInspectorTest extends AsyncTestCase
         $fields = $inspectedEntity->fields();
         self::assertCount(2, $fields);
         self::assertArrayHasKey('id', $fields);
-        self::assertSame('string', $fields['id']->type());
+        self::assertSame('string', $fields['id']->type);
         self::assertArrayHasKey('name', $fields);
-        self::assertSame('string', $fields['name']->type());
+        self::assertSame('string', $fields['name']->type);
     }
 
     #[Test]
@@ -70,7 +70,7 @@ final class EntityInspectorTest extends AsyncTestCase
             ] as $key => $type
         ) {
             self::assertArrayHasKey($key, $fields, $key);
-            self::assertSame($type, $fields[$key]->type(), $key);
+            self::assertSame($type, $fields[$key]->type, $key);
         }
 
         $joins = $inspectedEntity->joins();

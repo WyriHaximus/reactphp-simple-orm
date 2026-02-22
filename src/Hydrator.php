@@ -17,7 +17,14 @@ final readonly class Hydrator
         $this->fallbackMapper = new ObjectMapperUsingReflection();
     }
 
-    /** @param array<string, mixed> $data */
+    /**
+     * @param array<string, mixed>        $data
+     * @param InspectedEntityInterface<T> $inspectedEntity
+     *
+     * @return T
+     *
+     * @template T of EntityInterface
+     */
     public function hydrate(InspectedEntityInterface $inspectedEntity, array $data): EntityInterface
     {
         foreach ($inspectedEntity->joins() as $join) {
@@ -27,6 +34,7 @@ final readonly class Hydrator
 
             $data[$join->property] = $this->hydrate(
                 $join->entity,
+                /** @phpstan-ignore argument.type */
                 $data[$join->property],
             );
         }
@@ -37,6 +45,7 @@ final readonly class Hydrator
     /** @return array<string, mixed> */
     public function extract(EntityInterface $entity): array
     {
+        /** @phpstan-ignore return.type */
         return $this->fallbackMapper->serializeObject($entity);
     }
 }

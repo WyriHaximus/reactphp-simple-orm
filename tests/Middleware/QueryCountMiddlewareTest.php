@@ -30,6 +30,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
         ], [...$middleware->counters()]);
 
         foreach (
+            /** @phpstan-ignore argument.type */
             $middleware->query(new QueryFactory()->select()->asExpression(), static function (): iterable {
                 yield 1;
             }) as $row
@@ -77,6 +78,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         try {
             foreach (
+                /** @phpstan-ignore argument.type */
                 $middleware->query(new QueryFactory()->select()->asExpression(), static function (): iterable {
                     yield 1;
 
@@ -129,6 +131,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         try {
             foreach (
+                /** @phpstan-ignore argument.type */
                 $middleware->query(new QueryFactory()->select()->asExpression(), static function (): iterable {
                     await(sleep(2));
                     yield 1;

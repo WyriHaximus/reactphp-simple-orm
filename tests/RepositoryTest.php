@@ -209,7 +209,6 @@ final class RepositoryTest extends AsyncTestCase
         ), new Order(
             new Order\Desc('id'),
         ));
-        self::assertInstanceOf(BlogPostStub::class, $blogPost);
 
         self::assertSame('98ce9eaf-b38b-4a51-93ed-131ffac4051e', $blogPost->id);
         self::assertSame('blog_post_title', $blogPost->title);

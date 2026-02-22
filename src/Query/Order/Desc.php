@@ -6,6 +6,7 @@ namespace WyriHaximus\React\SimpleORM\Query\Order;
 
 use WyriHaximus\React\SimpleORM\Query\OrderInterface;
 
+/** @api */
 final readonly class Desc implements OrderInterface
 {
     public function __construct(private string $field)

@@ -7,6 +7,7 @@ namespace WyriHaximus\React\SimpleORM;
 use Deprecated;
 use Latitude\QueryBuilder\ExpressionInterface;
 
+/** @api */
 interface ClientInterface
 {
     /**

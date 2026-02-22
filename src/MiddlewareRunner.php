@@ -18,7 +18,11 @@ final class MiddlewareRunner
         $this->middleware = $middleware;
     }
 
-    /** @return iterable<array<string, mixed>> */
+    /**
+     * @param callable(ExpressionInterface): iterable<array<string, mixed>> $last
+     *
+     * @return iterable<array<string, mixed>>
+     */
     public function query(ExpressionInterface $query, callable $last): iterable
     {
         if (! array_key_exists(0, $this->middleware)) {

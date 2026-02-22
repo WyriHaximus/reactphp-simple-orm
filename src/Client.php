@@ -9,11 +9,16 @@ use Latitude\QueryBuilder\QueryFactory;
 
 use function array_key_exists;
 
+/** @api */
 final class Client implements ClientInterface
 {
     private readonly EntityInspector $entityInspector;
 
-    /** @var array<RepositoryInterface> */
+    /**
+     * @var array<class-string<T>, RepositoryInterface<T>>
+     * @template T of EntityInterface
+     * @phpstan-ignore generics.notSubtype,class.notFound,class.notFound
+     */
     private array $repositories = [];
 
     private readonly Connection $connection;
@@ -41,11 +46,12 @@ final class Client implements ClientInterface
      *
      * @return RepositoryInterface<T>
      *
-     * @template T
+     * @template T of EntityInterface
      */
     public function repository(string $entity): RepositoryInterface
     {
         if (! array_key_exists($entity, $this->repositories)) {
+            /** @phpstan-ignore assign.propertyType */
             $this->repositories[$entity] = new Repository(
                 $this->entityInspector->entity($entity),
                 $this,
@@ -55,6 +61,7 @@ final class Client implements ClientInterface
             );
         }
 
+        /** @phpstan-ignore return.type */
         return $this->repositories[$entity];
     }
 

@@ -8,8 +8,9 @@ use Latitude\QueryBuilder\ExpressionInterface;
 use Throwable;
 use WyriHaximus\React\SimpleORM\MiddlewareInterface;
 
-use function Safe\hrtime;
+use function hrtime;
 
+/** @api */
 final class QueryCountMiddleware implements MiddlewareInterface
 {
     private const int ZERO = 0;
@@ -28,7 +29,11 @@ final class QueryCountMiddleware implements MiddlewareInterface
     {
     }
 
-    /** @return iterable<array<string, mixed>> */
+    /**
+     * @param callable(ExpressionInterface): iterable<array<string, mixed>> $next
+     *
+     * @return iterable<array<string, mixed>>
+     */
     public function query(ExpressionInterface $query, callable $next): iterable
     {
         $this->initiatedCount++;
