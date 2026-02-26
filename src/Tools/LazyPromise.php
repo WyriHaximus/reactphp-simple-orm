@@ -58,11 +58,7 @@ final class LazyPromise implements PromiseInterface
         $this->promise()->cancel();
     }
 
-    /**
-     * @internal
-     *
-     * @see Promise::settle()
-     */
+    /** @see Promise::settle() */
     public function promise(): PromiseInterface|null
     {
         if (! $this->promise instanceof PromiseInterface) {

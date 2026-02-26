@@ -17,6 +17,7 @@ use function bin2hex;
 use function random_bytes;
 use function React\Promise\resolve;
 use function Safe\date;
+use function WyriHaximus\React\awaitObservable;
 
 final class HydratorTest extends TestCase
 {
@@ -48,11 +49,9 @@ final class HydratorTest extends TestCase
         $entity = new Hydrator()->hydrate(
             new EntityInspector(new Configuration(''))->entity(UserStub::class),
             [
-                'doesnotexist' => resolve(true),
                 'id' => $id,
                 'name' => $title,
                 'zelf' => resolve(true),
-                'alsodoesnotexist' => resolve(true),
             ],
         );
 
@@ -73,7 +72,6 @@ final class HydratorTest extends TestCase
         $entity = new Hydrator()->hydrate(
             new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
             [
-                'doesnotexist' => resolve(true),
                 'id' => $id,
                 'author_id' => $authorId,
                 'publisher_id' => $publisherId,
@@ -81,7 +79,29 @@ final class HydratorTest extends TestCase
                 'views' => 133,
                 'created' => date('Y-m-d H:i:s e'),
                 'modified' => date('Y-m-d H:i:s e'),
-                'previous_blog_post' => resolve(null),
+                'previous_blog_post' => resolve([
+                    'id' => $id,
+                    'author_id' => $authorId,
+                    'publisher_id' => $publisherId,
+                    'contents' => bin2hex(random_bytes(133)),
+                    'views' => 133,
+                    'created' => date('Y-m-d H:i:s e'),
+                    'modified' => date('Y-m-d H:i:s e'),
+                    'previous_blog_post' => resolve(null),
+                    'next_blog_post' => resolve(null),
+                    'title' => $title,
+                    'author' => [
+                        'id' => $authorId,
+                        'name' => $authorName,
+                        'zelf' => resolve(true),
+                    ],
+                    'publisher' => [
+                        'id' => $publisherId,
+                        'name' => $publisherName,
+                        'zelf' => resolve(true),
+                    ],
+                    'comments' => awaitObservable(Observable::fromArray([])),
+                ]),
                 'next_blog_post' => resolve(null),
                 'title' => $title,
                 'author' => [
@@ -94,18 +114,20 @@ final class HydratorTest extends TestCase
                     'name' => $publisherName,
                     'zelf' => resolve(true),
                 ],
-                'comments' => Observable::fromArray([]),
-                'alsodoesnotexist' => resolve(true),
+                'comments' => awaitObservable(Observable::fromArray([])),
             ],
         );
 
-        self::assertSame($id, $entity->id);
-        self::assertSame($title, $entity->title);
-        self::assertSame($authorId, $entity->author->id);
-        self::assertSame($authorName, $entity->author->name);
-        self::assertSame($publisherId, $entity->publisher->id);
-        self::assertSame($publisherName, $entity->publisher->name);
-        self::assertSame(133, $entity->views);
+        foreach ([$entity, $entity->previousBlogPost] as $bp) {
+            self::assertSame($id, $bp->id);
+            self::assertSame($title, $bp->title);
+            self::assertSame($authorId, $bp->author->id);
+            self::assertSame($authorName, $bp->author->name);
+            self::assertSame($publisherId, $bp->publisher->id);
+            self::assertSame($publisherName, $bp->publisher->name);
+            self::assertSame(133, $bp->views);
+        }
+//        self::assertNull($entity->nextBlogPost);
     }
 
     #[Test]
@@ -141,7 +163,7 @@ final class HydratorTest extends TestCase
                     'name' => $publisherName,
                     'zelf' => resolve(true),
                 ],
-                'comments' => Observable::fromArray([]),
+                'comments' => awaitObservable(Observable::fromArray([])),
             ],
         );
 

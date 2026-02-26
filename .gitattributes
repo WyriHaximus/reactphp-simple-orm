@@ -12,6 +12,7 @@
 *.bmp binary
 *.ttf binary
 *.blp binary
+*.db2 binary
 
 # Ignoring files for distribution archieves
 .github/ export-ignore

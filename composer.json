@@ -31,7 +31,7 @@
     "testcontainers/testcontainers": "^1.0",
     "vlucas/phpdotenv": "^5.4",
     "wyrihaximus/async-test-utilities": "^12.0.0",
-    "wyrihaximus/makefiles": "^0.9.0"
+    "wyrihaximus/makefiles": "^0.10.1"
   },
   "autoload": {
     "psr-4": {
