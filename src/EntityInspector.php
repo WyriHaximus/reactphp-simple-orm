@@ -115,7 +115,7 @@ final class EntityInspector
                 $keys = $attribute->getArguments()[0];
                 if (is_string($keys)) {
                     $column = $keys;
-                } elseif (is_array($keys) && count($keys) > 0) {
+                } elseif (is_array($keys) && count($keys) > 0 && is_string($keys[0])) {
                     $column = $keys[0];
                 }
             }

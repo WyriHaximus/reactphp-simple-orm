@@ -32,7 +32,9 @@ final readonly class Hydrator
     {
         foreach ($inspectedEntity->joins() as $join) {
             if ($data[$join->property] instanceof PromiseInterface) {
-                $data[$join->property] = $this->createLazyProxy($join->entity, $data[$join->property]);
+                /** @var PromiseInterface<mixed> $promise */
+                $promise               = $data[$join->property];
+                $data[$join->property] = $this->createLazyProxy($join->entity, $promise);
                 continue;
             }
 
@@ -40,9 +42,11 @@ final readonly class Hydrator
                 continue;
             }
 
+            /** @var array<string, mixed> $joinData */
+            $joinData              = $data[$join->property];
             $data[$join->property] = $this->hydrate(
                 $join->entity,
-                $data[$join->property],
+                $joinData,
             );
         }
 
@@ -56,15 +60,30 @@ final readonly class Hydrator
         return $this->fallbackMapper->serializeObject($entity);
     }
 
+    /**
+     * @param InspectedEntityInterface<T> $inspectedEntity
+     * @param PromiseInterface<mixed>     $object
+     *
+     * @return T
+     *
+     * @template T of EntityInterface
+     */
     private function createLazyProxy(InspectedEntityInterface $inspectedEntity, PromiseInterface $object): EntityInterface
     {
+        /** @var T */
         return new ReflectionClass(
             $inspectedEntity->class(),
         )->newLazyProxy(
-            fn (): EntityInterface => $this->hydrate(
-                $inspectedEntity,
-                await($object),
-            ),
+            /** @return T */
+            function () use ($inspectedEntity, $object): EntityInterface {
+                /** @var array<string, mixed> $data */
+                $data = await($object);
+
+                return $this->hydrate(
+                    $inspectedEntity,
+                    $data,
+                );
+            },
         );
     }
 }

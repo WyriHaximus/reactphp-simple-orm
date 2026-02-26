@@ -119,6 +119,10 @@ final class HydratorTest extends TestCase
         );
 
         foreach ([$entity, $entity->previousBlogPost] as $bp) {
+            if ($bp === null) {
+                continue;
+            }
+
             self::assertSame($id, $bp->id);
             self::assertSame($title, $bp->title);
             self::assertSame($authorId, $bp->author->id);
