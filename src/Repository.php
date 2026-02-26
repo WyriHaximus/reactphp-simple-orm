@@ -295,7 +295,7 @@ final class Repository implements RepositoryInterface
 
         foreach ($this->entity->fields() as $field) {
             $this->fields[$this->tableAliases[$tableKey] . '___' . $field->name] = alias(
-                $this->tableAliases[$tableKey] . '.' . $field->name,
+                $this->tableAliases[$tableKey] . '.' . $field->column,
                 $this->tableAliases[$tableKey] . '___' . $field->name,
             );
         }
@@ -367,7 +367,7 @@ final class Repository implements RepositoryInterface
             }
 
             foreach ($join->entity->fields() as $field) {
-                $this->fields[$this->tableAliases[$tableKey] . '___' . $field->name] = alias($this->tableAliases[$tableKey] . '.' . $field->name, $this->tableAliases[$tableKey] . '___' . $field->name);
+                $this->fields[$this->tableAliases[$tableKey] . '___' . $field->name] = alias($this->tableAliases[$tableKey] . '.' . $field->column, $this->tableAliases[$tableKey] . '___' . $field->name);
             }
 
             unset($this->fields[$entity->table() . '___' . $join->property]);
@@ -579,12 +579,20 @@ final class Repository implements RepositoryInterface
 
     private function translateFieldName(string $name): string
     {
-        $pos = strpos($name, '(');
-        if ($pos === false) {
-            return 't0.' . $name;
+        $column = $name;
+        foreach ($this->entity->fields() as $field) {
+            if ($field->name === $name) {
+                $column = $field->column;
+                break;
+            }
         }
 
-        return substr($name, 0, $pos + 1) . 't0.' . substr($name, $pos + 1);
+        $pos = strpos($column, '(');
+        if ($pos === false) {
+            return 't0.' . $column;
+        }
+
+        return substr($column, 0, $pos + 1) . 't0.' . substr($column, $pos + 1);
     }
 
     /**
@@ -594,22 +602,29 @@ final class Repository implements RepositoryInterface
      */
     private function prepareFields(array $fields): array
     {
+        $fieldsWithColumns = [];
         foreach ($fields as $key => $value) {
+            $column = $key;
+            foreach ($this->entity->fields() as $field) {
+                if ($field->name === $key) {
+                    $column = $field->column;
+                    break;
+                }
+            }
+
             if ($value instanceof DateTimeInterface) {
                 /** @phpstan-ignore shipmonk.variableTypeOverwritten */
-                $fields[$key] = $value = date(
+                $value = date(
                     self::DATE_TIME_TIMEZ1_FORMAT,
                     (int) $value->format('U'),
                 );
             }
 
             if (is_scalar($value)) {
-                continue;
+                $fieldsWithColumns[$column] = $value;
             }
-
-            unset($fields[$key]);
         }
 
-        return $fields;
+        return $fieldsWithColumns;
     }
 }

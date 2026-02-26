@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
+use EventSauce\ObjectHydrator\MapFrom;
 use ReflectionClass;
 use Roave\BetterReflection\BetterReflection;
 use Roave\BetterReflection\Reflection\ReflectionProperty;
@@ -77,24 +78,59 @@ final class EntityInspector
                 continue;
             }
 
-            $roaveProperty = (
-                static fn (BetterReflection $br, string $class): \Roave\BetterReflection\Reflection\ReflectionClass => $br->reflector()->reflectClass($class)
-            )(new BetterReflection(), $class->getName())->getProperty($property->getName());
+            $type = $property->getType();
+            if ($type instanceof \ReflectionNamedType) {
+                $typeName = $type->getName();
+                if ($typeName === EntityInterface::class || (class_exists($typeName) && (new ReflectionClass($typeName))->implementsInterface(EntityInterface::class))) {
+                    continue;
+                }
 
-            if (! $roaveProperty instanceof ReflectionProperty) {
-                continue;
+                if ($typeName === 'iterable' || $typeName === 'array') {
+                    continue;
+                }
+            } elseif ($type instanceof \ReflectionUnionType) {
+                $isEntity = false;
+                foreach ($type->getTypes() as $innerType) {
+                    if ($innerType instanceof \ReflectionNamedType) {
+                        $typeName = $innerType->getName();
+                        if ($typeName === EntityInterface::class || (class_exists($typeName) && (new ReflectionClass($typeName))->implementsInterface(EntityInterface::class))) {
+                            $isEntity = true;
+                            break;
+                        }
+
+                        if ($typeName === 'iterable' || $typeName === 'array') {
+                            $isEntity = true;
+                            break;
+                        }
+                    }
+                }
+
+                if ($isEntity) {
+                    continue;
+                }
+            }
+
+            $column = $property->getName();
+            foreach ($property->getAttributes(MapFrom::class) as $attribute) {
+                $keys = $attribute->getArguments()[0];
+                if (is_string($keys)) {
+                    $column = $keys;
+                } elseif (is_array($keys) && count($keys) > 0) {
+                    $column = $keys[0];
+                }
             }
 
             yield $property->getName() => new Field(
                 $property->getName(),
-                (static function (ReflectionProperty $property): string {
+                $column,
+                (static function (\ReflectionProperty $property): string {
                     $type = $property->getType();
                     if ($type !== null) {
                         return (string) $type;
                     }
 
                     return 'mixed';
-                })($roaveProperty),
+                })($property),
             );
         }
     }

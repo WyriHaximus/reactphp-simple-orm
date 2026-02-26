@@ -27,6 +27,8 @@ final class MiddlewareRunner
     {
         if (! array_key_exists(0, $this->middleware)) {
             yield from $last($query);
+
+            return;
         }
 
         yield from $this->call($query, 0, $last);
