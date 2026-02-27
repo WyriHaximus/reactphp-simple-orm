@@ -6,8 +6,9 @@ namespace WyriHaximus\React\SimpleORM;
 
 use EventSauce\ObjectHydrator\MapFrom;
 use ReflectionClass;
-use Roave\BetterReflection\BetterReflection;
-use Roave\BetterReflection\Reflection\ReflectionProperty;
+use ReflectionNamedType;
+use ReflectionProperty;
+use ReflectionUnionType;
 use RuntimeException;
 use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
 use WyriHaximus\React\SimpleORM\Attribute\Table;
@@ -15,8 +16,11 @@ use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\Join;
 
 use function array_key_exists;
+use function class_exists;
 use function count;
 use function current;
+use function is_array;
+use function is_string;
 
 final class EntityInspector
 {
@@ -79,29 +83,31 @@ final class EntityInspector
             }
 
             $type = $property->getType();
-            if ($type instanceof \ReflectionNamedType) {
+            if ($type instanceof ReflectionNamedType) {
                 $typeName = $type->getName();
-                if ($typeName === EntityInterface::class || (class_exists($typeName) && (new ReflectionClass($typeName))->implementsInterface(EntityInterface::class))) {
+                if ($typeName === EntityInterface::class || (class_exists($typeName) && new ReflectionClass($typeName)->implementsInterface(EntityInterface::class))) {
                     continue;
                 }
 
                 if ($typeName === 'iterable' || $typeName === 'array') {
                     continue;
                 }
-            } elseif ($type instanceof \ReflectionUnionType) {
+            } elseif ($type instanceof ReflectionUnionType) {
                 $isEntity = false;
                 foreach ($type->getTypes() as $innerType) {
-                    if ($innerType instanceof \ReflectionNamedType) {
-                        $typeName = $innerType->getName();
-                        if ($typeName === EntityInterface::class || (class_exists($typeName) && (new ReflectionClass($typeName))->implementsInterface(EntityInterface::class))) {
-                            $isEntity = true;
-                            break;
-                        }
+                    if (! ($innerType instanceof ReflectionNamedType)) {
+                        continue;
+                    }
 
-                        if ($typeName === 'iterable' || $typeName === 'array') {
-                            $isEntity = true;
-                            break;
-                        }
+                    $typeName = $innerType->getName();
+                    if ($typeName === EntityInterface::class || (class_exists($typeName) && new ReflectionClass($typeName)->implementsInterface(EntityInterface::class))) {
+                        $isEntity = true;
+                        break;
+                    }
+
+                    if ($typeName === 'iterable' || $typeName === 'array') {
+                        $isEntity = true;
+                        break;
                     }
                 }
 
@@ -123,7 +129,7 @@ final class EntityInspector
             yield $property->getName() => new Field(
                 $property->getName(),
                 $column,
-                (static function (\ReflectionProperty $property): string {
+                (static function (ReflectionProperty $property): string {
                     $type = $property->getType();
                     if ($type !== null) {
                         return (string) $type;

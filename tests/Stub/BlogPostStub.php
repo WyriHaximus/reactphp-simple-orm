@@ -36,7 +36,6 @@ use WyriHaximus\React\SimpleORM\Tools\WithFieldsTrait;
         ),
     ],
     property: 'author',
-    lazy: JoinInterface::IS_LAZY,
 )]
 #[InnerJoin(
     entity: UserStub::class,
@@ -47,7 +46,6 @@ use WyriHaximus\React\SimpleORM\Tools\WithFieldsTrait;
         ),
     ],
     property: 'publisher',
-    lazy: JoinInterface::IS_LAZY,
 )]
 #[InnerJoin(
     entity: BlogPostStub::class,

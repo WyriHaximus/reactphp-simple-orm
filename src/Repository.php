@@ -12,12 +12,14 @@ use Latitude\QueryBuilder\Query\SelectQuery;
 use Latitude\QueryBuilder\QueryFactory;
 use Latitude\QueryBuilder\QueryInterface;
 use Ramsey\Uuid\Uuid;
+use React\EventLoop\Loop;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 use ReflectionClass;
 use RuntimeException;
 use Rx\Observable;
 use Rx\Scheduler\ImmediateScheduler;
+use Rx\Subject\Subject;
 use Throwable;
 use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
 use WyriHaximus\React\SimpleORM\Query\Limit;
@@ -565,10 +567,16 @@ final class Repository implements RepositoryInterface
                         );
                     }
 
-                    return Observable::fromArray(
-                        [...$this->client->repository($join->entity->class())->fetch(new Where(...$where))],
-                        new ImmediateScheduler(),
-                    );
+                    $subject = new Subject();
+                    Loop::futureTick(function () use ($subject, $join, $where): void {
+                        foreach ($this->client->repository($join->entity->class())->fetch(new Where(...$where)) as $row) {
+                            $subject->onNext($row);
+                        }
+
+                        $subject->onCompleted();
+                    });
+
+                    return $subject;
                 },
                 new ImmediateScheduler(),
             ));
@@ -620,9 +628,11 @@ final class Repository implements RepositoryInterface
                 );
             }
 
-            if (is_scalar($value)) {
-                $fieldsWithColumns[$column] = $value;
+            if (! is_scalar($value)) {
+                continue;
             }
+
+            $fieldsWithColumns[$column] = $value;
         }
 
         return $fieldsWithColumns;

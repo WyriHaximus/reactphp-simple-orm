@@ -70,11 +70,10 @@ final readonly class Hydrator
      */
     private function createLazyProxy(InspectedEntityInterface $inspectedEntity, PromiseInterface $object): EntityInterface
     {
-        /** @var T */
+        /** @return T */
         return new ReflectionClass(
             $inspectedEntity->class(),
         )->newLazyProxy(
-            /** @return T */
             function () use ($inspectedEntity, $object): EntityInterface {
                 /** @var array<string, mixed> $data */
                 $data = await($object);

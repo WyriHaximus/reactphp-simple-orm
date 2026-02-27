@@ -21,8 +21,7 @@
     "reactivex/rxphp": "^2.1.0",
     "roave/better-reflection": "^6.68.0",
     "voryx/pgasync": "^2.0.6",
-    "wyrihaximus/react-awaitable-observable": "^1.1.0",
-    "wyrihaximus/react-event-loop-rx-scheduler-hook-up": "^0.1.1"
+    "wyrihaximus/react-awaitable-observable": "^1.2.0"
   },
   "require-dev": {
     "react/promise-timer": "^1.11",
@@ -31,7 +30,7 @@
     "testcontainers/testcontainers": "^1.0",
     "vlucas/phpdotenv": "^5.4",
     "wyrihaximus/async-test-utilities": "^12.0.0",
-    "wyrihaximus/makefiles": "^0.10.1"
+    "wyrihaximus/makefiles": "^0.10.2"
   },
   "autoload": {
     "psr-4": {

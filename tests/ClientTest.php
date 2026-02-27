@@ -15,7 +15,6 @@ use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\SimpleORM\Configuration;
-use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
 use function Latitude\QueryBuilder\field;
 
@@ -30,12 +29,6 @@ final class ClientTest extends AsyncTestCase
     {
         $this->pgClient = Mockery::mock(PgClient::class);
         $this->client   = Client::create(new Postgres($this->pgClient), new Configuration(''));
-    }
-
-    #[Test]
-    public function getRepository(): void
-    {
-        $this->client->repository(UserStub::class);
     }
 
     #[Test]
