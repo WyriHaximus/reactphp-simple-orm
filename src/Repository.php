@@ -44,6 +44,7 @@ use function Latitude\QueryBuilder\on;
 use function spl_object_hash;
 use function strpos;
 use function substr;
+use function var_export;
 use function WyriHaximus\React\awaitObservable;
 
 /**
@@ -80,14 +81,21 @@ final class Repository implements RepositoryInterface
             $query = $this->applyWhereToQuery($where, $query);
         }
 
+        /** @var false|int $count */
+        $count = false;
         foreach (
             $this->connection->query(
                 $query->asExpression(),
             ) as $row
         ) {
+            if ($count !== false) {
+                continue;
+            }
             /** @phpstan-ignore cast.int */
-            return (int) $row['count'];
+            $count = (int) $row['count'];
         }
+
+        if ($count !== false ) {return $count;}
 
         throw new RuntimeException('Could not count rows');
     }
@@ -123,9 +131,16 @@ final class Repository implements RepositoryInterface
     /** @return T */
     public function first(SectionInterface ...$sections): EntityInterface
     {
-        foreach ($this->fetch(...$sections) as $row) {
-            return $row;
+        /** @var false|T $first */
+        $first = false;
+        foreach ($this->fetch(...[...$sections, new Limit(1)]) as $row) {
+            if ($first !== false) {
+                continue;
+            }
+            $first = $row;
         }
+
+        if ($first !== false ) {return $first;}
 
         throw new RuntimeException('Could not find first item');
     }
@@ -169,9 +184,10 @@ final class Repository implements RepositoryInterface
                 $this->queryFactory->insert($this->entity->table(), $fields)->asExpression(),
             ) as $underscore
         ) {
-            break;
         }
 
+        /** @var false|T $first */
+        $first = false;
         foreach (
             $this->fetch(new Where(
                 new Where\Field(
@@ -181,8 +197,13 @@ final class Repository implements RepositoryInterface
                 ),
             )) as $item
         ) {
-            return $item;
+            if ($first !== false) {
+                continue;
+            }
+            $first = $item;
         }
+
+        if ($first !== false ) {return $first;}
 
         throw new RuntimeException('Could not create item');
     }
@@ -205,17 +226,23 @@ final class Repository implements RepositoryInterface
                 )->asExpression(),
             ) as $underscore
         ) {
-            break;
         }
 
+        /** @var false|T $first */
+        $first = false;
         foreach (
             $this->fetch(new Where(
             /** @phpstan-ignore property.notFound */
                 new Where\Field('id', 'eq', [$entity->id]),
             ), new Limit(1)) as $updatedEnitty
         ) {
-            return $updatedEnitty;
+            if ($first !== false) {
+                continue;
+            }
+            $first = $updatedEnitty;
         }
+
+        if ($first !== false ) {return $first;}
 
         throw new RuntimeException('Could not update item');
     }
@@ -296,11 +323,13 @@ final class Repository implements RepositoryInterface
         $query                         = $this->queryFactory->select()->from(alias($this->entity->table(), $this->tableAliases[$tableKey]));
 
         foreach ($this->entity->fields() as $field) {
-            $this->fields[$this->tableAliases[$tableKey] . '___' . $field->name] = alias(
+            $this->fields[$this->tableAliases[$tableKey] . '___' . $field->column] = alias(
                 $this->tableAliases[$tableKey] . '.' . $field->column,
-                $this->tableAliases[$tableKey] . '___' . $field->name,
+                $this->tableAliases[$tableKey] . '___' . $field->column,
             );
         }
+
+//        var_export($this->fields);
 
         $query = $this->buildJoins($query, $this->entity, $i);
 
@@ -369,7 +398,7 @@ final class Repository implements RepositoryInterface
             }
 
             foreach ($join->entity->fields() as $field) {
-                $this->fields[$this->tableAliases[$tableKey] . '___' . $field->name] = alias($this->tableAliases[$tableKey] . '.' . $field->column, $this->tableAliases[$tableKey] . '___' . $field->name);
+                $this->fields[$this->tableAliases[$tableKey] . '___' . $field->column] = alias($this->tableAliases[$tableKey] . '.' . $field->column, $this->tableAliases[$tableKey] . '___' . $field->column);
             }
 
             unset($this->fields[$entity->table() . '___' . $join->property]);
@@ -389,6 +418,10 @@ final class Repository implements RepositoryInterface
                 $query->asExpression(),
             ) as $row
         ) {
+//            var_export([$row, $this->buildTree(
+//                $this->inflate($row),
+//                $this->entity,
+//            ), $query->asExpression()->sql(new PostgresEngine())]);
             yield $this->hydrator->hydrate(
                 $this->entity,
                 $this->buildTree(

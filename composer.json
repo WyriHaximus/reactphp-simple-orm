@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "php": "^8.4",
+    "php": "^8.5",
     "eventsauce/object-hydrator": "^1.7.0",
     "latitude/latitude": "^4.4.1",
     "ramsey/uuid": "^4.9.2",
@@ -21,7 +21,7 @@
     "reactivex/rxphp": "^2.1.0",
     "roave/better-reflection": "^6.68.0",
     "voryx/pgasync": "^2.0.6",
-    "wyrihaximus/react-awaitable-observable": "^1.2.0"
+    "wyrihaximus/react-awaitable-observable": "^1.2.1"
   },
   "require-dev": {
     "react/promise-timer": "^1.11",
@@ -55,7 +55,7 @@
       "wyrihaximus/test-utilities": true
     },
     "platform": {
-      "php": "8.4.13"
+      "php": "8.5.13"
     },
     "sort-packages": true
   },

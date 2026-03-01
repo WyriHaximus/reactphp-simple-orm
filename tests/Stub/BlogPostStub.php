@@ -6,6 +6,7 @@ namespace WyriHaximus\React\Tests\SimpleORM\Stub;
 
 use DateTimeImmutable;
 use EventSauce\ObjectHydrator\MapFrom;
+use EventSauce\ObjectHydrator\PropertyCasters\CastToType;
 use WyriHaximus\React\SimpleORM\Attribute\Clause;
 use WyriHaximus\React\SimpleORM\Attribute\InnerJoin;
 use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
@@ -95,6 +96,7 @@ final readonly class BlogPostStub implements EntityInterface
         public UserStub $author,
         public UserStub $publisher,
         public iterable $comments,
+        #[CastToType('integer')]
         public int $views,
         public DateTimeImmutable $created,
         public DateTimeImmutable $modified,

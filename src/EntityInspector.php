@@ -7,7 +7,6 @@ namespace WyriHaximus\React\SimpleORM;
 use EventSauce\ObjectHydrator\MapFrom;
 use ReflectionClass;
 use ReflectionNamedType;
-use ReflectionProperty;
 use ReflectionUnionType;
 use RuntimeException;
 use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
@@ -82,7 +81,8 @@ final class EntityInspector
                 continue;
             }
 
-            $type = $property->getType();
+            $typeName = 'mixed';
+            $type     = $property->getType();
             if ($type instanceof ReflectionNamedType) {
                 $typeName = $type->getName();
                 if ($typeName === EntityInterface::class || (class_exists($typeName) && new ReflectionClass($typeName)->implementsInterface(EntityInterface::class))) {
@@ -129,14 +129,7 @@ final class EntityInspector
             yield $property->getName() => new Field(
                 $property->getName(),
                 $column,
-                (static function (ReflectionProperty $property): string {
-                    $type = $property->getType();
-                    if ($type !== null) {
-                        return (string) $type;
-                    }
-
-                    return 'mixed';
-                })($property),
+                $typeName,
             );
         }
     }

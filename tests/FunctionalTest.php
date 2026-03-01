@@ -95,13 +95,15 @@ final class FunctionalTest extends AsyncTestCase
             new Postgres(
                 new PgClient(
                     [
-                        'host'     => $this->testContainer->getHost(),
-                        'port'     => $this->testContainer->getMappedPort(5432),
+                        'host'     => $this->testContainer->getIpAddress($ip),
+                        'port'     => 5432,
                         'user'     => 'postgres',
                         'password' => 'postgres',
                         'database' => 'postgres',
+                        'auto_disconnect' => true,
+                        'max_connections' => 1,
+                        'tls' => \PgAsync\Connection::TLS_MODE_DISABLE,
                     ],
-                    Loop::get(),
                 ),
             ),
             new Configuration(''),
@@ -113,6 +115,7 @@ final class FunctionalTest extends AsyncTestCase
     public function shutdownContainer(): void
     {
         $this->testContainer?->stop();
+        sleep(3);
     }
 
     #[Test]
@@ -123,13 +126,13 @@ final class FunctionalTest extends AsyncTestCase
             $this->client?->repository(UserStub::class)->count(),
         );
 
-//        self::assertSame([
-//            'initiated' => 1,
-//            'successful' => 1,
-//            'errored' => 0,
-//            'slow' => 0,
-//            'completed' => 1,
-//        ], [...$this->counter->counters()]);
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 0,
+            'completed' => 1,
+        ], [...$this->counter->counters()]);
     }
 
     #[Test]
@@ -157,13 +160,13 @@ final class FunctionalTest extends AsyncTestCase
             $this->client?->repository(BlogPostStub::class)->count(),
         );
 
-//        self::assertSame([
-//            'initiated' => 1,
-//            'successful' => 1,
-//            'errored' => 0,
-//            'slow' => 0,
-//            'completed' => 1,
-//        ], [...$this->counter->counters()]);
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 0,
+            'completed' => 1,
+        ], [...$this->counter->counters()]);
     }
 
     #[Test]
@@ -187,7 +190,11 @@ final class FunctionalTest extends AsyncTestCase
     public function firstBlogPostCommentCount(): void
     {
         foreach ($this->client?->repository(BlogPostStub::class)->fetch() ?? [] as $blogPost) {
-            self::assertCount(2, $blogPost->comments);
+            if ($blogPost->id !== '53ab5832-9a90-4e6e-988b-06b8b5fed763') {
+                continue;
+            }
+
+            self::assertCount(2, [...$blogPost->comments]);
             break;
         }
 
@@ -203,9 +210,13 @@ final class FunctionalTest extends AsyncTestCase
     #[Test]
     public function firstBlogPostAuthorId(): void
     {
+        $first = false;
         foreach ($this->client?->repository(BlogPostStub::class)->fetch() ?? [] as $blogPost) {
+            if ($first) {
+                continue;
+            }
+            $first = true;
             self::assertSame('fb175cbc-04cc-41c7-8e35-6b817ac016ca', $blogPost->author->id);
-            break;
         }
 
         self::assertSame([
@@ -222,7 +233,6 @@ final class FunctionalTest extends AsyncTestCase
     {
         foreach ($this->client?->repository(BlogPostStub::class)->fetch(new Limit(1)) ?? [] as $blogPost) {
             self::assertSame('fb175cbc-04cc-41c7-8e35-6b817ac016ca', $blogPost->author->id);
-            break;
         }
 
         self::assertSame([

@@ -11,17 +11,16 @@ trait WithFieldsTrait
     /** @param array<string, mixed> $fields */
     public function withFields(array $fields): self
     {
-        $clone = clone $this;
-
+        $safeFields = [];
         foreach ($fields as $key => $value) {
             if (in_array($key, ['id', 'created', 'modified'], true)) {
                 continue;
             }
 
             /** @phpstan-ignore property.dynamicName */
-            $clone->$key = $value;
+            $safeFields[$key] = $value;
         }
 
-        return $clone;
+        return clone($this, $safeFields);
     }
 }
