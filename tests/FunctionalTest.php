@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace WyriHaximus\React\Tests\SimpleORM;
 
 use PgAsync\Client as PgClient;
+use PgAsync\Connection;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\Test;
-use React\EventLoop\Loop;
 use Safe\DateTimeImmutable;
 use Testcontainers\Container\GenericContainer;
 use Testcontainers\Container\StartedTestContainer;
@@ -102,7 +102,7 @@ final class FunctionalTest extends AsyncTestCase
                         'database' => 'postgres',
                         'auto_disconnect' => true,
                         'max_connections' => 1,
-                        'tls' => \PgAsync\Connection::TLS_MODE_DISABLE,
+                        'tls' => Connection::TLS_MODE_DISABLE,
                     ],
                 ),
             ),
@@ -215,6 +215,7 @@ final class FunctionalTest extends AsyncTestCase
             if ($first) {
                 continue;
             }
+
             $first = true;
             self::assertSame('fb175cbc-04cc-41c7-8e35-6b817ac016ca', $blogPost->author->id);
         }
@@ -319,7 +320,6 @@ final class FunctionalTest extends AsyncTestCase
                 1,
                 [...$blogPost->comments],
             );
-            break;
         }
 
         self::assertSame([
@@ -344,7 +344,6 @@ final class FunctionalTest extends AsyncTestCase
                 '15f25357-4b3d-4d4d-b6a5-2ceb93864b77',
                 $blogPost->author->id,
             );
-            break;
         }
 
         self::assertSame([

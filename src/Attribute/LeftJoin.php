@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace WyriHaximus\React\SimpleORM\Attribute;
 
 use Attribute;
+use WyriHaximus\React\SimpleORM\Entity\JointType;
 
 /** @api */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
 final readonly class LeftJoin implements JoinInterface
 {
-    public string $type;
+    public JointType $type;
 
     /**
      * @param array<Clause> $clause
@@ -23,6 +24,6 @@ final readonly class LeftJoin implements JoinInterface
         public string $property,
         public bool $lazy = self::IS_NOT_LAZY,
     ) {
-        $this->type = 'left';
+        $this->type = JointType::LEFT;
     }
 }

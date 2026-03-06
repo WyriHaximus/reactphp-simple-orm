@@ -20,7 +20,7 @@ final readonly class Join
      */
     public function __construct(
         public InspectedEntityInterface $entity,
-        public string $type,
+        public JointType $type,
         public string $property,
         public bool $lazy,
         Clause ...$clause,

@@ -64,6 +64,55 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
     }
 
     #[Test]
+    public function countingSlowSuccess(): void
+    {
+        $middleware = new QueryCountMiddleware(1);
+
+        self::assertSame([
+            'initiated' => 0,
+            'successful' => 0,
+            'errored' => 0,
+            'slow' => 0,
+            'completed' => 0,
+        ], [...$middleware->counters()]);
+
+        foreach (
+            /** @phpstan-ignore argument.type */
+            $middleware->query(new QueryFactory()->select()->asExpression(), static function (): iterable {
+                \sleep(2);
+
+                yield 1;
+            }) as $row
+        ) {
+            self::assertSame([
+                'initiated' => 1,
+                'successful' => 0,
+                'errored' => 0,
+                'slow' => 1,
+                'completed' => 0,
+            ], [...$middleware->counters()]);
+        }
+
+        self::assertSame([
+            'initiated' => 1,
+            'successful' => 1,
+            'errored' => 0,
+            'slow' => 1,
+            'completed' => 1,
+        ], [...$middleware->counters()]);
+
+        $middleware->resetCounters();
+
+        self::assertSame([
+            'initiated' => 0,
+            'successful' => 0,
+            'errored' => 0,
+            'slow' => 0,
+            'completed' => 0,
+        ], [...$middleware->counters()]);
+    }
+
+    #[Test]
     public function countingError(): void
     {
         $middleware = new QueryCountMiddleware(1);
@@ -143,7 +192,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
                     'initiated' => 1,
                     'successful' => 0,
                     'errored' => 0,
-                    'slow' => 0,
+                    'slow' => 1,
                     'completed' => 0,
                 ], [...$middleware->counters()]);
             }
@@ -155,7 +204,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             'initiated' => 1,
             'successful' => 0,
             'errored' => 1,
-            'slow' => 0,
+            'slow' => 1,
             'completed' => 0,
         ], [...$middleware->counters()]);
 
