@@ -6,11 +6,11 @@ namespace WyriHaximus\React\Tests\SimpleORM;
 
 use PHPUnit\Framework\Attributes\Test;
 use Rx\Observable;
+use WyriHaximus\DevApp\React\SimpleORM\BlogPostStub;
+use WyriHaximus\DevApp\React\SimpleORM\UserStub;
 use WyriHaximus\React\SimpleORM\Configuration;
 use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\SimpleORM\Hydrator;
-use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
-use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 use WyriHaximus\TestUtilities\TestCase;
 
 use function bin2hex;

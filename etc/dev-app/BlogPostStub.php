@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WyriHaximus\React\Tests\SimpleORM\Stub;
+namespace WyriHaximus\DevApp\React\SimpleORM;
 
 use DateTimeImmutable;
 use EventSauce\ObjectHydrator\MapFrom;
@@ -82,18 +82,14 @@ final readonly class BlogPostStub implements EntityInterface
     public function __construct(
         public string $id,
         #[MapFrom('previous_blog_post_id')]
-        public string|null $previousBlogPostId,
         public BlogPostStub|null $previousBlogPost,
         #[MapFrom('next_blog_post_id')]
-        public string|null $nextBlogPostId,
         public BlogPostStub|null $nextBlogPost,
-        #[MapFrom('author_id')]
-        public string $authorId,
-        #[MapFrom('publisher_id')]
-        public string $publisherId,
         public string $title,
         public string $contents,
+        #[MapFrom('author_id')]
         public UserStub $author,
+        #[MapFrom('publisher_id')]
         public UserStub $publisher,
         public iterable $comments,
         #[CastToType('integer')]

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WyriHaximus\React\Tests\SimpleORM\Stub;
+namespace WyriHaximus\DevApp\React\SimpleORM;
 
 use EventSauce\ObjectHydrator\MapFrom;
 use WyriHaximus\React\SimpleORM\Attribute\Clause;
@@ -40,10 +40,8 @@ final readonly class CommentStub implements EntityInterface
     public function __construct(
         public string $id,
         #[MapFrom('author_id')]
-        public string $authorId,
         public UserStub $author,
         #[MapFrom('blog_post_id')]
-        public string $blogPostId,
         public BlogPostStub $blogPost,
         public string $contents,
     ) {

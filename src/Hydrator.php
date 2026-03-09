@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
-use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
 use React\Promise\PromiseInterface;
 use ReflectionClass;
+use WyriHaximus\React\SimpleORM\Generated\Hydrator as GeneratedHydrator;
 
 use function array_key_exists;
+use function array_keys;
 use function is_array;
 use function React\Async\await;
+use function var_export;
 
 final readonly class Hydrator
 {
-    private ObjectMapperUsingReflection $fallbackMapper;
+    private GeneratedHydrator $fallbackMapper;
 
     public function __construct()
     {
-        $this->fallbackMapper = new ObjectMapperUsingReflection();
+        $this->fallbackMapper = new GeneratedHydrator();
     }
 
     /**
@@ -36,24 +38,26 @@ final readonly class Hydrator
                 continue;
             }
 
-            if ($data[$join->property] instanceof PromiseInterface) {
-                /** @var PromiseInterface<mixed> $promise */
-                $promise               = $data[$join->property];
-                $data[$join->property] = $this->createLazyProxy($join->entity, $promise);
-                continue;
-            }
+//            if ($data[$join->property] instanceof PromiseInterface) {
+//                /** @var PromiseInterface<mixed> $promise */
+//                $promise               = $data[$join->property];
+//                $data[$join->property] = $this->createLazyProxy($join->entity, $promise);
+//                continue;
+//            }
 
             if (! is_array($data[$join->property])) {
                 continue;
             }
 
             /** @var array<string, mixed> $joinData */
-            $joinData              = $data[$join->property];
-            $data[$join->property] = $this->hydrate(
+            $joinData                                                  = $data[$join->property];
+            $data[$inspectedEntity->fields()[$join->property]->column] = $this->hydrate(
                 $join->entity,
                 $joinData,
             );
         }
+
+        var_export([$inspectedEntity->fields(), $data, array_keys($data)]);
 
         return $this->fallbackMapper->hydrateObject($inspectedEntity->class(), $data);
     }

@@ -11,4 +11,6 @@
     <file>../../tests</file>
 
     <rule ref="WyriHaximus-OSS" />
+
+    <exclude-pattern>src/Generated/Hydrator.php</exclude-pattern>
 </ruleset>

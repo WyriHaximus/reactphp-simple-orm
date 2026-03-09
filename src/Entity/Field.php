@@ -7,7 +7,7 @@ namespace WyriHaximus\React\SimpleORM\Entity;
 /** @api */
 final readonly class Field
 {
-    public function __construct(public string $name, public string $type)
+    public function __construct(public string $property, public string $column, public string $type)
     {
     }
 }

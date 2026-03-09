@@ -8,13 +8,13 @@ use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\Test;
 use RuntimeException;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
+use WyriHaximus\DevApp\React\SimpleORM\BlogPostStub;
+use WyriHaximus\DevApp\React\SimpleORM\CommentStub;
+use WyriHaximus\DevApp\React\SimpleORM\NoSQLStub;
+use WyriHaximus\DevApp\React\SimpleORM\UserStub;
 use WyriHaximus\React\SimpleORM\Attribute\Clause;
 use WyriHaximus\React\SimpleORM\Configuration;
 use WyriHaximus\React\SimpleORM\EntityInspector;
-use WyriHaximus\React\Tests\SimpleORM\Stub\BlogPostStub;
-use WyriHaximus\React\Tests\SimpleORM\Stub\CommentStub;
-use WyriHaximus\React\Tests\SimpleORM\Stub\NoSQLStub;
-use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
 
 use function current;
 

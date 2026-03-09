@@ -2,6 +2,7 @@
   "name": "wyrihaximus/react-simple-orm",
   "description": "EXPERIMENTAL: Package to see how feasible a simple ORM in ReactPHP is",
   "license": "MIT",
+  "type": "composer-plugin",
   "authors": [
     {
       "name": "Cees-Jan Kiewiet",
@@ -11,6 +12,8 @@
   ],
   "require": {
     "php": "^8.5",
+    "composer-plugin-api": "^2.0.0",
+    "composer/composer": "^2.9.2",
     "eventsauce/object-hydrator": "^1.7.0",
     "latitude/latitude": "^4.4.1",
     "ramsey/uuid": "^4.9.2",
@@ -21,6 +24,7 @@
     "reactivex/rxphp": "^2.1.0",
     "roave/better-reflection": "^6.68.0",
     "voryx/pgasync": "^2.0.6",
+    "wyrihaximus/generative-composer-plugin-tooling": "^1.5.0",
     "wyrihaximus/react-awaitable-observable": "^1.2.1"
   },
   "require-dev": {
@@ -34,6 +38,7 @@
   },
   "autoload": {
     "psr-4": {
+      "WyriHaximus\\DevApp\\React\\SimpleORM\\": "etc/dev-app/",
       "WyriHaximus\\React\\SimpleORM\\": "src/"
     }
   },
@@ -59,12 +64,28 @@
     },
     "sort-packages": true
   },
+  "extra": {
+    "class": "WyriHaximus\\React\\SimpleORM\\Composer\\HydratorGenerator",
+    "wyrihaximus": {
+      "react": {
+        "orm": {
+          "has-entities": true
+        }
+      }
+    }
+  },
   "scripts": {
     "post-install-cmd": [
       "make on-install-or-update || true"
     ],
     "post-update-cmd": [
       "make on-install-or-update || true"
+    ],
+    "pre-autoload-dump": [
+      "WyriHaximus\\React\\SimpleORM\\Composer\\HydratorGenerator::findEntities"
+    ],
+    "generate-config": [
+      "WyriHaximus\\React\\SimpleORM\\Composer\\HydratorGenerator::findEntities"
     ]
   }
 }

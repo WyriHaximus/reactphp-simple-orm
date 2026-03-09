@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use PgAsync\Client as PgClient;
 use React\EventLoop\Loop;
+use WyriHaximus\DevApp\React\SimpleORM\NoSQLStub;
 use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use WyriHaximus\React\SimpleORM\Client;
 use WyriHaximus\React\SimpleORM\Configuration;
 use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
-use WyriHaximus\React\Tests\SimpleORM\Stub\NoSQLStub;
 
 use function PHPStan\Testing\assertType;
 

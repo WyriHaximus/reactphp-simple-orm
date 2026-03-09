@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WyriHaximus\React\SimpleORM;
 
 //use EventSauce\ObjectHydrator\MapFrom;
+use EventSauce\ObjectHydrator\MapFrom;
 use ReflectionClass;
 use Roave\BetterReflection\BetterReflection;
 use Roave\BetterReflection\Reflection\ReflectionProperty;
@@ -13,10 +14,13 @@ use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
 use WyriHaximus\React\SimpleORM\Attribute\Table;
 use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\Join;
+use WyriHaximus\React\SimpleORM\Entity\JointType;
 
 use function array_key_exists;
 use function count;
 use function current;
+use function is_array;
+use function is_string;
 use function method_exists;
 
 final class EntityInspector
@@ -68,14 +72,15 @@ final class EntityInspector
 
     /**
      * @param ReflectionClass<EntityInterface> $class
-     * @param Join[]                           $joins
+     * @param array<string, Join>              $joins
      *
      * @return iterable<string, Field>
      */
     private function fields(ReflectionClass $class, array $joins): iterable
     {
         foreach ($class->getProperties() as $property) {
-            if (array_key_exists($property->getName(), $joins)) {
+            $propertyName = $property->getName();
+            if (array_key_exists($property->getName(), $joins) && $joins[$property->getName()]->type === JointType::LEFT) {
                 continue;
             }
 
@@ -91,15 +96,37 @@ final class EntityInspector
                 continue;
             }
 
+            $column = $property->getName();
+            foreach ($property->getAttributes(MapFrom::class) as $attribute) {
+                $keys = $attribute->getArguments()[0];
+                if (is_string($keys)) {
+                    $column = $keys;
+                } elseif (is_array($keys) && count($keys) > 0) {
+                    $column = $keys[0];
+                }
+            }
+
+//            if (array_key_exists($property->getName(), $joins) && $joins[$property->getName()]->type === JointType::INNER) {
+//            if (array_key_exists($property->getName(), $joins)) {
+//                foreach ($joins[$property->getName()]->clause as $clause) {
+//                    if ($clause->localKey === $column) {
+////                        $propertyName = $joins[$property->getName()]->property;
+//                        $propertyName = $column;
+//                        break;
+//                    }
+//                }
+//            }
+
             yield $property->getName() => new Field(
-                $property->getName(),
+                $propertyName,
+                $column,
                 (static function (ReflectionProperty $property): string {
                     $type = $property->getType();
                     if ($type !== null) {
                         return (string) $type;
                     }
 
-                    return (string) current($property->getDocBlockTypes());
+                    return 'mixed';
                 })($roaveProperty),
             );
         }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WyriHaximus\React\Tests\SimpleORM\Stub;
+namespace WyriHaximus\DevApp\React\SimpleORM;
 
 use WyriHaximus\React\SimpleORM\EntityInterface;
 

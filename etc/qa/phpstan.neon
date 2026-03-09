@@ -5,4 +5,5 @@ parameters:
 		- ../../src
 		- ../../tests
 	excludePaths:
+		- ../../src/Generated/Hydrator.php
 		- ../../src/Tools/LazyPromise.php
