@@ -113,7 +113,7 @@ class Hydrator implements ObjectMapper
 
             after_id:
 
-            $value = $payload['previous_blog_post_id'] ?? null;
+            $value = $payload['previous_blog_post'] ?? null;
 
             if ($value === null) {
                 $properties['previousBlogPost'] = null;
@@ -133,7 +133,7 @@ class Hydrator implements ObjectMapper
 
             after_previousBlogPost:
 
-            $value = $payload['next_blog_post_id'] ?? null;
+            $value = $payload['next_blog_post'] ?? null;
 
             if ($value === null) {
                 $properties['nextBlogPost'] = null;
@@ -175,10 +175,10 @@ class Hydrator implements ObjectMapper
 
             after_contents:
 
-            $value = $payload['author_id'] ?? null;
+            $value = $payload['author'] ?? null;
 
             if ($value === null) {
-                $missingFields[] = 'author_id';
+                $missingFields[] = 'author';
                 goto after_author;
             }
 
@@ -195,10 +195,10 @@ class Hydrator implements ObjectMapper
 
             after_author:
 
-            $value = $payload['publisher_id'] ?? null;
+            $value = $payload['publisher'] ?? null;
 
             if ($value === null) {
-                $missingFields[] = 'publisher_id';
+                $missingFields[] = 'publisher';
                 goto after_publisher;
             }
 
@@ -337,10 +337,10 @@ class Hydrator implements ObjectMapper
 
             after_id:
 
-            $value = $payload['author_id'] ?? null;
+            $value = $payload['author'] ?? null;
 
             if ($value === null) {
-                $missingFields[] = 'author_id';
+                $missingFields[] = 'author';
                 goto after_author;
             }
 
@@ -357,10 +357,10 @@ class Hydrator implements ObjectMapper
 
             after_author:
 
-            $value = $payload['blog_post_id'] ?? null;
+            $value = $payload['blog_post'] ?? null;
 
             if ($value === null) {
-                $missingFields[] = 'blog_post_id';
+                $missingFields[] = 'blog_post';
                 goto after_blogPost;
             }
 
@@ -605,7 +605,7 @@ class Hydrator implements ObjectMapper
             goto after_previousBlogPost;
         }
         $previousBlogPost = $this->serializeObjectWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub($previousBlogPost);
-        after_previousBlogPost:        $result['previous_blog_post_id'] = $previousBlogPost;
+        after_previousBlogPost:        $result['previous_blog_post'] = $previousBlogPost;
 
         
         $nextBlogPost = $object->nextBlogPost;
@@ -614,7 +614,7 @@ class Hydrator implements ObjectMapper
             goto after_nextBlogPost;
         }
         $nextBlogPost = $this->serializeObjectWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub($nextBlogPost);
-        after_nextBlogPost:        $result['next_blog_post_id'] = $nextBlogPost;
+        after_nextBlogPost:        $result['next_blog_post'] = $nextBlogPost;
 
         
         $title = $object->title;
@@ -627,12 +627,12 @@ class Hydrator implements ObjectMapper
         
         $author = $object->author;
         $author = $this->serializeObjectWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub($author);
-        after_author:        $result['author_id'] = $author;
+        after_author:        $result['author'] = $author;
 
         
         $publisher = $object->publisher;
         $publisher = $this->serializeObjectWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub($publisher);
-        after_publisher:        $result['publisher_id'] = $publisher;
+        after_publisher:        $result['publisher'] = $publisher;
 
         
         $comments = $object->comments;
@@ -694,12 +694,12 @@ class Hydrator implements ObjectMapper
         
         $author = $object->author;
         $author = $this->serializeObjectWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub($author);
-        after_author:        $result['author_id'] = $author;
+        after_author:        $result['author'] = $author;
 
         
         $blogPost = $object->blogPost;
         $blogPost = $this->serializeObjectWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub($blogPost);
-        after_blogPost:        $result['blog_post_id'] = $blogPost;
+        after_blogPost:        $result['blog_post'] = $blogPost;
 
         
         $contents = $object->contents;

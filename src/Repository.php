@@ -436,10 +436,6 @@ final class Repository implements RepositoryInterface
     /** @return iterable<T> */
     private function fetchAndHydrate(QueryInterface $query): iterable
     {
-        var_export([
-            $query->asExpression()->sql(new PostgresEngine()),
-            $query->asExpression()->params(new PostgresEngine()),
-        ]);
         foreach (
             $this->connection->query(
                 $query->asExpression(),
@@ -480,6 +476,7 @@ final class Repository implements RepositoryInterface
      */
     private function buildTree(array $row, InspectedEntityInterface $entity, string $tableKeySuffix = 'root'): array
     {
+//        var_export($row);
         $tableKey = spl_object_hash($entity) . '___' . $tableKeySuffix;
         $tree     = $row[$this->tableAliases[$tableKey]];
 
@@ -492,13 +489,17 @@ final class Repository implements RepositoryInterface
             }
 
             if ($join->type === JointType::INNER && ($join->lazy === JoinInterface::IS_LAZY || $entity->class() === $join->entity->class())) {
-                foreach ($join->clause as $clause) {
-                    if ($row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
+//                foreach ($join->clause as $clause) {
+//                    if ($row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
+////                        $resolve(null);
+//
+//                        continue 2;
+//                    }
+//                }
+//                if ($row[$this->tableAliases[$tableKey]][$join->property] === null) {
 //                        $resolve(null);
-
-                        continue 2;
-                    }
-                }
+//                    continue;
+//                }
 //                /** @phpstan-ignore argument.type */
 //                $tree[$join->property] = new ReflectionClass($join->entity->class())->newLazyProxy(function () use ($row, $join, $tableKey): EntityInterface|null {
 //                    foreach ($join->clause as $clause) {

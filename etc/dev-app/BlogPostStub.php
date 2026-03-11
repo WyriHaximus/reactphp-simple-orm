@@ -81,15 +81,15 @@ final readonly class BlogPostStub implements EntityInterface
      */
     public function __construct(
         public string $id,
-        #[MapFrom('previous_blog_post_id')]
+        #[MapFrom('previous_blog_post')]
         public BlogPostStub|null $previousBlogPost,
-        #[MapFrom('next_blog_post_id')]
+        #[MapFrom('next_blog_post')]
         public BlogPostStub|null $nextBlogPost,
         public string $title,
         public string $contents,
-        #[MapFrom('author_id')]
+        #[MapFrom('author')]
         public UserStub $author,
-        #[MapFrom('publisher_id')]
+        #[MapFrom('publisher')]
         public UserStub $publisher,
         public iterable $comments,
         #[CastToType('integer')]

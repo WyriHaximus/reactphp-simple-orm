@@ -14,7 +14,6 @@ use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
 use WyriHaximus\React\SimpleORM\Attribute\Table;
 use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\Join;
-use WyriHaximus\React\SimpleORM\Entity\JointType;
 
 use function array_key_exists;
 use function count;
@@ -80,9 +79,6 @@ final class EntityInspector
     {
         foreach ($class->getProperties() as $property) {
             $propertyName = $property->getName();
-            if (array_key_exists($property->getName(), $joins) && $joins[$property->getName()]->type === JointType::LEFT) {
-                continue;
-            }
 
             $roaveProperty = (static function (BetterReflection $br, string $class): \Roave\BetterReflection\Reflection\ReflectionClass {
                 if (method_exists($br, 'classReflector')) {
@@ -90,13 +86,13 @@ final class EntityInspector
                 }
 
                 return $br->reflector()->reflectClass($class);
-            })(new BetterReflection(), $class->getName())->getProperty($property->getName());
+            })(new BetterReflection(), $class->getName())->getProperty($propertyName);
 
             if (! $roaveProperty instanceof ReflectionProperty) {
                 continue;
             }
 
-            $column = $property->getName();
+            $column = $propertyName;
             foreach ($property->getAttributes(MapFrom::class) as $attribute) {
                 $keys = $attribute->getArguments()[0];
                 if (is_string($keys)) {
@@ -104,6 +100,25 @@ final class EntityInspector
                 } elseif (is_array($keys) && count($keys) > 0) {
                     $column = $keys[0];
                 }
+            }
+
+//            if (array_key_exists($property->getName(), $joins) && $joins[$property->getName()]->type === JointType::LEFT) {
+            if (array_key_exists($propertyName, $joins) || array_key_exists((string) $column, $joins)) {
+                foreach ($joins as $key => $join) {
+                    if ($join->property !== $propertyName && $join->property !== (string) $column) {
+                        continue;
+                    }
+
+                    foreach ($join->clause as $clause) {
+                        yield $clause->localKey => new Field(
+                            $clause->localKey,
+                            $clause->localKey,
+                            'mixed',
+                        );
+                    }
+                }
+
+                continue;
             }
 
 //            if (array_key_exists($property->getName(), $joins) && $joins[$property->getName()]->type === JointType::INNER) {
@@ -117,7 +132,7 @@ final class EntityInspector
 //                }
 //            }
 
-            yield $property->getName() => new Field(
+            yield $propertyName => new Field(
                 $propertyName,
                 $column,
                 (static function (ReflectionProperty $property): string {

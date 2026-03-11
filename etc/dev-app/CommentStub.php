@@ -39,9 +39,9 @@ final readonly class CommentStub implements EntityInterface
     /** @phpstan-ignore shipmonk.deadMethod */
     public function __construct(
         public string $id,
-        #[MapFrom('author_id')]
+        #[MapFrom('author')]
         public UserStub $author,
-        #[MapFrom('blog_post_id')]
+        #[MapFrom('blog_post')]
         public BlogPostStub $blogPost,
         public string $contents,
     ) {
