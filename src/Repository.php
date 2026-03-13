@@ -7,7 +7,6 @@ namespace WyriHaximus\React\SimpleORM;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Latitude\QueryBuilder\CriteriaInterface;
-use Latitude\QueryBuilder\Engine\PostgresEngine;
 use Latitude\QueryBuilder\ExpressionInterface;
 use Latitude\QueryBuilder\Query\SelectQuery;
 use Latitude\QueryBuilder\QueryFactory;
@@ -197,6 +196,7 @@ final class Repository implements RepositoryInterface
             // No-op: Do nothing but ensure we complete the query
             $i++;
         }
+        unset($i);
 
         /** @var false|T $first */ // phpcs:disable
         $first = false;
@@ -243,6 +243,7 @@ final class Repository implements RepositoryInterface
             // No-op: Do nothing but ensure we complete the query
             $i++;
         }
+        unset($i);
 
         /** @var false|T $first */ // phpcs:disable
         $first = false;
