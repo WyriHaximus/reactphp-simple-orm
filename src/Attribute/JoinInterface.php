@@ -7,9 +7,7 @@ namespace WyriHaximus\React\SimpleORM\Attribute;
 use WyriHaximus\React\SimpleORM\Entity\JointType;
 
 /**
- * @property string $entity
  * @property JointType $type
- * @property string $property
  * @property bool $lazy
  * @property array<Clause> $clause
  */

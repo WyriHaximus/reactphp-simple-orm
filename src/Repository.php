@@ -490,15 +490,17 @@ final class Repository implements RepositoryInterface
             }
 
             if ($join->type === JointType::INNER && ($join->lazy === JoinInterface::IS_LAZY || $entity->class() === $join->entity->class())) {
-//                foreach ($join->clause as $clause) {
-//                    if ($row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
-////                        $resolve(null);
-//
-//                        continue 2;
-//                    }
-//                }
-//                if ($row[$this->tableAliases[$tableKey]][$join->property] === null) {
+                foreach ($join->clause as $clause) {
+                    if ($row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
+                        $tree[$join->property] = null;
 //                        $resolve(null);
+
+                        continue 2;
+                    }
+                }
+//                if ($row[$this->tableAliases[$tableKey]][$join->property] === null) {
+//                    $tree[$join->property] = null;
+////                        $resolve(null);
 //                    continue;
 //                }
 //                /** @phpstan-ignore argument.type */
@@ -646,6 +648,8 @@ final class Repository implements RepositoryInterface
                 new ImmediateScheduler(),
             ));
         }
+
+//        var_export($tree);
 
         return $tree;
     }

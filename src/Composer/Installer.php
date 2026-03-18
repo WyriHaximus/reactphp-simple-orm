@@ -12,7 +12,7 @@ use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use WyriHaximus\Composer\GenerativePluginTooling\GenerativePluginExecutioner;
 
-final class HydratorGenerator implements PluginInterface, EventSubscriberInterface
+final class Installer implements PluginInterface, EventSubscriberInterface
 {
     /** @return array<string, string> */
     public static function getSubscribedEvents(): array

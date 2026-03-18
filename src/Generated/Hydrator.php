@@ -604,7 +604,28 @@ class Hydrator implements ObjectMapper
         if (!$previousBlogPost instanceof \WyriHaximus\DevApp\React\SimpleORM\BlogPostStub) {
             goto after_previousBlogPost;
         }
-        $previousBlogPost = $this->serializeObjectWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub($previousBlogPost);
+        static $previousBlogPostSerializer0;
+
+        if ($previousBlogPostSerializer0 === null) {
+            $previousBlogPostSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+  'clause' => 
+   [
+    0 => 
+    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+       'localKey' => 'previous_blog_post_id',
+       'foreignKey' => 'id',
+       'localCast' => NULL,
+       'localFunction' => NULL,
+       'foreignCast' => NULL,
+       'foreignFunction' => NULL,
+    ]),
+  ],
+  'lazy' => true,
+]
+);
+        }
+        
+        $previousBlogPost = $previousBlogPostSerializer0->serialize($previousBlogPost, $this);
         after_previousBlogPost:        $result['previous_blog_post'] = $previousBlogPost;
 
         
@@ -613,7 +634,28 @@ class Hydrator implements ObjectMapper
         if (!$nextBlogPost instanceof \WyriHaximus\DevApp\React\SimpleORM\BlogPostStub) {
             goto after_nextBlogPost;
         }
-        $nextBlogPost = $this->serializeObjectWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub($nextBlogPost);
+        static $nextBlogPostSerializer0;
+
+        if ($nextBlogPostSerializer0 === null) {
+            $nextBlogPostSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+  'clause' => 
+   [
+    0 => 
+    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+       'localKey' => 'next_blog_post_id',
+       'foreignKey' => 'id',
+       'localCast' => NULL,
+       'localFunction' => NULL,
+       'foreignCast' => NULL,
+       'foreignFunction' => NULL,
+    ]),
+  ],
+  'lazy' => true,
+]
+);
+        }
+        
+        $nextBlogPost = $nextBlogPostSerializer0->serialize($nextBlogPost, $this);
         after_nextBlogPost:        $result['next_blog_post'] = $nextBlogPost;
 
         
@@ -626,16 +668,78 @@ class Hydrator implements ObjectMapper
 
         
         $author = $object->author;
-        $author = $this->serializeObjectWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub($author);
+        static $authorSerializer0;
+
+        if ($authorSerializer0 === null) {
+            $authorSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+  'clause' => 
+   [
+    0 => 
+    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+       'localKey' => 'author_id',
+       'foreignKey' => 'id',
+       'localCast' => NULL,
+       'localFunction' => NULL,
+       'foreignCast' => NULL,
+       'foreignFunction' => NULL,
+    ]),
+  ],
+]
+);
+        }
+        
+        $author = $authorSerializer0->serialize($author, $this);
         after_author:        $result['author'] = $author;
 
         
         $publisher = $object->publisher;
-        $publisher = $this->serializeObjectWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub($publisher);
+        static $publisherSerializer0;
+
+        if ($publisherSerializer0 === null) {
+            $publisherSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+  'clause' => 
+   [
+    0 => 
+    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+       'localKey' => 'publisher_id',
+       'foreignKey' => 'id',
+       'localCast' => NULL,
+       'localFunction' => NULL,
+       'foreignCast' => NULL,
+       'foreignFunction' => NULL,
+    ]),
+  ],
+]
+);
+        }
+        
+        $publisher = $publisherSerializer0->serialize($publisher, $this);
         after_publisher:        $result['publisher'] = $publisher;
 
         
         $comments = $object->comments;
+        static $commentsSerializer0;
+
+        if ($commentsSerializer0 === null) {
+            $commentsSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\LeftJoin(... [
+  'clause' => 
+   [
+    0 => 
+    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+       'localKey' => 'id',
+       'foreignKey' => 'blog_post_id',
+       'localCast' => 'BIGINT',
+       'localFunction' => NULL,
+       'foreignCast' => NULL,
+       'foreignFunction' => NULL,
+    ]),
+  ],
+  'lazy' => true,
+]
+);
+        }
+        
+        $comments = $commentsSerializer0->serialize($comments, $this);
         after_comments:        $result['comments'] = $comments;
 
         
@@ -693,12 +797,52 @@ class Hydrator implements ObjectMapper
 
         
         $author = $object->author;
-        $author = $this->serializeObjectWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub($author);
+        static $authorSerializer0;
+
+        if ($authorSerializer0 === null) {
+            $authorSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+  'clause' => 
+   [
+    0 => 
+    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+       'localKey' => 'author_id',
+       'foreignKey' => 'id',
+       'localCast' => NULL,
+       'localFunction' => NULL,
+       'foreignCast' => NULL,
+       'foreignFunction' => NULL,
+    ]),
+  ],
+]
+);
+        }
+        
+        $author = $authorSerializer0->serialize($author, $this);
         after_author:        $result['author'] = $author;
 
         
         $blogPost = $object->blogPost;
-        $blogPost = $this->serializeObjectWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub($blogPost);
+        static $blogPostSerializer0;
+
+        if ($blogPostSerializer0 === null) {
+            $blogPostSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+  'clause' => 
+   [
+    0 => 
+    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+       'localKey' => 'blog_post_id',
+       'foreignKey' => 'id',
+       'localCast' => NULL,
+       'localFunction' => NULL,
+       'foreignCast' => NULL,
+       'foreignFunction' => NULL,
+    ]),
+  ],
+]
+);
+        }
+        
+        $blogPost = $blogPostSerializer0->serialize($blogPost, $this);
         after_blogPost:        $result['blog_post'] = $blogPost;
 
         

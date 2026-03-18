@@ -6,7 +6,9 @@ namespace WyriHaximus\React\SimpleORM;
 
 //use EventSauce\ObjectHydrator\MapFrom;
 use EventSauce\ObjectHydrator\MapFrom;
+use EventSauce\ObjectHydrator\NaivePropertyTypeResolver;
 use ReflectionClass;
+use ReflectionNamedType;
 use Roave\BetterReflection\BetterReflection;
 use Roave\BetterReflection\Reflection\ReflectionProperty;
 use RuntimeException;
@@ -16,10 +18,12 @@ use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\Join;
 
 use function array_key_exists;
+use function class_exists;
 use function count;
 use function current;
 use function is_array;
 use function is_string;
+use function is_subclass_of;
 use function method_exists;
 
 final class EntityInspector
@@ -55,12 +59,20 @@ final class EntityInspector
 
             $tableAttribute = current($tableAttributes)->newInstance();
 
-            $joins = [...$this->joins($class)];
+            $fields = $joins = [];
+            foreach ($this->fields($class) as $fieldOrJoin) {
+                if ($fieldOrJoin instanceof Field) {
+                    $fields[] = $fieldOrJoin;
+                } elseif ($fieldOrJoin instanceof Join) {
+                    $joins[] = $fieldOrJoin;
+                }
+            }
+
             /** @phpstan-ignore assign.propertyType */
             $this->entities[$entity] = new InspectedEntity(
                 $entity,
                 $this->configuration->tablePrefix . $tableAttribute->table,
-                [...$this->fields($class, $joins)],
+                $fields,
                 $joins,
             );
         }
@@ -71,12 +83,13 @@ final class EntityInspector
 
     /**
      * @param ReflectionClass<EntityInterface> $class
-     * @param array<string, Join>              $joins
      *
      * @return iterable<string, Field>
      */
-    private function fields(ReflectionClass $class, array $joins): iterable
+    private function fields(ReflectionClass $class): iterable
     {
+        $constructor = $class->getConstructor();
+
         foreach ($class->getProperties() as $property) {
             $propertyName = $property->getName();
 
@@ -102,23 +115,55 @@ final class EntityInspector
                 }
             }
 
-//            if (array_key_exists($property->getName(), $joins) && $joins[$property->getName()]->type === JointType::LEFT) {
-            if (array_key_exists($propertyName, $joins) || array_key_exists((string) $column, $joins)) {
-                foreach ($joins as $key => $join) {
-                    if ($join->property !== $propertyName && $join->property !== (string) $column) {
-                        continue;
-                    }
+            foreach ($property->getAttributes() as $attribute) {
+                $annotation = $attribute->newInstance();
+                if ($annotation instanceof JoinInterface === false) {
+                    continue;
+                }
 
-                    foreach ($join->clause as $clause) {
-                        yield $clause->localKey => new Field(
-                            $clause->localKey,
-                            $clause->localKey,
-                            'mixed',
-                        );
+//                var_export([
+//                    $propertyName,
+//                    $annotation,
+//                    $property->getType(),
+//                ]);
+                $joinEntity   = '';
+                $propertyType = $property->getType();
+                if ($propertyType instanceof ReflectionNamedType) {
+                    $joinEntity = $propertyType->getName();
+                }
+
+                if ($joinEntity === 'array' || $joinEntity === 'iterable') {
+                    $joinEntity = new NaivePropertyTypeResolver()->typeFromConstructorParameter($property, $constructor)->concreteTypes()[0]->name;
+//                    var_export([
+//                        $propertyName,
+//                        $annotation,
+//                        $property->getType(),
+//                        $joinEntity,
+//                        ,
+//                    ]);
+                }
+
+//                var_export([
+//                    $propertyName,
+//                    $annotation,
+//                    $property->getType(),
+//                    $joinEntity,
+//                ]);
+                if (class_exists($joinEntity) && is_subclass_of($joinEntity, EntityInterface::class)) {
+                    foreach ($this->join($property, $annotation, $joinEntity) as $join) {
+                        yield $join->property => $join;
+
+                        foreach ($join->clause as $clause) {
+                            yield $clause->localKey => new Field(
+                                $clause->localKey,
+                                $clause->localKey,
+                                'mixed',
+                            );
+                        }
                     }
                 }
 
-                continue;
+                continue 2;
             }
 
 //            if (array_key_exists($property->getName(), $joins) && $joins[$property->getName()]->type === JointType::INNER) {
@@ -148,33 +193,26 @@ final class EntityInspector
     }
 
     /**
-     * @param ReflectionClass<EntityInterface> $class
+     * @param class-string<T> $entity
      *
      * @return iterable<string, Join>
+     *
+     * @template T of EntityInterface
      */
-    private function joins(ReflectionClass $class): iterable
-    {
-        foreach ($class->getAttributes() as $attribute) {
-            $annotation = $attribute->newInstance();
-            if ($annotation instanceof JoinInterface === false) {
-                continue;
-            }
-
-            yield from $this->join($annotation);
-        }
-    }
-
-    /** @return iterable<string, Join> */
-    private function join(JoinInterface $join): iterable
+    private function join(\ReflectionProperty $property, JoinInterface $join, string $entity): iterable
     {
         /** @phpstan-ignore generator.keyType,property.notFound */
-        yield $join->property => new Join(
+        yield $property->name => new Join(
         /** @phpstan-ignore argument.type,property.notFound */
-            new LazyInspectedEntity($this, $join->entity),
+            new ReflectionClass(
+                InspectedEntity::class,
+            )->newLazyProxy(
+                fn (): InspectedEntityInterface => $this->entity($entity),
+            ),
             /** @phpstan-ignore argument.type,property.notFound */
             $join->type,
             /** @phpstan-ignore argument.type,property.notFound */
-            $join->property,
+            $property->name,
             /** @phpstan-ignore argument.type,property.notFound */
             $join->lazy,
             /** @phpstan-ignore argument.type,argument.unpackNonIterable,property.notFound */

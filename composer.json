@@ -65,7 +65,7 @@
     "sort-packages": true
   },
   "extra": {
-    "class": "WyriHaximus\\React\\SimpleORM\\Composer\\HydratorGenerator",
+    "class": "WyriHaximus\\React\\SimpleORM\\Composer\\Installer",
     "wyrihaximus": {
       "react": {
         "orm": {
@@ -82,10 +82,10 @@
       "make on-install-or-update || true"
     ],
     "pre-autoload-dump": [
-      "WyriHaximus\\React\\SimpleORM\\Composer\\HydratorGenerator::findEntities"
+      "WyriHaximus\\React\\SimpleORM\\Composer\\Installer::findEntities"
     ],
     "generate-config": [
-      "WyriHaximus\\React\\SimpleORM\\Composer\\HydratorGenerator::findEntities"
+      "WyriHaximus\\React\\SimpleORM\\Composer\\Installer::findEntities"
     ]
   }
 }

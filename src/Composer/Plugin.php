@@ -57,7 +57,13 @@ final class Plugin implements GenerativePlugin
 
         File::write(
             $rootPath . '/src/Generated/Hydrator.php',
-            new ObjectMapperCodeGenerator()->dump(array_map(static fn (ItemContract $item): string => $item->class, $items), Hydrator::class) . PHP_EOL,
+            new ObjectMapperCodeGenerator()->dump(
+                array_map(
+                    static fn (ItemContract $item): string => $item->class,
+                    $items,
+                ),
+                Hydrator::class,
+            ) . PHP_EOL,
         );
     }
 }
