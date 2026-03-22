@@ -11,12 +11,16 @@ use WyriHaximus\Composer\GenerativePluginTooling\Filter\Package\ComposerJsonHasI
 use WyriHaximus\Composer\GenerativePluginTooling\GenerativePlugin;
 use WyriHaximus\Composer\GenerativePluginTooling\Helper\File;
 use WyriHaximus\Composer\GenerativePluginTooling\Helper\Remove;
+use WyriHaximus\Composer\GenerativePluginTooling\Helper\TwigFile;
 use WyriHaximus\Composer\GenerativePluginTooling\Item as ItemContract;
 use WyriHaximus\Composer\GenerativePluginTooling\LogStages;
+use WyriHaximus\React\SimpleORM\Configuration;
+use WyriHaximus\React\SimpleORM\EntityInspector;
 use WyriHaximus\React\SimpleORM\EntityInterface;
 use WyriHaximus\React\SimpleORM\Generated\Hydrator;
 
 use function array_map;
+use function md5;
 
 use const PHP_EOL;
 
@@ -65,5 +69,22 @@ final class Plugin implements GenerativePlugin
                 Hydrator::class,
             ) . PHP_EOL,
         );
+
+        $entityToGenerateClassesClassNameSuffixMapping = [];
+        foreach ($items as $item) {
+            $entityToGenerateClassesClassNameSuffixMapping[$item->class] = 'IE' . md5($item->class);
+        }
+
+        $entityInspector = new EntityInspector(new Configuration());
+        foreach ($items as $item) {
+            TwigFile::render(
+                $rootPath . '/etc/generated_templates/InspectedEntity.php.twig',
+                $rootPath . '/src/Generated/InspectedEntity/' . $entityToGenerateClassesClassNameSuffixMapping[$item->class] . '.php',
+                [
+                    'entity' => $entityInspector->entity($item->class),
+                    'entityToGenerateClassesClassNameSuffixMapping' => $entityToGenerateClassesClassNameSuffixMapping,
+                ],
+            );
+        }
     }
 }
