@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace WyriHaximus\React\SimpleORM\Attribute;
 
 use Attribute;
+use EventSauce\ObjectHydrator\DoNotSerialize;
 use EventSauce\ObjectHydrator\ObjectMapper;
+use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 use ReflectionClass;
 use WyriHaximus\React\SimpleORM\Entity\JointType;
 
 /** @api */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final readonly class InnerJoin implements JoinInterface, PropertySerializer
+final class InnerJoin extends DoNotSerialize implements JoinInterface, PropertyCaster, PropertySerializer
 {
-    public JointType $type;
+    public readonly JointType $type;
 
     /**
      * @param array<Clause> $clause
@@ -22,10 +24,15 @@ final readonly class InnerJoin implements JoinInterface, PropertySerializer
      * @phpstan-ignore ergebnis.noConstructorParameterWithDefaultValue
      */
     public function __construct(
-        public array $clause,
-        public bool $lazy = self::IS_NOT_LAZY,
+        public readonly array $clause,
+        public readonly bool $lazy = self::IS_NOT_LAZY,
     ) {
         $this->type = JointType::INNER;
+    }
+
+    public function cast(mixed $value, ObjectMapper $hydrator): mixed
+    {
+        return $value;
     }
 
     public function serialize(mixed $value, ObjectMapper $hydrator): mixed

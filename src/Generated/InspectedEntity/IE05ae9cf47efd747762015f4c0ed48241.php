@@ -11,7 +11,6 @@ use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
 use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\Join;
 use WyriHaximus\React\SimpleORM\Entity\JointType;
-use WyriHaximus\React\SimpleORM\InspectedEntity;
 use WyriHaximus\React\SimpleORM\InspectedEntityInterface;
 
 /**
@@ -63,7 +62,7 @@ final class IE05ae9cf47efd747762015f4c0ed48241 implements InspectedEntityInterfa
         return [
             new Join(
                 new ReflectionClass(
-                    InspectedEntity::class,
+                    IE4bb6e4e4a34d3d950b4deb9f8ede90f9::class,
                 )->newLazyProxy(
                     static fn (): InspectedEntityInterface => new IE4bb6e4e4a34d3d950b4deb9f8ede90f9(),
                 ),
@@ -81,7 +80,7 @@ final class IE05ae9cf47efd747762015f4c0ed48241 implements InspectedEntityInterfa
             ),
             new Join(
                 new ReflectionClass(
-                    InspectedEntity::class,
+                    IE470237142c090f978033f483acdac943::class,
                 )->newLazyProxy(
                     static fn (): InspectedEntityInterface => new IE470237142c090f978033f483acdac943(),
                 ),

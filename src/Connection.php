@@ -17,9 +17,9 @@ final readonly class Connection
     /** @return iterable<array<string, mixed>> */
     public function query(ExpressionInterface $query): iterable
     {
-        yield from $this->middlewareRunner->query(
+        return $this->middlewareRunner->query(
             $query,
-            fn (ExpressionInterface $query): iterable => yield from $this->adapter->query($query),
+            fn (ExpressionInterface $query): iterable => $this->adapter->query($query),
         );
     }
 }

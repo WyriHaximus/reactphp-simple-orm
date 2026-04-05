@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
-//use EventSauce\ObjectHydrator\MapFrom;
 use EventSauce\ObjectHydrator\MapFrom;
-use EventSauce\ObjectHydrator\NaivePropertyTypeResolver;
 use ReflectionClass;
 use ReflectionNamedType;
 use Roave\BetterReflection\BetterReflection;
@@ -16,11 +14,13 @@ use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
 use WyriHaximus\React\SimpleORM\Attribute\Table;
 use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\Join;
+use WyriHaximus\React\SimpleORM\Tools\NaivePropertyTypeResolver;
 
 use function array_key_exists;
 use function class_exists;
 use function count;
 use function current;
+use function in_array;
 use function is_array;
 use function is_string;
 use function is_subclass_of;
@@ -49,6 +49,10 @@ final class EntityInspector
      */
     public function entity(string $entity): InspectedEntityInterface
     {
+//        if (! array_key_exists($entity, $this->entities) && array_key_exists($entity, InspectedEntityMap::MAP) && class_exists(InspectedEntityMap::MAP[$entity])) {
+//            $this->entities[$entity] = new (InspectedEntityMap::MAP[$entity]);
+//        }
+
         if (! array_key_exists($entity, $this->entities)) {
             $class           = new ReflectionClass($entity);
             $tableAttributes = $class->getAttributes(Table::class);
@@ -132,14 +136,13 @@ final class EntityInspector
                     $joinEntity = $propertyType->getName();
                 }
 
-                if ($joinEntity === 'array' || $joinEntity === 'iterable') {
+                if (in_array($joinEntity, ['array', 'iterable', 'list'], true)) {
                     $joinEntity = new NaivePropertyTypeResolver()->typeFromConstructorParameter($property, $constructor)->concreteTypes()[0]->name;
 //                    var_export([
 //                        $propertyName,
 //                        $annotation,
 //                        $property->getType(),
-//                        $joinEntity,
-//                        ,
+//                        new NaivePropertyTypeResolver()->typeFromConstructorParameter($property, $constructor),
 //                    ]);
                 }
 

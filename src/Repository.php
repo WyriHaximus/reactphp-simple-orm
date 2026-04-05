@@ -437,18 +437,22 @@ final class Repository implements RepositoryInterface
     /** @return iterable<T> */
     private function fetchAndHydrate(QueryInterface $query): iterable
     {
+//        var_export([$query->sql(new PostgresEngine()), $query->params(new PostgresEngine())]);
         foreach (
             $this->connection->query(
                 $query->asExpression(),
             ) as $row
         ) {
-            yield $this->hydrator->hydrate(
+            $tree = $this->buildTree(
+                $this->inflate($row),
                 $this->entity,
-                $this->buildTree(
-                    $this->inflate($row),
-                    $this->entity,
-                ),
             );
+            $entity = $this->hydrator->hydrate(
+                $this->entity,
+                $tree,
+            );
+//            var_export([$row, $tree, $entity]);
+            yield $entity;
         }
     }
 
@@ -477,9 +481,9 @@ final class Repository implements RepositoryInterface
      */
     private function buildTree(array $row, InspectedEntityInterface $entity, string $tableKeySuffix = 'root'): array
     {
-//        var_export($row);
         $tableKey = spl_object_hash($entity) . '___' . $tableKeySuffix;
         $tree     = $row[$this->tableAliases[$tableKey]];
+//        var_export([$row, $this->tableAliases, $tableKey]);
 
         foreach ($entity->joins() as $join) {
             if ($join->type === JointType::INNER && $entity->class() !== $join->entity->class() && $join->lazy === JoinInterface::IS_NOT_LAZY) {

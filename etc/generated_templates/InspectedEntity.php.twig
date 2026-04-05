@@ -39,7 +39,7 @@ final class {{ entityToGenerateClassesClassNameSuffixMapping[entity.class] }} im
             {% for join in entity.joins -%}
                 new \WyriHaximus\React\SimpleORM\Entity\Join(
                     new \ReflectionClass(
-                        \WyriHaximus\React\SimpleORM\InspectedEntity::class,
+                        \WyriHaximus\React\SimpleORM\Generated\InspectedEntity\{{ entityToGenerateClassesClassNameSuffixMapping[join.entity.class] }}::class,
                     )->newLazyProxy(
                         fn (): \WyriHaximus\React\SimpleORM\InspectedEntityInterface => new \WyriHaximus\React\SimpleORM\Generated\InspectedEntity\{{ entityToGenerateClassesClassNameSuffixMapping[join.entity.class] }}(),
                     ),

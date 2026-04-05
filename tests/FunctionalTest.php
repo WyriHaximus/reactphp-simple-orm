@@ -461,25 +461,17 @@ final class FunctionalTest extends AsyncTestCase
         $repository = $this->client?->repository(BlogPostStub::class);
         self::assertInstanceOf(RepositoryInterface::class, $repository);
 
-        $blogPost         = null;
-        $originalBlogPost = null;
-        $randomContents   = bin2hex(random_bytes(13));
+        $randomContents = bin2hex(random_bytes(13));
 
-        /** @phpstan-ignore foreach.valueOverwrite */
-        foreach (
-            $repository->first(
-                new Where(
-                    new Where\Field(
-                        'id',
-                        'eq',
-                        ['090fa83b-5c5a-4042-9f05-58d9ab649a1a'],
-                    ),
+        $originalBlogPost = $blogPost = $repository->first(
+            new Where(
+                new Where\Field(
+                    'id',
+                    'eq',
+                    ['090fa83b-5c5a-4042-9f05-58d9ab649a1a'],
                 ),
-            ) as $blogPost
-        ) {
-            $originalBlogPost = $blogPost;
-        }
-
+            ),
+        );
         self::assertNotNull($blogPost);
         self::waitUntilTheNextSecond();
 

@@ -75,6 +75,12 @@ final class Plugin implements GenerativePlugin
             $entityToGenerateClassesClassNameSuffixMapping[$item->class] = 'IE' . md5($item->class);
         }
 
+        TwigFile::render(
+            $rootPath . '/etc/generated_templates/InspectedEntityMap.php.twig',
+            $rootPath . '/src/Generated/InspectedEntityMap.php',
+            ['map' => $entityToGenerateClassesClassNameSuffixMapping],
+        );
+
         $entityInspector = new EntityInspector(new Configuration());
         foreach ($items as $item) {
             TwigFile::render(

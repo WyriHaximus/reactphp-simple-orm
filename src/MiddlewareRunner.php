@@ -26,12 +26,10 @@ final class MiddlewareRunner
     public function query(ExpressionInterface $query, callable $last): iterable
     {
         if (! array_key_exists(0, $this->middleware)) {
-            yield from $last($query);
-
-            return;
+            return $last($query);
         }
 
-        yield from $this->call($query, 0, $last);
+        return $this->call($query, 0, $last);
     }
 
     /** @return iterable<array<string, mixed>> */
@@ -41,11 +39,9 @@ final class MiddlewareRunner
         $nextPosition++;
         // final request handler will be invoked without hooking into the promise
         if (! array_key_exists($nextPosition, $this->middleware)) {
-            yield from $this->middleware[$position]->query($query, $last);
-
-            return;
+            return $this->middleware[$position]->query($query, $last);
         }
 
-        yield from $this->middleware[$position]->query($query, fn (ExpressionInterface $query): iterable => yield from $this->call($query, $nextPosition, $last));
+        return $this->middleware[$position]->query($query, fn (ExpressionInterface $query): iterable => $this->call($query, $nextPosition, $last));
     }
 }
