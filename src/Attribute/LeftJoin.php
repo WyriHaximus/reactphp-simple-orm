@@ -11,6 +11,7 @@ use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 use ReflectionClass;
 use WyriHaximus\React\SimpleORM\Entity\JointType;
+use WyriHaximus\React\SimpleORM\EntityInterface;
 
 /** @api */
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -41,6 +42,10 @@ final class LeftJoin extends DoNotSerialize implements JoinInterface, PropertyCa
             return null;
         }
 
-        return $hydrator->serializeObject($value);
+        if ($value instanceof EntityInterface) {
+            return $hydrator->serializeObject($value);
+        }
+
+        return null;
     }
 }

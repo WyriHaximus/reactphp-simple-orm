@@ -11,6 +11,7 @@ use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 use ReflectionClass;
 use WyriHaximus\React\SimpleORM\Entity\JointType;
+use WyriHaximus\React\SimpleORM\EntityInterface;
 
 /** @api */
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -32,7 +33,7 @@ final class InnerJoin extends DoNotSerialize implements JoinInterface, PropertyC
 
     public function cast(mixed $value, ObjectMapper $hydrator): mixed
     {
-        return $value;
+           return $value;
     }
 
     public function serialize(mixed $value, ObjectMapper $hydrator): mixed
@@ -41,6 +42,10 @@ final class InnerJoin extends DoNotSerialize implements JoinInterface, PropertyC
             return null;
         }
 
-        return $hydrator->serializeObject($value);
+        if ($value instanceof EntityInterface) {
+            return $hydrator->serializeObject($value);
+        }
+
+        return null;
     }
 }
