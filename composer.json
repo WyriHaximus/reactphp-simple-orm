@@ -29,12 +29,12 @@
   },
   "require-dev": {
     "react/promise-timer": "^1.11",
-    "symfony/http-client": "^8.0",
-    "symfony/yaml": "^5.4 || ^7.0",
+    "symfony/http-client": "^8.1",
+    "symfony/yaml": "^5.4 || ^7.0 || ^8 || ^9",
     "testcontainers/testcontainers": "^1.0",
-    "vlucas/phpdotenv": "^5.4",
-    "wyrihaximus/async-test-utilities": "^12.0.0",
-    "wyrihaximus/makefiles": "^0.10.2"
+    "vlucas/phpdotenv": "^5.6.3",
+    "wyrihaximus/async-test-utilities": "^13.1.0",
+    "wyrihaximus/makefiles": "^0.11.1"
   },
   "autoload": {
     "psr-4": {

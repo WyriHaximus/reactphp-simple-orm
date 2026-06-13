@@ -43,6 +43,7 @@ use const T_STRING;
 use const T_USE;
 use const T_WHITESPACE;
 
+// phpcs:disable
 class NaivePropertyTypeResolver implements PropertyTypeResolver
 {
     public function typeFromConstructorParameter(

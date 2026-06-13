@@ -25,7 +25,7 @@ final class IE4bb6e4e4a34d3d950b4deb9f8ede90f9 implements InspectedEntityInterfa
         return 'users';
     }
 
-    /** @return array<Field> */
+    /** @return list<Field> */
     public function fields(): array
     {
         return [
@@ -42,7 +42,7 @@ final class IE4bb6e4e4a34d3d950b4deb9f8ede90f9 implements InspectedEntityInterfa
         ];
     }
 
-    /** @return array<Join> */
+    /** @return list<Join> */
     public function joins(): array
     {
         return [];

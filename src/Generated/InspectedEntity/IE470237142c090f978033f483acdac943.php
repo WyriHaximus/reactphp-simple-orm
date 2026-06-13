@@ -29,7 +29,7 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
         return 'blog_posts';
     }
 
-    /** @return array<Field> */
+    /** @return list<Field> */
     public function fields(): array
     {
         return [
@@ -91,7 +91,7 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
         ];
     }
 
-    /** @return array<Join> */
+    /** @return list<Join> */
     public function joins(): array
     {
         return [

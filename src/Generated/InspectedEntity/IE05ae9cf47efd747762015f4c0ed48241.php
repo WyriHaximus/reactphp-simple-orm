@@ -29,7 +29,7 @@ final class IE05ae9cf47efd747762015f4c0ed48241 implements InspectedEntityInterfa
         return 'comments';
     }
 
-    /** @return array<Field> */
+    /** @return list<Field> */
     public function fields(): array
     {
         return [
@@ -56,7 +56,7 @@ final class IE05ae9cf47efd747762015f4c0ed48241 implements InspectedEntityInterfa
         ];
     }
 
-    /** @return array<Join> */
+    /** @return list<Join> */
     public function joins(): array
     {
         return [

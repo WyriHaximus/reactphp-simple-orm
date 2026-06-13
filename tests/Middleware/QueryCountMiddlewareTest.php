@@ -79,6 +79,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
         foreach (
             /** @phpstan-ignore argument.type */
             $middleware->query(new QueryFactory()->select()->asExpression(), static function (): iterable {
+                /** @phpstan-ignore wyrihaximus.reactphp.blocking.function.sleep */
                 \sleep(2);
 
                 yield 1;

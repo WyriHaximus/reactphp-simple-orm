@@ -25,7 +25,7 @@ final class IE1b0af1af861296f904e87aec498ad09b implements InspectedEntityInterfa
         return 'logs';
     }
 
-    /** @return array<Field> */
+    /** @return list<Field> */
     public function fields(): array
     {
         return [
@@ -42,7 +42,7 @@ final class IE1b0af1af861296f904e87aec498ad09b implements InspectedEntityInterfa
         ];
     }
 
-    /** @return array<Join> */
+    /** @return list<Join> */
     public function joins(): array
     {
         return [];
