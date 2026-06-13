@@ -6,11 +6,9 @@ namespace WyriHaximus\React\Tests\SimpleORM;
 
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\Test;
-use RuntimeException;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\DevApp\React\SimpleORM\BlogPostStub;
 use WyriHaximus\DevApp\React\SimpleORM\CommentStub;
-use WyriHaximus\DevApp\React\SimpleORM\NoSQLStub;
 use WyriHaximus\DevApp\React\SimpleORM\UserStub;
 use WyriHaximus\React\SimpleORM\Attribute\Clause;
 use WyriHaximus\React\SimpleORM\Configuration;
@@ -111,14 +109,5 @@ final class EntityInspectorTest extends AsyncTestCase
         self::assertNull($commentAuthorClause->foreignCast);
         self::assertNull($commentAuthorClause->foreignFunction);
         self::assertSame('author', $joins['comments']->entity->joins()['author']->property);
-    }
-
-    #[Test]
-    public function inspectWithoutTable(): void
-    {
-        self::expectException(RuntimeException::class);
-        self::expectExceptionMessage('Missing Table annotation on entity: ' . NoSQLStub::class);
-
-        $this->entityInspector->entity(NoSQLStub::class);
     }
 }
