@@ -284,11 +284,11 @@ final class Repository implements RepositoryInterface
 
     private function buildSelectQuery(SectionInterface ...$sections): SelectQuery
     {
-        if ($this->baseSelectQuery instanceof SelectQuery) {
-            return $this->baseSelectQuery;
+        if (!($this->baseSelectQuery instanceof SelectQuery)) {
+            $this->baseSelectQuery = $this->buildBaseSelectQuery();
         }
 
-        $query = $this->buildBaseSelectQuery();
+        $query = $this->baseSelectQuery;
         $query = $query->columns(...array_values($this->fields));
         foreach ($sections as $section) {
             /** @phpstan-ignore ergebnis.noSwitch */
@@ -305,8 +305,6 @@ final class Repository implements RepositoryInterface
                     break;
             }
         }
-
-        $this->baseSelectQuery = $query;
 
         return $query;
     }
@@ -447,6 +445,7 @@ final class Repository implements RepositoryInterface
                 $this->inflate($row),
                 $this->entity,
             );
+//            var_export([$row, $this->entity->class(), $tree]);
             $entity = $this->hydrator->hydrate(
                 $this->entity,
                 $tree,

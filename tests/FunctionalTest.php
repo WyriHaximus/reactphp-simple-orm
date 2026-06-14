@@ -27,7 +27,6 @@ use WyriHaximus\React\SimpleORM\Query\Limit;
 use WyriHaximus\React\SimpleORM\Query\Where;
 use WyriHaximus\React\SimpleORM\RepositoryInterface;
 
-use function array_filter;
 use function array_map;
 use function array_values;
 use function bin2hex;
@@ -310,12 +309,11 @@ final class FunctionalTest extends AsyncTestCase
     #[Test]
     public function secondBlogPostCommentCount(): void
     {
-        foreach (
-            array_filter(
-                [...$this->client?->repository(BlogPostStub::class)->fetch() ?? []],
-                static fn (BlogPostStub $blogPost): bool => $blogPost->id === '090fa83b-5c5a-4042-9f05-58d9ab649a1a',
-            ) as $blogPost
-        ) {
+        foreach ($this->client?->repository(BlogPostStub::class)->fetch() ?? [] as $blogPost) {
+            if ($blogPost->id !== '090fa83b-5c5a-4042-9f05-58d9ab649a1a') {
+                continue;
+            }
+
             self::assertCount(
                 1,
                 [...$blogPost->comments],
@@ -334,12 +332,11 @@ final class FunctionalTest extends AsyncTestCase
     #[Test]
     public function secondBlogPostAuthorId(): void
     {
-        foreach (
-            array_filter(
-                [...$this->client?->repository(BlogPostStub::class)->fetch() ?? []],
-                static fn (BlogPostStub $blogPost): bool => $blogPost->id === '090fa83b-5c5a-4042-9f05-58d9ab649a1a',
-            ) as $blogPost
-        ) {
+        foreach ($this->client?->repository(BlogPostStub::class)->fetch() ?? [] as $blogPost) {
+            if ($blogPost->id !== '090fa83b-5c5a-4042-9f05-58d9ab649a1a') {
+                continue;
+            }
+
             self::assertSame(
                 '15f25357-4b3d-4d4d-b6a5-2ceb93864b77',
                 $blogPost->author->id,
@@ -358,12 +355,11 @@ final class FunctionalTest extends AsyncTestCase
     #[Test]
     public function secondBlogPostCommentAuthorIds(): void
     {
-        foreach (
-            array_filter(
-                [...$this->client?->repository(BlogPostStub::class)->fetch() ?? []],
-                static fn (BlogPostStub $blogPost): bool => $blogPost->id === '090fa83b-5c5a-4042-9f05-58d9ab649a1a',
-            ) as $blogPost
-        ) {
+        foreach ($this->client?->repository(BlogPostStub::class)->fetch() ?? [] as $blogPost) {
+            if ($blogPost->id !== '090fa83b-5c5a-4042-9f05-58d9ab649a1a') {
+                continue;
+            }
+
             self::assertSame(
                 ['fb175cbc-04cc-41c7-8e35-6b817ac016ca'],
                 array_values(
@@ -388,12 +384,11 @@ final class FunctionalTest extends AsyncTestCase
     #[Test]
     public function secondBlogPostPreviousBlogPostAuthorId(): void
     {
-        foreach (
-            array_filter(
-                [...$this->client?->repository(BlogPostStub::class)->fetch() ?? []],
-                static fn (BlogPostStub $blogPost): bool => $blogPost->id === '090fa83b-5c5a-4042-9f05-58d9ab649a1a',
-            ) as $blogPost
-        ) {
+        foreach ($this->client?->repository(BlogPostStub::class)->fetch() ?? [] as $blogPost) {
+            if ($blogPost->id !== '090fa83b-5c5a-4042-9f05-58d9ab649a1a') {
+                continue;
+            }
+
             self::assertInstanceOf(BlogPostStub::class, $blogPost->previousBlogPost);
 
             self::assertSame(
@@ -414,12 +409,11 @@ final class FunctionalTest extends AsyncTestCase
     #[Test]
     public function secondBlogPostNextBlogPostResolvesToNull(): void
     {
-        foreach (
-            array_filter(
-                [...$this->client?->repository(BlogPostStub::class)->fetch() ?? []],
-                static fn (BlogPostStub $blogPost): bool => $blogPost->id === '090fa83b-5c5a-4042-9f05-58d9ab649a1a',
-            ) as $blogPost
-        ) {
+        foreach ($this->client?->repository(BlogPostStub::class)->fetch() ?? [] as $blogPost) {
+            if ($blogPost->id !== '090fa83b-5c5a-4042-9f05-58d9ab649a1a') {
+                continue;
+            }
+
             self::assertNull($blogPost->nextBlogPost);
         }
 
