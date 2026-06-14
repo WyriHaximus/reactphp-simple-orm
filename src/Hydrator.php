@@ -9,8 +9,10 @@ use ReflectionClass;
 use WyriHaximus\React\SimpleORM\Generated\Hydrator as GeneratedHydrator;
 
 use function array_key_exists;
+use function array_keys;
 use function is_array;
 use function React\Async\await;
+use function var_export;
 
 final readonly class Hydrator
 {
@@ -31,6 +33,7 @@ final readonly class Hydrator
      */
     public function hydrate(InspectedEntityInterface $inspectedEntity, array $data): EntityInterface
     {
+//        $ogData = $data;
         foreach ($inspectedEntity->joins() as $join) {
             if (! array_key_exists($join->property, $data)) {
                 continue;
@@ -38,8 +41,8 @@ final readonly class Hydrator
 
             if ($data[$join->property] instanceof PromiseInterface) {
                 /** @var PromiseInterface<mixed> $promise */
-                $promise               = $data[$join->property];
-                $data[$join->property] = $this->createLazyProxy($join->entity, $promise);
+                $promise            = $data[$join->property];
+                $data[$join->mapTo] = $this->createLazyProxy($join->entity, $promise);
                 continue;
             }
 
@@ -48,14 +51,15 @@ final readonly class Hydrator
             }
 
             /** @var array<string, mixed> $joinData */
-            $joinData              = $data[$join->property];
-            $data[$join->property] = $this->hydrate(
+            $joinData           = $data[$join->property];
+            $data[$join->mapTo] = $this->hydrate(
                 $join->entity,
                 $joinData,
             );
         }
 
-//        var_export([$inspectedEntity, $data, array_keys($data)]);
+//        var_export([$ogData, $data, array_keys($ogData), array_keys($data)]);
+//        var_export([array_keys($ogData), array_keys($data)]);
 //        var_export([$inspectedEntity, array_keys($data)]);
 
         return $this->fallbackMapper->hydrateObject($inspectedEntity->class(), $data);

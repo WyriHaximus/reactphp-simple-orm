@@ -103,6 +103,7 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
                 ),
                 JointType::INNER,
                 'previousBlogPost',
+                'previous_blog_post',
                 JoinInterface::IS_LAZY,
                 new Clause(
                     'previous_blog_post_id',
@@ -121,6 +122,7 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
                 ),
                 JointType::INNER,
                 'nextBlogPost',
+                'next_blog_post',
                 JoinInterface::IS_LAZY,
                 new Clause(
                     'next_blog_post_id',
@@ -138,6 +140,7 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
                     static fn (): InspectedEntityInterface => new IE4bb6e4e4a34d3d950b4deb9f8ede90f9(),
                 ),
                 JointType::INNER,
+                'author',
                 'author',
                 JoinInterface::IS_NOT_LAZY,
                 new Clause(
@@ -157,6 +160,7 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
                 ),
                 JointType::INNER,
                 'publisher',
+                'publisher',
                 JoinInterface::IS_NOT_LAZY,
                 new Clause(
                     'publisher_id',
@@ -174,6 +178,7 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
                     static fn (): InspectedEntityInterface => new IE05ae9cf47efd747762015f4c0ed48241(),
                 ),
                 JointType::LEFT,
+                'comments',
                 'comments',
                 JoinInterface::IS_LAZY,
                 new Clause(

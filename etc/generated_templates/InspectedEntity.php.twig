@@ -45,6 +45,7 @@ final class {{ entityToGenerateClassesClassNameSuffixMapping[entity.class] }} im
                     ),
                     \WyriHaximus\React\SimpleORM\Entity\JointType::{{ join.type.name }},
                     '{{ join.property }}',
+                    '{{ join.mapTo }}',
                     \WyriHaximus\React\SimpleORM\Attribute\JoinInterface::{{ join.lazy ? 'IS_LAZY' : 'IS_NOT_LAZY' }},
                     {% for clause in join.clause -%}
                     new \WyriHaximus\React\SimpleORM\Attribute\Clause(

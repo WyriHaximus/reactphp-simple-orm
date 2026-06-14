@@ -22,6 +22,7 @@ final readonly class Join
         public InspectedEntityInterface $entity,
         public JointType $type,
         public string $property,
+        public string $mapTo,
         public bool $lazy,
         Clause ...$clause,
     ) {

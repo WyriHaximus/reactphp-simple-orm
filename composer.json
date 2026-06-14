@@ -15,6 +15,7 @@
     "composer-plugin-api": "^2.0.0",
     "composer/composer": "^2.9.2",
     "eventsauce/object-hydrator": "^1.7.0",
+    "icanboogie/inflector": "^4.0",
     "latitude/latitude": "^4.4.1",
     "ramsey/uuid": "^4.9.2",
     "react/async": "^4.3.0",

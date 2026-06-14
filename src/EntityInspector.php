@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WyriHaximus\React\SimpleORM;
 
 use EventSauce\ObjectHydrator\MapFrom;
+use ICanBoogie\StaticInflector;
 use ReflectionClass;
 use ReflectionNamedType;
 use Roave\BetterReflection\BetterReflection;
@@ -216,6 +217,8 @@ final class EntityInspector
             $join->type,
             /** @phpstan-ignore argument.type,property.notFound */
             $property->name,
+            /** @phpstan-ignore argument.type,property.notFound */
+            StaticInflector::underscore($property->name),
             /** @phpstan-ignore argument.type,property.notFound */
             $join->lazy,
             /** @phpstan-ignore argument.type,argument.unpackNonIterable,property.notFound */

@@ -68,6 +68,7 @@ final class IE05ae9cf47efd747762015f4c0ed48241 implements InspectedEntityInterfa
                 ),
                 JointType::INNER,
                 'author',
+                'author',
                 JoinInterface::IS_NOT_LAZY,
                 new Clause(
                     'author_id',
@@ -86,6 +87,7 @@ final class IE05ae9cf47efd747762015f4c0ed48241 implements InspectedEntityInterfa
                 ),
                 JointType::INNER,
                 'blogPost',
+                'blog_post',
                 JoinInterface::IS_NOT_LAZY,
                 new Clause(
                     'blog_post_id',
