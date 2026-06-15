@@ -248,6 +248,7 @@ final class FunctionalTest extends AsyncTestCase
     public function firstBlogPostCommentAuthorIds(): void
     {
         foreach ($this->client?->repository(BlogPostStub::class)->fetch() ?? [] as $blogPost) {
+//            var_export([$blogPost, ...$blogPost->comments]);
             self::assertSame(
                 [
                     '2fa0d077-d374-4409-b1ef-9687c6729158',

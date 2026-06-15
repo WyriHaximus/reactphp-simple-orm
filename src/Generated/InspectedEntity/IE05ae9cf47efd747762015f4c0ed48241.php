@@ -29,26 +29,26 @@ final class IE05ae9cf47efd747762015f4c0ed48241 implements InspectedEntityInterfa
         return 'comments';
     }
 
-    /** @return list<Field> */
+    /** @return list<string, Field> */
     public function fields(): array
     {
         return [
-            new Field(
+            'id' => new Field(
                 'id',
                 'id',
                 'string',
             ),
-            new Field(
+            'author_id' => new Field(
                 'author_id',
                 'author_id',
-                'mixed',
+                'string',
             ),
-            new Field(
+            'blog_post_id' => new Field(
                 'blog_post_id',
                 'blog_post_id',
-                'mixed',
+                'string',
             ),
-            new Field(
+            'contents' => new Field(
                 'contents',
                 'contents',
                 'string',
@@ -60,7 +60,7 @@ final class IE05ae9cf47efd747762015f4c0ed48241 implements InspectedEntityInterfa
     public function joins(): array
     {
         return [
-            new Join(
+            'author' => new Join(
                 new ReflectionClass(
                     IE4bb6e4e4a34d3d950b4deb9f8ede90f9::class,
                 )->newLazyProxy(
@@ -79,7 +79,7 @@ final class IE05ae9cf47efd747762015f4c0ed48241 implements InspectedEntityInterfa
                     null,
                 ),
             ),
-            new Join(
+            'blogPost' => new Join(
                 new ReflectionClass(
                     IE470237142c090f978033f483acdac943::class,
                 )->newLazyProxy(

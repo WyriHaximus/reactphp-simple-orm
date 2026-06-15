@@ -10,6 +10,7 @@ use WyriHaximus\DevApp\React\SimpleORM\BlogPostStub;
 use WyriHaximus\DevApp\React\SimpleORM\UserStub;
 use WyriHaximus\React\SimpleORM\Configuration;
 use WyriHaximus\React\SimpleORM\EntityInspector;
+use WyriHaximus\React\SimpleORM\EntityInterface;
 use WyriHaximus\React\SimpleORM\Hydrator;
 use WyriHaximus\TestUtilities\TestCase;
 
@@ -32,7 +33,6 @@ final class HydratorTest extends TestCase
             [
                 'id' => $id,
                 'name' => $title,
-                'zelf' => resolve(true),
             ],
         );
 
@@ -51,7 +51,6 @@ final class HydratorTest extends TestCase
             [
                 'id' => $id,
                 'name' => $title,
-                'zelf' => resolve(true),
             ],
         );
 
@@ -87,39 +86,35 @@ final class HydratorTest extends TestCase
                     'views' => 133,
                     'created' => date('Y-m-d H:i:s e'),
                     'modified' => date('Y-m-d H:i:s e'),
-                    'previous_blog_post' => resolve(null),
-                    'next_blog_post' => resolve(null),
+                    'previous_blogost' => null,
+                    'next_blog_post' => null,
                     'title' => $title,
                     'author' => [
                         'id' => $authorId,
                         'name' => $authorName,
-                        'zelf' => resolve(true),
                     ],
                     'publisher' => [
                         'id' => $publisherId,
                         'name' => $publisherName,
-                        'zelf' => resolve(true),
                     ],
                     'comments' => awaitObservable(Observable::fromArray([])),
                 ]),
-                'next_blog_post' => resolve(null),
+                'next_blog_post' => null,
                 'title' => $title,
                 'author' => [
                     'id' => $authorId,
                     'name' => $authorName,
-                    'zelf' => resolve(true),
                 ],
                 'publisher' => [
                     'id' => $publisherId,
                     'name' => $publisherName,
-                    'zelf' => resolve(true),
                 ],
                 'comments' => awaitObservable(Observable::fromArray([])),
             ],
         );
 
         foreach ([$entity, $entity->previousBlogPost] as $bp) {
-            if ($bp === null) {
+            if (! $bp instanceof EntityInterface) {
                 continue;
             }
 
@@ -154,18 +149,16 @@ final class HydratorTest extends TestCase
                 'views' => 133,
                 'created' => date('Y-m-d H:i:s e'),
                 'modified' => date('Y-m-d H:i:s e'),
-                'previous_blog_post' => resolve(null),
-                'next_blog_post' => resolve(null),
+                'previous_blog_post' => null,
+                'next_blog_post' => null,
                 'title' => $title,
                 'author' => [
                     'id' => $authorId,
                     'name' => $authorName,
-                    'zelf' => resolve(true),
                 ],
                 'publisher' => [
                     'id' => $publisherId,
                     'name' => $publisherName,
-                    'zelf' => resolve(true),
                 ],
                 'comments' => awaitObservable(Observable::fromArray([])),
             ],

@@ -43,7 +43,6 @@ use function Latitude\QueryBuilder\alias;
 use function Latitude\QueryBuilder\field;
 use function Latitude\QueryBuilder\func;
 use function Latitude\QueryBuilder\on;
-use function spl_object_hash;
 use function strpos;
 use function substr;
 use function WyriHaximus\React\awaitObservable;
@@ -284,11 +283,12 @@ final class Repository implements RepositoryInterface
 
     private function buildSelectQuery(SectionInterface ...$sections): SelectQuery
     {
-        if (!($this->baseSelectQuery instanceof SelectQuery)) {
-            $this->baseSelectQuery = $this->buildBaseSelectQuery();
-        }
+//        if (!($this->baseSelectQuery instanceof SelectQuery)) {
+//            $this->baseSelectQuery = $this->buildBaseSelectQuery();
+//        }
 
-        $query = $this->baseSelectQuery;
+//        $query = $this->baseSelectQuery;
+        $query = $this->buildBaseSelectQuery();
         $query = $query->columns(...array_values($this->fields));
         foreach ($sections as $section) {
             /** @phpstan-ignore ergebnis.noSwitch */
@@ -342,7 +342,7 @@ final class Repository implements RepositoryInterface
     private function buildBaseSelectQuery(): SelectQuery
     {
         $i                             = new IncrementingInteger();
-        $tableKey                      = spl_object_hash($this->entity) . '___root';
+        $tableKey                      = $this->entity->class() . '___root';
         $this->tableAliases[$tableKey] = 't' . $i->getNext();
         $query                         = $this->queryFactory->select()->from(alias($this->entity->table(), $this->tableAliases[$tableKey]));
 
@@ -374,7 +374,7 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
-            $tableKey = spl_object_hash($join->entity) . '___' . $join->property;
+            $tableKey = $join->entity->class() . '___' . $join->property;
             if (! array_key_exists($tableKey, $this->tableAliases)) {
                 $this->tableAliases[$tableKey] = 't' . $i->getNext();
             }
@@ -391,7 +391,7 @@ final class Repository implements RepositoryInterface
                 }
 
                 $onRightSide =
-                    $this->tableAliases[spl_object_hash($entity) . '___' . $rootProperty] . '.' . $clause->localKey;
+                    $this->tableAliases[$entity->class() . '___' . $rootProperty] . '.' . $clause->localKey;
                 if ($clause->localFunction !== null) {
                     $onRightSide = $clause->localFunction . '(' . $onRightSide . ')';
                 }
@@ -441,6 +441,7 @@ final class Repository implements RepositoryInterface
                 $query->asExpression(),
             ) as $row
         ) {
+//            var_export([$row]);
             $tree = $this->buildTree(
                 $this->inflate($row),
                 $this->entity,
@@ -480,14 +481,14 @@ final class Repository implements RepositoryInterface
      */
     private function buildTree(array $row, InspectedEntityInterface $entity, string $tableKeySuffix = 'root'): array
     {
-        $tableKey = spl_object_hash($entity) . '___' . $tableKeySuffix;
+        $tableKey = $entity->class() . '___' . $tableKeySuffix;
         $tree     = $row[$this->tableAliases[$tableKey]];
 //        var_export([$row, $this->tableAliases, $tableKey]);
 
         foreach ($entity->joins() as $join) {
             if ($join->type === JointType::INNER && $entity->class() !== $join->entity->class() && $join->lazy === JoinInterface::IS_NOT_LAZY) {
                 /** @phpstan-ignore argument.type */
-                $tree[$join->property] = $this->buildTree($row, $join->entity, $join->property);
+                $tree[$join->mapTo] = $this->buildTree($row, $join->entity, $join->mapTo);
 
                 continue;
             }
@@ -495,7 +496,7 @@ final class Repository implements RepositoryInterface
             if ($join->type === JointType::INNER && ($join->lazy === JoinInterface::IS_LAZY || $entity->class() === $join->entity->class())) {
                 foreach ($join->clause as $clause) {
                     if (!array_key_exists($tableKey,$this->tableAliases) || !array_key_exists($this->tableAliases[$tableKey],$row) || !array_key_exists($clause->localKey,$row[$this->tableAliases[$tableKey]]) || $row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
-                        $tree[$join->property] = null;
+                        $tree[$join->mapTo] = null;
 //                        $resolve(null);
 
                         continue 2;
@@ -563,7 +564,7 @@ final class Repository implements RepositoryInterface
 //                });
 
                 /** @phpstan-ignore method.deprecatedClass,new.deprecatedClass */
-                $tree[$join->property] = new LazyPromise(fn (): PromiseInterface => new Promise(function (callable $resolve, callable $reject) use ($row, $join, $tableKey): void {
+                $tree[$join->mapTo] = new LazyPromise(fn (): PromiseInterface => new Promise(function (callable $resolve, callable $reject) use ($row, $join, $tableKey): void {
                     foreach ($join->clause as $clause) {
                         if ($row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
                             $resolve(null);
@@ -623,7 +624,7 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
-            $tree[$join->property] = awaitObservable(Observable::defer(
+            $tree[$join->mapTo] = awaitObservable(Observable::defer(
                 function () use ($row, $join, $tableKey): Observable {
                     $where = [];
 

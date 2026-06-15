@@ -11,8 +11,7 @@ use Throwable;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
 
-use function React\Async\await;
-use function React\Promise\Timer\sleep;
+use function sleep;
 
 final class QueryCountMiddlewareTest extends AsyncTestCase
 {
@@ -80,7 +79,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
             /** @phpstan-ignore argument.type */
             $middleware->query(new QueryFactory()->select()->asExpression(), static function (): iterable {
                 /** @phpstan-ignore wyrihaximus.reactphp.blocking.function.sleep */
-                \sleep(2);
+                sleep(2);
 
                 yield 1;
             }) as $row
@@ -181,9 +180,9 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
 
         try {
             foreach (
-                /** @phpstan-ignore argument.type */
                 $middleware->query(new QueryFactory()->select()->asExpression(), static function (): iterable {
-                    await(sleep(2));
+                    sleep(2);
+
                     yield 1;
 
                     throw new Exception('whoops');

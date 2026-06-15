@@ -25,16 +25,16 @@ final class IE4bb6e4e4a34d3d950b4deb9f8ede90f9 implements InspectedEntityInterfa
         return 'users';
     }
 
-    /** @return list<Field> */
+    /** @return list<string, Field> */
     public function fields(): array
     {
         return [
-            new Field(
+            'id' => new Field(
                 'id',
                 'id',
                 'string',
             ),
-            new Field(
+            'name' => new Field(
                 'name',
                 'name',
                 'string',

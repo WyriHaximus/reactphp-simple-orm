@@ -35,15 +35,10 @@ final readonly class Hydrator
 //        return new ReflectionClass(
 //            $inspectedEntity->class(),
 //        )->newLazyProxy(
-//            function () use ($inspectedEntity, $data): EntityInterface {
-//                $entity = $this->hydrateEntity(
-//                    $inspectedEntity,
-//                    $data,
-//                );
-//                var_export([gettype($entity), $entity::class, $data]);
-//
-//                return $entity;
-//            },
+//            fn (): EntityInterface => $this->hydrateEntity(
+//                $inspectedEntity,
+//                $data,
+//            ),
 //        );
 //    }
 //
@@ -57,25 +52,25 @@ final readonly class Hydrator
 //     */
 //    private function hydrateEntity(InspectedEntityInterface $inspectedEntity, array $data): EntityInterface
 //    {
-//        $ogData = $data;
+////        $ogData = $data;
         foreach ($inspectedEntity->joins() as $join) {
-            if (! array_key_exists($join->property, $data)) {
+            if (! array_key_exists($join->mapTo, $data)) {
                 continue;
             }
 
-            if ($data[$join->property] instanceof PromiseInterface) {
+            if ($data[$join->mapTo] instanceof PromiseInterface) {
                 /** @var PromiseInterface<mixed> $promise */
-                $promise            = $data[$join->property];
+                $promise            = $data[$join->mapTo];
                 $data[$join->mapTo] = $this->createLazyProxy($join->entity, $promise);
                 continue;
             }
 
-            if (! is_array($data[$join->property])) {
+            if (! is_array($data[$join->mapTo])) {
                 continue;
             }
 
             /** @var array<string, mixed> $joinData */
-            $joinData           = $data[$join->property];
+            $joinData           = $data[$join->mapTo];
             $data[$join->mapTo] = $this->hydrate(
                 $join->entity,
                 $joinData,

@@ -15,6 +15,8 @@ use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
 use WyriHaximus\React\SimpleORM\Attribute\Table;
 use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\Join;
+use WyriHaximus\React\SimpleORM\Entity\JointType;
+use WyriHaximus\React\SimpleORM\Generated\InspectedEntityMap;
 use WyriHaximus\React\SimpleORM\Tools\NaivePropertyTypeResolver;
 
 use function array_key_exists;
@@ -26,6 +28,7 @@ use function is_array;
 use function is_string;
 use function is_subclass_of;
 use function method_exists;
+use function str_replace;
 
 final class EntityInspector
 {
@@ -50,9 +53,9 @@ final class EntityInspector
      */
     public function entity(string $entity): InspectedEntityInterface
     {
-//        if (! array_key_exists($entity, $this->entities) && array_key_exists($entity, InspectedEntityMap::MAP) && class_exists(InspectedEntityMap::MAP[$entity])) {
-//            $this->entities[$entity] = new (InspectedEntityMap::MAP[$entity]);
-//        }
+        if (! array_key_exists($entity, $this->entities) && array_key_exists($entity, InspectedEntityMap::MAP) && class_exists(InspectedEntityMap::MAP[$entity])) {
+            $this->entities[$entity] = new (InspectedEntityMap::MAP[$entity]);
+        }
 
         if (! array_key_exists($entity, $this->entities)) {
             $class           = new ReflectionClass($entity);
@@ -157,11 +160,22 @@ final class EntityInspector
                     foreach ($this->join($property, $annotation, $joinEntity) as $join) {
                         yield $join->property => $join;
 
+                        if ($join->type === JointType::LEFT) {
+                            continue;
+                        }
+
                         foreach ($join->clause as $clause) {
                             yield $clause->localKey => new Field(
                                 $clause->localKey,
                                 $clause->localKey,
-                                'mixed',
+                                (static function (ReflectionProperty $property, string $joinEntity): string {
+                                    $type = $property->getType();
+                                    if ($type !== null) {
+                                        return str_replace($joinEntity, 'string', (string) $type);
+                                    }
+
+                                    return 'string';
+                                })($roaveProperty, $joinEntity),
                             );
                         }
                     }

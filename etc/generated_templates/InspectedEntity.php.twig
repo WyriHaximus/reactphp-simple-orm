@@ -18,12 +18,12 @@ final class {{ entityToGenerateClassesClassNameSuffixMapping[entity.class] }} im
         return '{{ entity.table }}';
     }
 
-    /** @return list<\WyriHaximus\React\SimpleORM\Entity\Field> */
+    /** @return list<string, \WyriHaximus\React\SimpleORM\Entity\Field> */
     public function fields(): array
     {
         return [
             {% for field in entity.fields -%}
-                new \WyriHaximus\React\SimpleORM\Entity\Field(
+                '{{ field.property }}' => new \WyriHaximus\React\SimpleORM\Entity\Field(
                     '{{ field.property }}',
                     '{{ field.column }}',
                     '{{ field.type }}',
@@ -37,7 +37,7 @@ final class {{ entityToGenerateClassesClassNameSuffixMapping[entity.class] }} im
     {
         return [
             {% for join in entity.joins -%}
-                new \WyriHaximus\React\SimpleORM\Entity\Join(
+                '{{ join.property }}' => new \WyriHaximus\React\SimpleORM\Entity\Join(
                     new \ReflectionClass(
                         \WyriHaximus\React\SimpleORM\Generated\InspectedEntity\{{ entityToGenerateClassesClassNameSuffixMapping[join.entity.class] }}::class,
                     )->newLazyProxy(

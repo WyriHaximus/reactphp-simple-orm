@@ -25,16 +25,16 @@ final class IE1b0af1af861296f904e87aec498ad09b implements InspectedEntityInterfa
         return 'logs';
     }
 
-    /** @return list<Field> */
+    /** @return list<string, Field> */
     public function fields(): array
     {
         return [
-            new Field(
+            'id' => new Field(
                 'id',
                 'id',
                 'string',
             ),
-            new Field(
+            'message' => new Field(
                 'message',
                 'message',
                 'string',

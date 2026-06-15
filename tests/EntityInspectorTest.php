@@ -51,15 +51,15 @@ final class EntityInspectorTest extends AsyncTestCase
         self::assertSame('blog_posts', $inspectedEntity->table());
 
         $fields = $inspectedEntity->fields();
-        self::assertCount(12, $fields);
+        self::assertCount(10, $fields);
 
         foreach (
             [
                 'id' => 'string',
-                'previousBlogPostId' => 'string|null',
-                'nextBlogPostId' => 'string|null',
-                'authorId' => 'string',
-                'publisherId' => 'string',
+                'previous_blog_post_id' => 'string|null',
+                'next_blog_post_id' => 'string|null',
+                'author_id' => 'string',
+                'publisher_id' => 'string',
                 'title' => 'string',
                 'contents' => 'string',
                 'views' => 'int',

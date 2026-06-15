@@ -29,61 +29,56 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
         return 'blog_posts';
     }
 
-    /** @return list<Field> */
+    /** @return list<string, Field> */
     public function fields(): array
     {
         return [
-            new Field(
+            'id' => new Field(
                 'id',
                 'id',
                 'string',
             ),
-            new Field(
+            'previous_blog_post_id' => new Field(
                 'previous_blog_post_id',
                 'previous_blog_post_id',
-                'mixed',
+                'string|null',
             ),
-            new Field(
+            'next_blog_post_id' => new Field(
                 'next_blog_post_id',
                 'next_blog_post_id',
-                'mixed',
+                'string|null',
             ),
-            new Field(
+            'title' => new Field(
                 'title',
                 'title',
                 'string',
             ),
-            new Field(
+            'contents' => new Field(
                 'contents',
                 'contents',
                 'string',
             ),
-            new Field(
+            'author_id' => new Field(
                 'author_id',
                 'author_id',
-                'mixed',
+                'string',
             ),
-            new Field(
+            'publisher_id' => new Field(
                 'publisher_id',
                 'publisher_id',
-                'mixed',
+                'string',
             ),
-            new Field(
-                'id',
-                'id',
-                'mixed',
-            ),
-            new Field(
+            'views' => new Field(
                 'views',
                 'views',
                 'int',
             ),
-            new Field(
+            'created' => new Field(
                 'created',
                 'created',
                 'DateTimeImmutable',
             ),
-            new Field(
+            'modified' => new Field(
                 'modified',
                 'modified',
                 'DateTimeImmutable',
@@ -95,7 +90,7 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
     public function joins(): array
     {
         return [
-            new Join(
+            'previousBlogPost' => new Join(
                 new ReflectionClass(
                     self::class,
                 )->newLazyProxy(
@@ -114,7 +109,7 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
                     null,
                 ),
             ),
-            new Join(
+            'nextBlogPost' => new Join(
                 new ReflectionClass(
                     self::class,
                 )->newLazyProxy(
@@ -133,7 +128,7 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
                     null,
                 ),
             ),
-            new Join(
+            'author' => new Join(
                 new ReflectionClass(
                     IE4bb6e4e4a34d3d950b4deb9f8ede90f9::class,
                 )->newLazyProxy(
@@ -152,7 +147,7 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
                     null,
                 ),
             ),
-            new Join(
+            'publisher' => new Join(
                 new ReflectionClass(
                     IE4bb6e4e4a34d3d950b4deb9f8ede90f9::class,
                 )->newLazyProxy(
@@ -171,7 +166,7 @@ final class IE470237142c090f978033f483acdac943 implements InspectedEntityInterfa
                     null,
                 ),
             ),
-            new Join(
+            'comments' => new Join(
                 new ReflectionClass(
                     IE05ae9cf47efd747762015f4c0ed48241::class,
                 )->newLazyProxy(
