@@ -13,7 +13,6 @@ final readonly class UserStub implements EntityInterface
 {
     use WithFieldsTrait;
 
-    /** @phpstan-ignore shipmonk.deadMethod */
     public function __construct(
         public string $id,
         public string $name,

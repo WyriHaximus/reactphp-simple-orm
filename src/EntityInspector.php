@@ -219,9 +219,7 @@ final class EntityInspector
      */
     private function join(\ReflectionProperty $property, JoinInterface $join, string $entity): iterable
     {
-        /** @phpstan-ignore generator.keyType,property.notFound */
         yield $property->name => new Join(
-        /** @phpstan-ignore argument.type,property.notFound */
             new ReflectionClass(
                 InspectedEntity::class,
             )->newLazyProxy(
@@ -229,9 +227,7 @@ final class EntityInspector
             ),
             /** @phpstan-ignore argument.type,property.notFound */
             $join->type,
-            /** @phpstan-ignore argument.type,property.notFound */
             $property->name,
-            /** @phpstan-ignore argument.type,property.notFound */
             StaticInflector::underscore($property->name),
             /** @phpstan-ignore argument.type,property.notFound */
             $join->lazy,

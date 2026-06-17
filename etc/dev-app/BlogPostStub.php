@@ -22,7 +22,7 @@ final readonly class BlogPostStub implements EntityInterface
     /**
      * @param iterable<CommentStub> $comments
      *
-     * @phpstan-ignore shipmonk.deadMethod,ergebnis.noParameterWithNullableTypeDeclaration,ergebnis.noParameterWithNullableTypeDeclaration,ergebnis.noParameterWithNullableTypeDeclaration,ergebnis.noParameterWithNullableTypeDeclaration
+     * @phpstan-ignore ergebnis.noParameterWithNullableTypeDeclaration,ergebnis.noParameterWithNullableTypeDeclaration
      */
     public function __construct(
         public string $id,

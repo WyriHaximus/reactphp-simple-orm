@@ -106,9 +106,13 @@ final readonly class Hydrator
             $inspectedEntity->class(),
         )->newLazyProxy(
             function () use ($inspectedEntity, $object): EntityInterface {
-                /** @var array<string, mixed> $data */
                 $data = await($object);
 
+                if ($data instanceof EntityInterface) {
+                    return $data;
+                }
+
+                /** @var array<string, mixed> $data */
                 return $this->hydrate(
                     $inspectedEntity,
                     $data,

@@ -374,7 +374,7 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
-            $tableKey = $join->entity->class() . '___' . $join->property;
+            $tableKey = $join->entity->class() . '___' . $rootProperty . '___' . $join->property;
             if (! array_key_exists($tableKey, $this->tableAliases)) {
                 $this->tableAliases[$tableKey] = 't' . $i->getNext();
             }
@@ -426,7 +426,7 @@ final class Repository implements RepositoryInterface
             unset($this->fields[$entity->table() . '___' . $join->property]);
 
             /** @phpstan-ignore argument.type */
-            $query = $this->buildJoins($query, $join->entity, $i, $join->property);
+            $query = $this->buildJoins($query, $join->entity, $i, $rootProperty . '___' . $join->property);
         }
 
         return $query;
@@ -488,7 +488,7 @@ final class Repository implements RepositoryInterface
         foreach ($entity->joins() as $join) {
             if ($join->type === JointType::INNER && $entity->class() !== $join->entity->class() && $join->lazy === JoinInterface::IS_NOT_LAZY) {
                 /** @phpstan-ignore argument.type */
-                $tree[$join->mapTo] = $this->buildTree($row, $join->entity, $join->mapTo);
+                $tree[$join->mapTo] = $this->buildTree($row, $join->entity, $tableKeySuffix . '___' . $join->property);
 
                 continue;
             }
@@ -606,16 +606,22 @@ final class Repository implements RepositoryInterface
                     }
 
                     try {
-                        $resolve([
-                            ...$this->client
+                        foreach (
+                            $this->client
                             ->repository(
                                 $join->entity->class(),
                             )
                             ->fetch(
                                 new Where(...$where),
                                 new Limit(self::SINGLE),
-                            ),
-                        ]);
+                            ) as $entity
+                        ) {
+                            $resolve($entity);
+
+                            return;
+                        }
+
+                        $resolve(null);
                     } catch (Throwable $throwable) {
                         $reject($throwable);
                     }
