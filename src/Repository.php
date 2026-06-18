@@ -436,22 +436,24 @@ final class Repository implements RepositoryInterface
     private function fetchAndHydrate(QueryInterface $query): iterable
     {
 //        var_export([$query->sql(new PostgresEngine()), $query->params(new PostgresEngine())]);
+        $rows = [];
         foreach (
             $this->connection->query(
                 $query->asExpression(),
             ) as $row
         ) {
-//            var_export([$row]);
+            $rows[] = $row;
+        }
+
+        foreach ($rows as $row) {
             $tree = $this->buildTree(
                 $this->inflate($row),
                 $this->entity,
             );
-//            var_export([$row, $this->entity->class(), $tree]);
             $entity = $this->hydrator->hydrate(
                 $this->entity,
                 $tree,
             );
-//            var_export([$row, $tree, $entity]);
             yield $entity;
         }
     }
@@ -630,33 +632,22 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
-            $tree[$join->mapTo] = awaitObservable(Observable::defer(
-                function () use ($row, $join, $tableKey): Observable {
-                    $where = [];
+            /** @phpstan-ignore assign.propertyType */
+            $tree[$join->mapTo] = (function () use ($row, $join, $tableKey): iterable {
+                $where = [];
 
-                    foreach ($join->clause as $clause) {
-                        $where[] = new Where\Field(
-                            $clause->foreignKey,
-                            'eq',
-                            [
-                                $row[$this->tableAliases[$tableKey]][$clause->localKey],
-                            ],
-                        );
-                    }
+                foreach ($join->clause as $clause) {
+                    $where[] = new Where\Field(
+                        $clause->foreignKey,
+                        'eq',
+                        [
+                            $row[$this->tableAliases[$tableKey]][$clause->localKey],
+                        ],
+                    );
+                }
 
-                    $subject = new Subject();
-                    Loop::futureTick(function () use ($subject, $join, $where): void {
-                        foreach ($this->client->repository($join->entity->class())->fetch(new Where(...$where)) as $row) {
-                            $subject->onNext($row);
-                        }
-
-                        $subject->onCompleted();
-                    });
-
-                    return $subject;
-                },
-                new ImmediateScheduler(),
-            ));
+                yield from $this->client->repository($join->entity->class())->fetch(new Where(...$where));
+            })();
         }
 
         return $tree;
