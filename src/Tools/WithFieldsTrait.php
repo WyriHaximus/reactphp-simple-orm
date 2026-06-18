@@ -8,7 +8,11 @@ use function in_array;
 
 trait WithFieldsTrait
 {
-    /** @param array<string, mixed> $fields */
+    /**
+     * @param array<string, mixed> $fields
+     *
+     * @phpstan-ignore shipmonk.deadMethod
+     */
     public function withFields(array $fields): self
     {
         $safeFields = [];

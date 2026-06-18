@@ -382,9 +382,6 @@ cs: ## Check the code for code style issues ##*LCH*##^code-style^##
 stan: ## Run static analysis (PHPStan) ##*LCH*##^static-analysis^##
 	$(DOCKER_SHELL) vendor/bin/phpstan analyse --ansi --configuration=./etc/qa/phpstan.neon
 
-stan-baseline: ## Generate the PHPStan baseline ####^static-analysis^##
-	$(DOCKER_RUN) vendor/bin/phpstan analyse --configuration=./etc/qa/phpstan.neon --generate-baseline=./etc/qa/phpstan-baseline.neon --allow-empty-baseline
-
 unit-testing: ## Run tests ##*A*##^unit-tests^##
 	$(DOCKER_RUN_WITH_SOCKET) vendor/bin/phpunit --colors=always -c ./etc/qa/phpunit.xml $(shell $(DOCKER_SHELL) php -r 'if (function_exists("xdebug_get_code_coverage")) { echo " --coverage-text --coverage-html ./var/tests-unit-coverage-html --coverage-clover ./var/tests-unit-clover-coverage.xml"; }')
 

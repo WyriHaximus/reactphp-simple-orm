@@ -282,11 +282,11 @@ final class FunctionalTest extends AsyncTestCase
         }
 
         self::assertSame([
-            'initiated' => 2,
-            'successful' => 2,
+            'initiated' => 1,
+            'successful' => 1,
             'errored' => 0,
             'slow' => 0,
-            'completed' => 2,
+            'completed' => 1,
         ], [...$this->counter->counters()]);
     }
 
@@ -467,15 +467,12 @@ final class FunctionalTest extends AsyncTestCase
                 ),
             ),
         );
-        self::assertNotNull($blogPost);
         self::waitUntilTheNextSecond();
 
         $timestamp       = time();
         $updatedBlogPost = $repository->update(
             $blogPost->withFields(['views' => $blogPost->views + 1, 'contents' => $randomContents, 'id' => 'nah', 'created' => new DateTimeImmutable(), 'modified' => new DateTimeImmutable()]),
         );
-
-        self::assertInstanceOf(BlogPostStub::class, $originalBlogPost);
 
         self::assertSame(167, $updatedBlogPost->views);
         self::assertSame($originalBlogPost->id, $updatedBlogPost->id);

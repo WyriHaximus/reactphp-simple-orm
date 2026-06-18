@@ -8,6 +8,10 @@ namespace WyriHaximus\React\SimpleORM\Generated;
  */
 final class InspectedEntityMap
 {
+    /**
+     * @template T of EntityInterface
+     * @var non-empty-array<class-string<T>, class-string<\WyriHaximus\React\SimpleORM\InspectedEntityInterface<T>>>
+     */
     public const array MAP = [
 {% for key, value in map %}
         \{{ key }}::class => \WyriHaximus\React\SimpleORM\Generated\InspectedEntity\{{ value }}::class,

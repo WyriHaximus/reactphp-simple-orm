@@ -92,7 +92,7 @@ final class EntityInspector
     /**
      * @param ReflectionClass<EntityInterface> $class
      *
-     * @return iterable<string, Field>
+     * @return iterable<string, Field|Join>
      */
     private function fields(ReflectionClass $class): iterable
     {

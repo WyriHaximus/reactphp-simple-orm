@@ -12,13 +12,9 @@ use Latitude\QueryBuilder\Query\SelectQuery;
 use Latitude\QueryBuilder\QueryFactory;
 use Latitude\QueryBuilder\QueryInterface;
 use Ramsey\Uuid\Uuid;
-use React\EventLoop\Loop;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 use RuntimeException;
-use Rx\Observable;
-use Rx\Scheduler\ImmediateScheduler;
-use Rx\Subject\Subject;
 use Throwable;
 use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
 use WyriHaximus\React\SimpleORM\Entity\JointType;
@@ -33,10 +29,8 @@ use WyriHaximus\React\SimpleORM\Tools\LazyPromise;
 
 use function array_key_exists;
 use function array_values;
-use function assert;
 use function date;
 use function explode;
-use function is_int;
 use function is_scalar;
 use function is_string;
 use function Latitude\QueryBuilder\alias;
@@ -45,7 +39,6 @@ use function Latitude\QueryBuilder\func;
 use function Latitude\QueryBuilder\on;
 use function strpos;
 use function substr;
-use function WyriHaximus\React\awaitObservable;
 
 /**
  * @template T of EntityInterface
@@ -61,8 +54,8 @@ final class Repository implements RepositoryInterface
     private array $fields = [];
 
     /** @var string[] */
-    private array $tableAliases               = [];
-    private SelectQuery|null $baseSelectQuery = null;
+    private array $tableAliases = [];
+//    private SelectQuery|null $baseSelectQuery = null;
 
     /** @param InspectedEntityInterface<T> $entity */
     public function __construct(
@@ -83,7 +76,6 @@ final class Repository implements RepositoryInterface
         }
 
         $count = false;
-        assert($count === false || is_int($count));
         foreach (
             $this->connection->query(
                 $query->asExpression(),
@@ -93,7 +85,7 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
-            /** @phpstan-ignore cast.int */
+            /** @phpstan-ignore cast.int,shipmonk.variableTypeOverwritten */
             $count = (int) $row['count'];
         }
 
@@ -142,6 +134,7 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
+            /** @phpstan-ignore shipmonk.variableTypeOverwritten */
             $first = $row;
         }
 
@@ -212,6 +205,7 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
+            /** @phpstan-ignore shipmonk.variableTypeOverwritten */
             $first = $item;
         }
 
@@ -256,6 +250,7 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
+            /** @phpstan-ignore shipmonk.variableTypeOverwritten */
             $first = $updatedEnitty;
         }
 
@@ -436,16 +431,16 @@ final class Repository implements RepositoryInterface
     private function fetchAndHydrate(QueryInterface $query): iterable
     {
 //        var_export([$query->sql(new PostgresEngine()), $query->params(new PostgresEngine())]);
-//        $rows = [];
+        $rows = [];
         foreach (
             $this->connection->query(
                 $query->asExpression(),
             ) as $row
         ) {
-//            $rows[] = $row;
-//        }
-//
-//        foreach ($rows as $row) {
+            $rows[] = $row;
+        }
+
+        foreach ($rows as $row) {
             $tree = $this->buildTree(
                 $this->inflate($row),
                 $this->entity,
@@ -497,7 +492,7 @@ final class Repository implements RepositoryInterface
 
             if ($join->type === JointType::INNER && ($join->lazy === JoinInterface::IS_LAZY || $entity->class() === $join->entity->class())) {
                 foreach ($join->clause as $clause) {
-                    if (!array_key_exists($tableKey,$this->tableAliases) || !array_key_exists($this->tableAliases[$tableKey],$row) || !array_key_exists($clause->localKey,$row[$this->tableAliases[$tableKey]]) || $row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
+                    if (!array_key_exists($tableKey, $this->tableAliases) || !array_key_exists($this->tableAliases[$tableKey], $row) || !array_key_exists($clause->localKey, $row[$this->tableAliases[$tableKey]]) || $row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
                         $tree[$join->mapTo] = null;
 //                        $resolve(null);
 
@@ -632,7 +627,6 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
-            /** @phpstan-ignore assign.propertyType */
             $tree[$join->mapTo] = (function () use ($row, $join, $tableKey): iterable {
                 $where = [];
 

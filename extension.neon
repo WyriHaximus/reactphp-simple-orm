@@ -1,0 +1,5 @@
+services:
+    -
+        class: WyriHaximus\React\SimpleORM\PHPSan\ShipMonkDeadCode
+        tags:
+            - shipmonk.deadCode.memberUsageProvider

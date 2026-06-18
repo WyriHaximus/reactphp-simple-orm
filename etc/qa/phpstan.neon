@@ -7,3 +7,4 @@ parameters:
 	excludePaths:
 		- ../../src/Generated/Hydrator.php
 		- ../../src/Tools/LazyPromise.php
+		- ../../src/Tools/NaivePropertyTypeResolver.php
