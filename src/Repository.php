@@ -436,16 +436,16 @@ final class Repository implements RepositoryInterface
     private function fetchAndHydrate(QueryInterface $query): iterable
     {
 //        var_export([$query->sql(new PostgresEngine()), $query->params(new PostgresEngine())]);
-        $rows = [];
+//        $rows = [];
         foreach (
             $this->connection->query(
                 $query->asExpression(),
             ) as $row
         ) {
-            $rows[] = $row;
-        }
-
-        foreach ($rows as $row) {
+//            $rows[] = $row;
+//        }
+//
+//        foreach ($rows as $row) {
             $tree = $this->buildTree(
                 $this->inflate($row),
                 $this->entity,
