@@ -31,7 +31,6 @@ use function array_map;
 use function array_values;
 use function bin2hex;
 use function current;
-use function dirname;
 use function is_string;
 use function random_bytes;
 use function React\Async\await;
@@ -71,7 +70,7 @@ final class FunctionalTest extends AsyncTestCase
                 'FLYWAY_USER' => 'postgres',
                 'FLYWAY_PASSWORD' => 'postgres',
             ])
-            ->withMount(dirname(__DIR__) . '/etc/db', '/flyway/migrations')
+            ->withMount(__DIR__ . '/../etc/db', '/flyway/migrations')
             ->withMount('/var/run/docker.sock', '/var/run/docker.sock')
             ->start();
 

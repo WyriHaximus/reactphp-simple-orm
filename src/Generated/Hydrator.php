@@ -100,24 +100,22 @@ class Hydrator implements ObjectMapper
 
             static $previousBlogPostCaster1;
 
-            if ($previousBlogPostCaster1 === null) {
-                $previousBlogPostCaster1 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+            $previousBlogPostCaster1 ??= new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'previous_blog_post_id',
-       'foreignKey' => 'id',
-       'localCast' => NULL,
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'previous_blog_post_id',
+     'foreignKey' => 'id',
+     'localCast' => NULL,
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
   'lazy' => true,
 ]
 );
-            }
 
             $value = $previousBlogPostCaster1->cast($value, $this);
 
@@ -148,24 +146,22 @@ class Hydrator implements ObjectMapper
 
             static $nextBlogPostCaster1;
 
-            if ($nextBlogPostCaster1 === null) {
-                $nextBlogPostCaster1 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+            $nextBlogPostCaster1 ??= new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'next_blog_post_id',
-       'foreignKey' => 'id',
-       'localCast' => NULL,
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'next_blog_post_id',
+     'foreignKey' => 'id',
+     'localCast' => NULL,
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
   'lazy' => true,
 ]
 );
-            }
 
             $value = $nextBlogPostCaster1->cast($value, $this);
 
@@ -218,23 +214,21 @@ class Hydrator implements ObjectMapper
 
             static $authorCaster1;
 
-            if ($authorCaster1 === null) {
-                $authorCaster1 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+            $authorCaster1 ??= new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'author_id',
-       'foreignKey' => 'id',
-       'localCast' => NULL,
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'author_id',
+     'foreignKey' => 'id',
+     'localCast' => NULL,
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
 ]
 );
-            }
 
             $value = $authorCaster1->cast($value, $this);
 
@@ -265,23 +259,21 @@ class Hydrator implements ObjectMapper
 
             static $publisherCaster1;
 
-            if ($publisherCaster1 === null) {
-                $publisherCaster1 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+            $publisherCaster1 ??= new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'publisher_id',
-       'foreignKey' => 'id',
-       'localCast' => NULL,
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'publisher_id',
+     'foreignKey' => 'id',
+     'localCast' => NULL,
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
 ]
 );
-            }
 
             $value = $publisherCaster1->cast($value, $this);
 
@@ -312,24 +304,22 @@ class Hydrator implements ObjectMapper
 
             static $commentsCaster1;
 
-            if ($commentsCaster1 === null) {
-                $commentsCaster1 = new \WyriHaximus\React\SimpleORM\Attribute\LeftJoin(... [
+            $commentsCaster1 ??= new \WyriHaximus\React\SimpleORM\Attribute\LeftJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'id',
-       'foreignKey' => 'blog_post_id',
-       'localCast' => 'BIGINT',
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'id',
+     'foreignKey' => 'blog_post_id',
+     'localCast' => 'BIGINT',
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
   'lazy' => true,
 ]
 );
-            }
 
             $value = $commentsCaster1->cast($value, $this);
 
@@ -351,12 +341,10 @@ class Hydrator implements ObjectMapper
 
             static $viewsCaster1;
 
-            if ($viewsCaster1 === null) {
-                $viewsCaster1 = new \EventSauce\ObjectHydrator\PropertyCasters\CastToType(... [
+            $viewsCaster1 ??= new \EventSauce\ObjectHydrator\PropertyCasters\CastToType(... [
   0 => 'integer',
 ]
 );
-            }
 
             $value = $viewsCaster1->cast($value, $this);
 
@@ -378,11 +366,9 @@ class Hydrator implements ObjectMapper
 
             static $createdCaster1;
 
-            if ($createdCaster1 === null) {
-                $createdCaster1 = new \EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable(... [
+            $createdCaster1 ??= new \EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable(... [
 ]
 );
-            }
 
             $value = $createdCaster1->cast($value, $this);
 
@@ -404,11 +390,9 @@ class Hydrator implements ObjectMapper
 
             static $modifiedCaster1;
 
-            if ($modifiedCaster1 === null) {
-                $modifiedCaster1 = new \EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable(... [
+            $modifiedCaster1 ??= new \EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable(... [
 ]
 );
-            }
 
             $value = $modifiedCaster1->cast($value, $this);
 
@@ -462,23 +446,21 @@ class Hydrator implements ObjectMapper
 
             static $authorCaster1;
 
-            if ($authorCaster1 === null) {
-                $authorCaster1 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+            $authorCaster1 ??= new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'author_id',
-       'foreignKey' => 'id',
-       'localCast' => NULL,
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'author_id',
+     'foreignKey' => 'id',
+     'localCast' => NULL,
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
 ]
 );
-            }
 
             $value = $authorCaster1->cast($value, $this);
 
@@ -509,23 +491,21 @@ class Hydrator implements ObjectMapper
 
             static $blogPostCaster1;
 
-            if ($blogPostCaster1 === null) {
-                $blogPostCaster1 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+            $blogPostCaster1 ??= new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'blog_post_id',
-       'foreignKey' => 'id',
-       'localCast' => NULL,
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'blog_post_id',
+     'foreignKey' => 'id',
+     'localCast' => NULL,
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
 ]
 );
-            }
 
             $value = $blogPostCaster1->cast($value, $this);
 
@@ -663,11 +643,9 @@ class Hydrator implements ObjectMapper
     {
         static $serializer;
         
-        if ($serializer === null) {
-            $serializer = new \EventSauce\ObjectHydrator\PropertySerializers\SerializeArrayItems(... [
+        $serializer ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeArrayItems(... [
 ]
 );
-        }
         
         return $serializer->serialize($value, $this);
     }
@@ -677,11 +655,9 @@ class Hydrator implements ObjectMapper
     {
         static $serializer;
         
-        if ($serializer === null) {
-            $serializer = new \EventSauce\ObjectHydrator\PropertySerializers\SerializeUuidToString(... [
+        $serializer ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeUuidToString(... [
 ]
 );
-        }
         
         return $serializer->serialize($value, $this);
     }
@@ -691,11 +667,9 @@ class Hydrator implements ObjectMapper
     {
         static $serializer;
         
-        if ($serializer === null) {
-            $serializer = new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
+        $serializer ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
 ]
 );
-        }
         
         return $serializer->serialize($value, $this);
     }
@@ -705,11 +679,9 @@ class Hydrator implements ObjectMapper
     {
         static $serializer;
         
-        if ($serializer === null) {
-            $serializer = new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
+        $serializer ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
 ]
 );
-        }
         
         return $serializer->serialize($value, $this);
     }
@@ -719,11 +691,9 @@ class Hydrator implements ObjectMapper
     {
         static $serializer;
         
-        if ($serializer === null) {
-            $serializer = new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
+        $serializer ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
 ]
 );
-        }
         
         return $serializer->serialize($value, $this);
     }
@@ -762,24 +732,22 @@ class Hydrator implements ObjectMapper
         }
         static $previousBlogPostSerializer0;
 
-        if ($previousBlogPostSerializer0 === null) {
-            $previousBlogPostSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+        $previousBlogPostSerializer0 ??= new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'previous_blog_post_id',
-       'foreignKey' => 'id',
-       'localCast' => NULL,
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'previous_blog_post_id',
+     'foreignKey' => 'id',
+     'localCast' => NULL,
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
   'lazy' => true,
 ]
 );
-        }
         
         $previousBlogPost = $previousBlogPostSerializer0->serialize($previousBlogPost, $this);
         after_previousBlogPost:        $result['previous_blog_post'] = $previousBlogPost;
@@ -792,24 +760,22 @@ class Hydrator implements ObjectMapper
         }
         static $nextBlogPostSerializer0;
 
-        if ($nextBlogPostSerializer0 === null) {
-            $nextBlogPostSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+        $nextBlogPostSerializer0 ??= new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'next_blog_post_id',
-       'foreignKey' => 'id',
-       'localCast' => NULL,
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'next_blog_post_id',
+     'foreignKey' => 'id',
+     'localCast' => NULL,
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
   'lazy' => true,
 ]
 );
-        }
         
         $nextBlogPost = $nextBlogPostSerializer0->serialize($nextBlogPost, $this);
         after_nextBlogPost:        $result['next_blog_post'] = $nextBlogPost;
@@ -826,23 +792,21 @@ class Hydrator implements ObjectMapper
         $author = $object->author;
         static $authorSerializer0;
 
-        if ($authorSerializer0 === null) {
-            $authorSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+        $authorSerializer0 ??= new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'author_id',
-       'foreignKey' => 'id',
-       'localCast' => NULL,
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'author_id',
+     'foreignKey' => 'id',
+     'localCast' => NULL,
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
 ]
 );
-        }
         
         $author = $authorSerializer0->serialize($author, $this);
         after_author:        $result['author'] = $author;
@@ -851,23 +815,21 @@ class Hydrator implements ObjectMapper
         $publisher = $object->publisher;
         static $publisherSerializer0;
 
-        if ($publisherSerializer0 === null) {
-            $publisherSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+        $publisherSerializer0 ??= new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'publisher_id',
-       'foreignKey' => 'id',
-       'localCast' => NULL,
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'publisher_id',
+     'foreignKey' => 'id',
+     'localCast' => NULL,
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
 ]
 );
-        }
         
         $publisher = $publisherSerializer0->serialize($publisher, $this);
         after_publisher:        $result['publisher'] = $publisher;
@@ -876,24 +838,22 @@ class Hydrator implements ObjectMapper
         $comments = $object->comments;
         static $commentsSerializer0;
 
-        if ($commentsSerializer0 === null) {
-            $commentsSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\LeftJoin(... [
+        $commentsSerializer0 ??= new \WyriHaximus\React\SimpleORM\Attribute\LeftJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'id',
-       'foreignKey' => 'blog_post_id',
-       'localCast' => 'BIGINT',
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'id',
+     'foreignKey' => 'blog_post_id',
+     'localCast' => 'BIGINT',
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
   'lazy' => true,
 ]
 );
-        }
         
         $comments = $commentsSerializer0->serialize($comments, $this);
         after_comments:        $result['comments'] = $comments;
@@ -902,12 +862,10 @@ class Hydrator implements ObjectMapper
         $views = $object->views;
         static $viewsSerializer0;
 
-        if ($viewsSerializer0 === null) {
-            $viewsSerializer0 = new \EventSauce\ObjectHydrator\PropertyCasters\CastToType(... [
+        $viewsSerializer0 ??= new \EventSauce\ObjectHydrator\PropertyCasters\CastToType(... [
   0 => 'integer',
 ]
 );
-        }
         
         $views = $viewsSerializer0->serialize($views, $this);
         after_views:        $result['views'] = $views;
@@ -916,11 +874,9 @@ class Hydrator implements ObjectMapper
         $created = $object->created;
         static $createdSerializer0;
 
-        if ($createdSerializer0 === null) {
-            $createdSerializer0 = new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
+        $createdSerializer0 ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
 ]
 );
-        }
         
         $created = $createdSerializer0->serialize($created, $this);
         after_created:        $result['created'] = $created;
@@ -929,11 +885,9 @@ class Hydrator implements ObjectMapper
         $modified = $object->modified;
         static $modifiedSerializer0;
 
-        if ($modifiedSerializer0 === null) {
-            $modifiedSerializer0 = new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
+        $modifiedSerializer0 ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
 ]
 );
-        }
         
         $modified = $modifiedSerializer0->serialize($modified, $this);
         after_modified:        $result['modified'] = $modified;
@@ -955,23 +909,21 @@ class Hydrator implements ObjectMapper
         $author = $object->author;
         static $authorSerializer0;
 
-        if ($authorSerializer0 === null) {
-            $authorSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+        $authorSerializer0 ??= new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'author_id',
-       'foreignKey' => 'id',
-       'localCast' => NULL,
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'author_id',
+     'foreignKey' => 'id',
+     'localCast' => NULL,
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
 ]
 );
-        }
         
         $author = $authorSerializer0->serialize($author, $this);
         after_author:        $result['author'] = $author;
@@ -980,23 +932,21 @@ class Hydrator implements ObjectMapper
         $blogPost = $object->blogPost;
         static $blogPostSerializer0;
 
-        if ($blogPostSerializer0 === null) {
-            $blogPostSerializer0 = new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
+        $blogPostSerializer0 ??= new \WyriHaximus\React\SimpleORM\Attribute\InnerJoin(... [
   'clause' => 
-   [
-    0 => 
-    new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
-       'localKey' => 'blog_post_id',
-       'foreignKey' => 'id',
-       'localCast' => NULL,
-       'localFunction' => NULL,
-       'foreignCast' => NULL,
-       'foreignFunction' => NULL,
-    ]),
-  ],
+ [
+  0 => 
+  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+     'localKey' => 'blog_post_id',
+     'foreignKey' => 'id',
+     'localCast' => NULL,
+     'localFunction' => NULL,
+     'foreignCast' => NULL,
+     'foreignFunction' => NULL,
+  ]),
+],
 ]
 );
-        }
         
         $blogPost = $blogPostSerializer0->serialize($blogPost, $this);
         after_blogPost:        $result['blog_post'] = $blogPost;
