@@ -12,6 +12,8 @@
   ],
   "require": {
     "php": "^8.5",
+    "ext-json": "^8.5",
+    "ext-tokenizer": "^8.5",
     "composer-plugin-api": "^2.0.0",
     "composer/composer": "^2.9.2",
     "eventsauce/object-hydrator": "^1.7.0",
@@ -21,7 +23,6 @@
     "react/async": "^4.3.0",
     "react/event-loop": "^1.6.0",
     "react/promise": "^3.3.0",
-    "react/stream": "^1.4.0",
     "reactivex/rxphp": "^2.1.0",
     "roave/better-reflection": "^6.68.0",
     "voryx/pgasync": "^2.0.6",

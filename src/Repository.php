@@ -490,7 +490,7 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
-            if ($join->type === JointType::INNER && ($join->lazy === JoinInterface::IS_LAZY || $entity->class() === $join->entity->class())) {
+            if ($join->type === JointType::INNER) {
                 foreach ($join->clause as $clause) {
                     if (!array_key_exists($tableKey, $this->tableAliases) || !array_key_exists($this->tableAliases[$tableKey], $row) || !array_key_exists($clause->localKey, $row[$this->tableAliases[$tableKey]]) || $row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
                         $tree[$join->mapTo] = null;

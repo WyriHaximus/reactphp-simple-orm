@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WyriHaximus\React\SimpleORM\Composer;
 
 use EventSauce\ObjectHydrator\ObjectMapperCodeGenerator;
+use LogicException;
 use WyriHaximus\Composer\GenerativePluginTooling\Filter\Class\ImplementsInterface;
 use WyriHaximus\Composer\GenerativePluginTooling\Filter\Class\IsInstantiable;
 use WyriHaximus\Composer\GenerativePluginTooling\Filter\Package\ComposerJsonHasItemWithSpecificValue;
@@ -63,7 +64,7 @@ final class Plugin implements GenerativePlugin
             $rootPath . '/src/Generated/Hydrator.php',
             new ObjectMapperCodeGenerator()->dump(
                 array_map(
-                    static fn (ItemContract $item): string => $item->class,
+                    $this->entityClass(...),
                     $items,
                 ),
                 Hydrator::class,
@@ -72,7 +73,8 @@ final class Plugin implements GenerativePlugin
 
         $entityToGenerateClassesClassNameSuffixMapping = [];
         foreach ($items as $item) {
-            $entityToGenerateClassesClassNameSuffixMapping[$item->class] = 'IE' . md5($item->class);
+            $entityClass                                                 = $this->entityClass($item);
+            $entityToGenerateClassesClassNameSuffixMapping[$entityClass] = 'IE' . md5($entityClass);
         }
 
         TwigFile::render(
@@ -83,14 +85,25 @@ final class Plugin implements GenerativePlugin
 
         $entityInspector = new EntityInspector(new Configuration());
         foreach ($items as $item) {
+            $entityClass = $this->entityClass($item);
             TwigFile::render(
                 $rootPath . '/etc/generated_templates/InspectedEntity.php.twig',
-                $rootPath . '/src/Generated/InspectedEntity/' . $entityToGenerateClassesClassNameSuffixMapping[$item->class] . '.php',
+                $rootPath . '/src/Generated/InspectedEntity/' . $entityToGenerateClassesClassNameSuffixMapping[$entityClass] . '.php',
                 [
-                    'entity' => $entityInspector->entity($item->class),
+                    'entity' => $entityInspector->entity($entityClass),
                     'entityToGenerateClassesClassNameSuffixMapping' => $entityToGenerateClassesClassNameSuffixMapping,
                 ],
             );
         }
+    }
+
+    /** @return class-string<EntityInterface> */
+    private function entityClass(ItemContract $item): string
+    {
+        if (! $item instanceof Item) {
+            throw new LogicException('Expected an entity item collected by ' . Collector::class);
+        }
+
+        return $item->class;
     }
 }

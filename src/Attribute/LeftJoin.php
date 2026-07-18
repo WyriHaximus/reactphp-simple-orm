@@ -13,6 +13,8 @@ use ReflectionClass;
 use WyriHaximus\React\SimpleORM\Entity\JointType;
 use WyriHaximus\React\SimpleORM\EntityInterface;
 
+use function is_object;
+
 /** @api */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class LeftJoin extends DoNotSerialize implements JoinInterface, PropertyCaster, PropertySerializer
@@ -38,7 +40,11 @@ final class LeftJoin extends DoNotSerialize implements JoinInterface, PropertyCa
 
     public function serialize(mixed $value, ObjectMapper $hydrator): mixed
     {
-        if (new ReflectionClass($value::class)->isUninitializedLazyObject($value)) {
+        if (! is_object($value)) {
+            return null;
+        }
+
+        if (new ReflectionClass($value)->isUninitializedLazyObject($value)) {
             return null;
         }
 

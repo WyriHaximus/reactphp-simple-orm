@@ -27,7 +27,6 @@ use function in_array;
 use function is_array;
 use function is_string;
 use function is_subclass_of;
-use function method_exists;
 use function str_replace;
 
 final class EntityInspector
@@ -54,7 +53,8 @@ final class EntityInspector
     public function entity(string $entity): InspectedEntityInterface
     {
         if (! array_key_exists($entity, $this->entities) && array_key_exists($entity, InspectedEntityMap::MAP) && class_exists(InspectedEntityMap::MAP[$entity])) {
-            $this->entities[$entity] = new (InspectedEntityMap::MAP[$entity]);
+            /** @phpstan-ignore assign.propertyType */
+            $this->entities[$entity] = new (InspectedEntityMap::MAP[$entity])();
         }
 
         if (! array_key_exists($entity, $this->entities)) {
@@ -90,9 +90,11 @@ final class EntityInspector
     }
 
     /**
-     * @param ReflectionClass<EntityInterface> $class
+     * @param ReflectionClass<T> $class
      *
      * @return iterable<string, Field|Join>
+     *
+     * @template T of EntityInterface
      */
     private function fields(ReflectionClass $class): iterable
     {
@@ -101,13 +103,7 @@ final class EntityInspector
         foreach ($class->getProperties() as $property) {
             $propertyName = $property->getName();
 
-            $roaveProperty = (static function (BetterReflection $br, string $class): \Roave\BetterReflection\Reflection\ReflectionClass {
-                if (method_exists($br, 'classReflector')) {
-                    return $br->classReflector()->reflect($class);
-                }
-
-                return $br->reflector()->reflectClass($class);
-            })(new BetterReflection(), $class->getName())->getProperty($propertyName);
+            $roaveProperty = new BetterReflection()->reflector()->reflectClass($class->getName())->getProperty($propertyName);
 
             if (! $roaveProperty instanceof ReflectionProperty) {
                 continue;
@@ -118,7 +114,7 @@ final class EntityInspector
                 $keys = $attribute->getArguments()[0];
                 if (is_string($keys)) {
                     $column = $keys;
-                } elseif (is_array($keys) && count($keys) > 0) {
+                } elseif (is_array($keys) && count($keys) > 0 && is_string($keys[0])) {
                     $column = $keys[0];
                 }
             }
@@ -141,6 +137,11 @@ final class EntityInspector
                 }
 
                 if (in_array($joinEntity, ['array', 'iterable', 'list'], true)) {
+                    if ($constructor === null) {
+                        continue;
+                    }
+
+                    /** @phpstan-ignore property.internalClass */
                     $joinEntity = new NaivePropertyTypeResolver()->typeFromConstructorParameter($property, $constructor)->concreteTypes()[0]->name;
 //                    var_export([
 //                        $propertyName,
@@ -223,6 +224,7 @@ final class EntityInspector
             new ReflectionClass(
                 InspectedEntity::class,
             )->newLazyProxy(
+                /** @phpstan-ignore argument.type */
                 fn (): InspectedEntityInterface => $this->entity($entity),
             ),
             /** @phpstan-ignore argument.type,property.notFound */

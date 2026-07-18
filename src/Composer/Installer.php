@@ -37,8 +37,6 @@ final class Installer implements PluginInterface, EventSubscriberInterface
 
     /**
      * Called before every dump autoload, generates a fresh PHP class.
-     *
-     * @phpstan-ignore shipmonk.deadMethod
      */
     public static function findEntities(Event $event): void
     {

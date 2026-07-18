@@ -2,7 +2,9 @@
   "symbol-whitelist" : [
     "null", "true", "false",
     "static", "self", "parent",
-    "array", "string", "int", "float", "bool", "iterable", "callable", "void", "object"
+    "array", "string", "int", "float", "bool", "iterable", "callable", "void", "object",
+    "ShipMonk\\PHPStan\\DeadCode\\Provider\\ReflectionBasedMemberUsageProvider",
+    "ShipMonk\\PHPStan\\DeadCode\\Provider\\VirtualUsageData"
   ],
   "php-core-extensions" : [
     "Core",

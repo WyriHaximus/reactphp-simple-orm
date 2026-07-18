@@ -15,9 +15,9 @@ use WyriHaximus\React\SimpleORM\Hydrator;
 use WyriHaximus\TestUtilities\TestCase;
 
 use function bin2hex;
+use function date;
 use function random_bytes;
 use function React\Promise\resolve;
-use function Safe\date;
 use function WyriHaximus\React\awaitObservable;
 
 final class HydratorTest extends TestCase

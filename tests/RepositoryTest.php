@@ -27,7 +27,7 @@ use WyriHaximus\React\SimpleORM\Query\Order;
 use WyriHaximus\React\SimpleORM\Query\Where;
 use WyriHaximus\React\SimpleORM\Repository;
 
-use function Safe\date;
+use function date;
 use function str_contains;
 
 final class RepositoryTest extends AsyncTestCase

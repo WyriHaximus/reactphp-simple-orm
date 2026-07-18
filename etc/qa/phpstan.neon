@@ -1,5 +1,10 @@
 parameters:
 	level: max
+	ergebnis:
+		noExtends:
+			classesAllowedToBeExtended:
+				- EventSauce\ObjectHydrator\DoNotSerialize
+				- ShipMonk\PHPStan\DeadCode\Provider\ReflectionBasedMemberUsageProvider
 	paths:
 		- ../../etc
 		- ../../src
