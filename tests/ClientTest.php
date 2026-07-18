@@ -4,69 +4,51 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
-use Doctrine\Common\Annotations\Reader;
 use Latitude\QueryBuilder\QueryFactory;
+use Mockery;
+use Mockery\MockInterface;
 use PgAsync\Client as PgClient;
-use Prophecy\Argument;
-use Prophecy\Prophecy\ObjectProphecy;
-use ReflectionClass;
+use PHPUnit\Framework\Attributes\Before;
+use PHPUnit\Framework\Attributes\Test;
 use Rx\Observable;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\React\SimpleORM\Adapter\Postgres;
-use WyriHaximus\React\SimpleORM\Attribute\Table;
 use WyriHaximus\React\SimpleORM\Client;
-use WyriHaximus\React\Tests\SimpleORM\Stub\UserStub;
+use WyriHaximus\React\SimpleORM\Configuration;
 
 use function Latitude\QueryBuilder\field;
-use function React\Async\await;
 
 final class ClientTest extends AsyncTestCase
 {
-    private ObjectProphecy $pgClient;
-
-    private ObjectProphecy $annotationReader;
+    private MockInterface&PgClient $pgClient;
 
     private Client $client;
 
-    protected function setUp(): void
+    #[Before]
+    public function setupMocks(): void
     {
-        parent::setUp();
-
-        $this->pgClient         = $this->prophesize(PgClient::class);
-        $this->annotationReader = $this->prophesize(Reader::class);
-        $this->client           = Client::createWithAnnotationReader(new Postgres($this->pgClient->reveal()), $this->annotationReader->reveal());
+        $this->pgClient = Mockery::mock(PgClient::class);
+        $this->client   = Client::create(new Postgres($this->pgClient), new Configuration(''));
     }
 
-    public function testGetRepository(): void
+    #[Test]
+    public function fetch(): void
     {
-        $this->annotationReader->getClassAnnotation(
-            Argument::type(ReflectionClass::class),
-            Table::class,
-        )->shouldBeCalled()->willReturn(new Table(['users']));
+        $query = new QueryFactory()->select()->from('table')->where(field('id')->eq(1))->asExpression();
 
-        $this->annotationReader->getClassAnnotations(
-            Argument::type(ReflectionClass::class),
-        )->shouldBeCalled()->willReturn([
-            new Table(['users']),
-        ]);
+        $this->pgClient->shouldReceive('executeStatement')
+            ->once()
+            ->with('SELECT * FROM "table" WHERE "id" = $1', [1])
+            ->andReturn(
+                Observable::fromArray([
+                    [
+                        'id' => 1,
+                        'title' => 'Title',
+                    ],
+                ]),
+            );
 
-        $this->client->repository(UserStub::class);
-    }
-
-    public function testFetch(): void
-    {
-        $query = (new QueryFactory())->select()->from('table')->where(field('id')->eq(1))->asExpression();
-
-        $this->pgClient->executeStatement('SELECT * FROM "table" WHERE "id" = $1', [1])->shouldBeCalled()->willReturn(
-            Observable::fromArray([
-                [
-                    'id' => 1,
-                    'title' => 'Title',
-                ],
-            ]),
-        );
-
-        $rows = await($this->client->query($query)->toArray()->toPromise());
+        $rows = [...$this->client->query($query)];
 
         self::assertCount(1, $rows);
     }

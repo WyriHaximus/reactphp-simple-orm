@@ -7,9 +7,10 @@ namespace WyriHaximus\React\SimpleORM;
 use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\Join;
 
-/** @template T */
+/** @template T of EntityInterface */
 interface InspectedEntityInterface
 {
+    /** @return class-string<T> */
     public function class(): string;
 
     public function table(): string;

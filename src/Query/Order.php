@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Query;
 
-final class Order implements SectionInterface
+final readonly class Order implements SectionInterface
 {
     /** @var array<OrderInterface> */
-    private array $orders = [];
+    private array $orders;
 
     public function __construct(OrderInterface ...$orders)
     {

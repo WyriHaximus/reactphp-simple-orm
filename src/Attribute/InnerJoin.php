@@ -5,19 +5,53 @@ declare(strict_types=1);
 namespace WyriHaximus\React\SimpleORM\Attribute;
 
 use Attribute;
+use EventSauce\ObjectHydrator\DoNotSerialize;
+use EventSauce\ObjectHydrator\ObjectMapper;
+use EventSauce\ObjectHydrator\PropertyCaster;
+use EventSauce\ObjectHydrator\PropertySerializer;
+use ReflectionClass;
+use WyriHaximus\React\SimpleORM\Entity\JointType;
+use WyriHaximus\React\SimpleORM\EntityInterface;
 
-#[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
-final readonly class InnerJoin implements JoinInterface
+use function is_object;
+
+/** @api */
+#[Attribute(Attribute::TARGET_PROPERTY)]
+final class InnerJoin extends DoNotSerialize implements JoinInterface, PropertyCaster, PropertySerializer
 {
-    public string $type;
+    public readonly JointType $type;
 
-    /** @param array<Clause> $clause */
-    public function __construct( /** @phpstan-ignore-line */
-        public string $entity,
-        public array $clause,
-        public string $property,
-        public bool $lazy = self::IS_NOT_LAZY,
+    /**
+     * @param array<Clause> $clause
+     *
+     * @phpstan-ignore ergebnis.noConstructorParameterWithDefaultValue
+     */
+    public function __construct(
+        public readonly array $clause,
+        public readonly bool $lazy = self::IS_NOT_LAZY,
     ) {
-        $this->type = 'inner';
+        $this->type = JointType::INNER;
+    }
+
+    public function cast(mixed $value, ObjectMapper $hydrator): mixed
+    {
+           return $value;
+    }
+
+    public function serialize(mixed $value, ObjectMapper $hydrator): mixed
+    {
+        if (! is_object($value)) {
+            return null;
+        }
+
+        if (new ReflectionClass($value)->isUninitializedLazyObject($value)) {
+            return null;
+        }
+
+        if ($value instanceof EntityInterface) {
+            return $hydrator->serializeObject($value);
+        }
+
+        return null;
     }
 }

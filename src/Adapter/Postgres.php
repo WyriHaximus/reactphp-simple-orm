@@ -8,17 +8,15 @@ use Latitude\QueryBuilder\Engine\PostgresEngine;
 use Latitude\QueryBuilder\EngineInterface;
 use Latitude\QueryBuilder\ExpressionInterface;
 use PgAsync\Client as PgClient;
-use Rx\Observable;
 use WyriHaximus\React\SimpleORM\AdapterInterface;
 
 use function explode;
 use function implode;
-use function strpos;
+use function str_contains;
+use function WyriHaximus\React\awaitObservable;
 
-use const WyriHaximus\Constants\Boolean\FALSE_;
-use const WyriHaximus\Constants\Numeric\ZERO;
-
-final class Postgres implements AdapterInterface
+/** @api */
+final readonly class Postgres implements AdapterInterface
 {
     private EngineInterface $engine;
 
@@ -27,15 +25,16 @@ final class Postgres implements AdapterInterface
         $this->engine = new PostgresEngine();
     }
 
-    public function query(ExpressionInterface $expression): Observable
+    /** @return iterable<array<string, mixed>> */
+    public function query(ExpressionInterface $expression): iterable
     {
         $params = $expression->params($this->engine);
         $sql    = $expression->sql($this->engine);
-        if (strpos($sql, '?') !== FALSE_) {
+        if (str_contains($sql, '?')) {
             $chunks    = explode('?', $sql);
             $sqlChunks = [];
             foreach ($chunks as $i => $chunk) {
-                if ($i === ZERO) {
+                if ($i === 0) {
                     $sqlChunks[] = $chunk;
                     continue;
                 }
@@ -46,7 +45,8 @@ final class Postgres implements AdapterInterface
             $sql = implode('', $sqlChunks);
         }
 
-        return $this->client->executeStatement($sql, $params);
+        /** @phpstan-ignore generator.valueType,argument.type */
+        yield from awaitObservable($this->client->executeStatement($sql, $params));
     }
 
     public function engine(): EngineInterface

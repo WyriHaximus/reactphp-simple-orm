@@ -4,19 +4,10 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Entity;
 
-final class Field
+/** @api */
+final readonly class Field
 {
-    public function __construct(private string $name, private string $type)
+    public function __construct(public string $property, public string $column, public string $type)
     {
-    }
-
-    public function name(): string
-    {
-        return $this->name;
-    }
-
-    public function type(): string
-    {
-        return $this->type;
     }
 }

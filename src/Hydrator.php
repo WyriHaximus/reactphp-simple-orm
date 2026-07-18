@@ -4,32 +4,82 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
-use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
+use React\Promise\PromiseInterface;
+use ReflectionClass;
+use WyriHaximus\React\SimpleORM\Generated\Hydrator as GeneratedHydrator;
 
+use function array_key_exists;
 use function is_array;
+use function React\Async\await;
 
 final readonly class Hydrator
 {
-    private ObjectMapperUsingReflection $fallbackMapper;
+    private GeneratedHydrator $fallbackMapper;
 
     public function __construct()
     {
-        $this->fallbackMapper = new ObjectMapperUsingReflection();
+        $this->fallbackMapper = new GeneratedHydrator();
     }
 
-    /** @param array<string, mixed> $data */
+    /**
+     * @param array<string, mixed>        $data
+     * @param InspectedEntityInterface<T> $inspectedEntity
+     *
+     * @return T
+     *
+     * @template T of EntityInterface
+     */
     public function hydrate(InspectedEntityInterface $inspectedEntity, array $data): EntityInterface
     {
+//        /** @return T */
+//        return new ReflectionClass(
+//            $inspectedEntity->class(),
+//        )->newLazyProxy(
+//            fn (): EntityInterface => $this->hydrateEntity(
+//                $inspectedEntity,
+//                $data,
+//            ),
+//        );
+//    }
+//
+//    /**
+//     * @param array<string, mixed>        $data
+//     * @param InspectedEntityInterface<T> $inspectedEntity
+//     *
+//     * @return T
+//     *
+//     * @template T of EntityInterface
+//     */
+//    private function hydrateEntity(InspectedEntityInterface $inspectedEntity, array $data): EntityInterface
+//    {
+////        $ogData = $data;
         foreach ($inspectedEntity->joins() as $join) {
-            if (! is_array($data[$join->property])) {
+            if (! array_key_exists($join->mapTo, $data)) {
                 continue;
             }
 
-            $data[$join->property] = $this->hydrate(
+            if ($data[$join->mapTo] instanceof PromiseInterface) {
+                /** @var PromiseInterface<mixed> $promise */
+                $promise            = $data[$join->mapTo];
+                $data[$join->mapTo] = $this->createLazyProxy($join->entity, $promise);
+                continue;
+            }
+
+            if (! is_array($data[$join->mapTo])) {
+                continue;
+            }
+
+            /** @var array<string, mixed> $joinData */
+            $joinData           = $data[$join->mapTo];
+            $data[$join->mapTo] = $this->hydrate(
                 $join->entity,
-                $data[$join->property],
+                $joinData,
             );
         }
+
+//        var_export([$ogData, $data, array_keys($ogData), array_keys($data)]);
+//        var_export([array_keys($ogData), array_keys($data)]);
+//        var_export([$inspectedEntity, array_keys($data)]);
 
         return $this->fallbackMapper->hydrateObject($inspectedEntity->class(), $data);
     }
@@ -37,6 +87,42 @@ final readonly class Hydrator
     /** @return array<string, mixed> */
     public function extract(EntityInterface $entity): array
     {
+        /** @phpstan-ignore return.type */
         return $this->fallbackMapper->serializeObject($entity);
+    }
+
+    /**
+     * @param InspectedEntityInterface<T> $inspectedEntity
+     * @param PromiseInterface<mixed>     $object
+     *
+     * @return T
+     *
+     * @template T of EntityInterface
+     */
+    private function createLazyProxy(InspectedEntityInterface $inspectedEntity, PromiseInterface $object): EntityInterface
+    {
+        /** @return T */
+        return new ReflectionClass(
+            $inspectedEntity->class(),
+        )->newLazyProxy(
+            function () use ($inspectedEntity, $object): EntityInterface {
+                /** @var array<string, mixed> $data */
+                $data = await($object);
+
+                /**
+                 * Needs a proper fix, but this will work for now
+                 *
+                 * @phpstan-ignore instanceof.alwaysFalse
+                 */
+                if ($data instanceof EntityInterface) {
+                    return $data;
+                }
+
+                return $this->hydrate(
+                    $inspectedEntity,
+                    $data,
+                );
+            },
+        );
     }
 }

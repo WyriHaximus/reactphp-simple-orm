@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM;
 
+/** @api */
 final readonly class Configuration
 {
-    public function __construct( /** @phpstan-ignore-line */
+    /** @phpstan-ignore ergebnis.noConstructorParameterWithDefaultValue */
+    public function __construct(
         public string $tablePrefix = '',
     ) {
     }

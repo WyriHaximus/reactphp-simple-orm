@@ -10,11 +10,15 @@ use WyriHaximus\React\SimpleORM\Query\WhereInterface;
 
 final readonly class Field implements WhereInterface
 {
-    /** @param mixed[] $criteriaArguments */
+    /**
+     * @param mixed[] $criteriaArguments
+     *
+     * @phpstan-ignore ergebnis.noConstructorParameterWithDefaultValue
+     */
     public function __construct(
         private string $field,
         private string $criteria,
-        private array $criteriaArguments = [], /** @phpstan-ignore-line */
+        private array $criteriaArguments = [],
     ) {
     }
 
@@ -25,7 +29,7 @@ final readonly class Field implements WhereInterface
 
     public function applyCriteria(CriteriaBuilder $criteria): CriteriaInterface
     {
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore method.dynamicName,return.type */
         return $criteria->{$this->criteria}(...$this->criteriaArguments);
     }
 }

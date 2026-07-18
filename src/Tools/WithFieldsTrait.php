@@ -8,19 +8,23 @@ use function in_array;
 
 trait WithFieldsTrait
 {
-    /** @param array<string, mixed> $fields */
+    /**
+     * @param array<string, mixed> $fields
+     *
+     * @phpstan-ignore shipmonk.deadMethod
+     */
     public function withFields(array $fields): self
     {
-        $clone = clone $this;
-
+        $safeFields = [];
         foreach ($fields as $key => $value) {
             if (in_array($key, ['id', 'created', 'modified'], true)) {
                 continue;
             }
 
-            $clone->$key = $value; /** @phpstan-ignore-line */
+            /** @phpstan-ignore property.dynamicName */
+            $safeFields[$key] = $value;
         }
 
-        return $clone;
+        return clone($this, $safeFields);
     }
 }

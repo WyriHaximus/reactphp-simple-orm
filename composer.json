@@ -2,6 +2,7 @@
   "name": "wyrihaximus/react-simple-orm",
   "description": "EXPERIMENTAL: Package to see how feasible a simple ORM in ReactPHP is",
   "license": "MIT",
+  "type": "composer-plugin",
   "authors": [
     {
       "name": "Cees-Jan Kiewiet",
@@ -10,29 +11,40 @@
     }
   ],
   "require": {
-    "php": "^8.2",
-    "eventsauce/object-hydrator": "^1.4",
-    "latitude/latitude": "^4.1",
-    "ramsey/uuid": "^4.2.3",
-    "react/event-loop": "^1.3",
-    "react/promise": "^3.1",
-    "react/stream": "^1.1",
-    "reactivex/rxphp": "^2.0.12",
-    "roave/better-reflection": "^6",
-    "thecodingmachine/safe": "^2",
-    "voryx/pgasync": "^2.0",
-    "wyrihaximus/constants": "^1.5",
-    "wyrihaximus/doctrine-annotation-autoloader": "^1.0",
-    "wyrihaximus/react-event-loop-rx-scheduler-hook-up": "^0.1.1"
+    "php": "^8.5",
+    "ext-json": "^8.5",
+    "ext-tokenizer": "^8.5",
+    "composer-plugin-api": "^2.0.0",
+    "composer/composer": "^2.9.2",
+    "eventsauce/object-hydrator": "^1.7.0",
+    "icanboogie/inflector": "^4.0",
+    "latitude/latitude": "^4.4.1",
+    "ramsey/uuid": "^4.9.2",
+    "react/async": "^4.3.0",
+    "react/event-loop": "^1.6.0",
+    "react/promise": "^3.3.0",
+    "reactivex/rxphp": "^2.1.0",
+    "roave/better-reflection": "^6.68.0",
+    "voryx/pgasync": "^2.0.6",
+    "wyrihaximus/generative-composer-plugin-tooling": "^1.5.0",
+    "wyrihaximus/react-awaitable-observable": "^1.2.1"
   },
   "require-dev": {
-    "robmorgan/phinx": "^0.12.11",
-    "symfony/yaml": "^5.4 || ^7.0",
-    "vlucas/phpdotenv": "^5.4",
-    "wyrihaximus/async-test-utilities": "^8.0.1"
+    "react/promise-timer": "^1.11",
+    "shipmonk/dead-code-detector": "^0.14.1 || ^0.15.0 || ^1.0.0",
+    "symfony/http-client": "^8.1",
+    "symfony/yaml": "^5.4 || ^7.0 || ^8 || ^9",
+    "testcontainers/testcontainers": "^1.0",
+    "vlucas/phpdotenv": "^5.6.3",
+    "wyrihaximus/async-test-utilities": "^13.1.0",
+    "wyrihaximus/makefiles": "^0.11.1"
+  },
+  "suggest": {
+    "shipmonk/dead-code-detector": "This package supports ^1, ^0.15, ^0.14.1 by hooking in and marking all listeners as alive"
   },
   "autoload": {
     "psr-4": {
+      "WyriHaximus\\DevApp\\React\\SimpleORM\\": "etc/dev-app/",
       "WyriHaximus\\React\\SimpleORM\\": "src/"
     }
   },
@@ -47,28 +59,44 @@
       "dealerdirect/phpcodesniffer-composer-installer": true,
       "ergebnis/composer-normalize": true,
       "icanhazstring/composer-unused": true,
-      "infection/extension-installer": true
+      "infection/extension-installer": true,
+      "php-http/discovery": true,
+      "phpstan/extension-installer": true,
+      "wyrihaximus/makefiles": true,
+      "wyrihaximus/test-utilities": true
     },
     "platform": {
-      "php": "8.2.13"
+      "php": "8.5.13"
     },
     "sort-packages": true
   },
   "extra": {
-    "unused": [
-      "react/dns",
-      "react/event-loop",
-      "react/stream"
-    ]
+    "class": "WyriHaximus\\React\\SimpleORM\\Composer\\Installer",
+    "phpstan": {
+      "includes": [
+        "extension.neon"
+      ]
+    },
+    "wyrihaximus": {
+      "react": {
+        "orm": {
+          "has-entities": true
+        }
+      }
+    }
   },
   "scripts": {
     "post-install-cmd": [
-      "composer normalize",
-      "composer update --lock --no-scripts"
+      "make on-install-or-update || true"
     ],
     "post-update-cmd": [
-      "composer normalize",
-      "composer update --lock --no-scripts"
+      "make on-install-or-update || true"
+    ],
+    "pre-autoload-dump": [
+      "WyriHaximus\\React\\SimpleORM\\Composer\\Installer::findEntities"
+    ],
+    "generate-config": [
+      "WyriHaximus\\React\\SimpleORM\\Composer\\Installer::findEntities"
     ]
   }
 }

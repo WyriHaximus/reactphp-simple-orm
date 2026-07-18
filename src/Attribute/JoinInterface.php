@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\SimpleORM\Attribute;
 
+use WyriHaximus\React\SimpleORM\Entity\JointType;
+
 /**
- * @property string $entity
- * @property string $type
- * @property string $property
+ * @property JointType $type
  * @property bool $lazy
  * @property array<Clause> $clause
  */
 interface JoinInterface
 {
-    public const IS_LAZY     = true;
-    public const IS_NOT_LAZY = false;
+    public const true IS_LAZY      = true;
+    public const false IS_NOT_LAZY = false;
 }

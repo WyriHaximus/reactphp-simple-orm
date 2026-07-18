@@ -11,11 +11,15 @@ use WyriHaximus\React\SimpleORM\Query\WhereInterface;
 
 final readonly class Expression implements WhereInterface
 {
-    /** @param array<mixed> $criteriaArguments */
+    /**
+     * @param array<mixed> $criteriaArguments
+     *
+     * @phpstan-ignore ergebnis.noConstructorParameterWithDefaultValue
+     */
     public function __construct(
         private ExpressionInterface $expression,
         private string $criteria,
-        private array $criteriaArguments = [], /** @phpstan-ignore-line */
+        private array $criteriaArguments = [],
     ) {
     }
 
@@ -26,7 +30,7 @@ final readonly class Expression implements WhereInterface
 
     public function applyExpression(ExpressionInterface $expression): CriteriaInterface
     {
-        /** @phpstan-ignore-next-line */
-        return (new CriteriaBuilder($expression))->{$this->criteria}(...$this->criteriaArguments);
+        /** @phpstan-ignore method.dynamicName,return.type */
+        return new CriteriaBuilder($expression)->{$this->criteria}(...$this->criteriaArguments);
     }
 }

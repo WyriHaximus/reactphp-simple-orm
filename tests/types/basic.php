@@ -2,17 +2,36 @@
 
 declare(strict_types=1);
 
+use PgAsync\Client as PgClient;
+use React\EventLoop\Loop;
+use WyriHaximus\DevApp\React\SimpleORM\LogStub;
+use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use WyriHaximus\React\SimpleORM\Client;
-use WyriHaximus\React\Tests\SimpleORM\Stub\NoSQLStub;
+use WyriHaximus\React\SimpleORM\Configuration;
+use WyriHaximus\React\SimpleORM\Middleware\QueryCountMiddleware;
 
 use function PHPStan\Testing\assertType;
 
-/** @phpstan-ignore-next-line */
-$client     = Client::create();
-$repository = $client->repository(NoSQLStub::class);
+$client     = Client::create(
+    new Postgres(
+        new PgClient(
+            [
+                'host'     => 'localhost',
+                'port'     => 55432,
+                'user'     => 'postgres',
+                'password' => 'postgres',
+                'database' => 'postgres',
+            ],
+            Loop::get(),
+        ),
+    ),
+    new Configuration(''),
+    new QueryCountMiddleware(1),
+);
+$repository = $client->repository(LogStub::class);
 
-assertType('WyriHaximus\React\SimpleORM\RepositoryInterface<WyriHaximus\React\Tests\SimpleORM\Stub\NoSQLStub>', $repository);
-assertType('React\Promise\PromiseInterface<int>', $repository->count());
-assertType('Rx\Observable<WyriHaximus\React\Tests\SimpleORM\Stub\NoSQLStub>', $repository->fetch());
-assertType('Rx\Observable<WyriHaximus\React\Tests\SimpleORM\Stub\NoSQLStub>', $repository->page(1));
-assertType('Rx\Observable<WyriHaximus\React\Tests\SimpleORM\Stub\NoSQLStub>', $repository->stream());
+assertType('WyriHaximus\React\SimpleORM\RepositoryInterface<WyriHaximus\DevApp\React\SimpleORM\LogStub>', $repository);
+assertType('int', $repository->count());
+assertType('iterable<WyriHaximus\DevApp\React\SimpleORM\LogStub>', $repository->fetch());
+assertType('iterable<WyriHaximus\DevApp\React\SimpleORM\LogStub>', $repository->page(1));
+assertType('iterable<WyriHaximus\DevApp\React\SimpleORM\LogStub>', $repository->stream());
