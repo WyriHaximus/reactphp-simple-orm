@@ -14,6 +14,6 @@ permissions:
 jobs:
   ci:
     name: Continuous Integration
-    uses: WyriHaximus/github-workflows/.github/workflows/package.yaml@main
+    uses: WyriHaximus/github-workflows/.github/workflows/package.yaml@3490e8c2e10bbdd420ae7ff939dc8028f295c2c9 # main
     with:
       services: "{\"postgres\":{\"image\":\"postgres:16.2\",\"env\":{\"POSTGRES_PASSWORD\":\"postgres\"},\"options\":\"--health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5\"}}"

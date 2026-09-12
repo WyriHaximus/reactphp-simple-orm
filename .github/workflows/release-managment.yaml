@@ -17,7 +17,7 @@ permissions:
 jobs:
   release-managment:
     name: Create Release
-    uses: WyriHaximus/github-workflows/.github/workflows/package-release-managment.yaml@main
+    uses: WyriHaximus/github-workflows/.github/workflows/package-release-managment.yaml@3490e8c2e10bbdd420ae7ff939dc8028f295c2c9 # main
     with:
       milestone: ${{ github.event.milestone.title }}
       description: ${{ github.event.milestone.title }}
