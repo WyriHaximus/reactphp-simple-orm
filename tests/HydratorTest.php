@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WyriHaximus\React\Tests\SimpleORM;
 
 use PHPUnit\Framework\Attributes\Test;
+use RuntimeException;
 use Rx\Observable;
 use WyriHaximus\DevApp\React\SimpleORM\BlogPostStub;
 use WyriHaximus\DevApp\React\SimpleORM\UserStub;
@@ -171,5 +172,131 @@ final class HydratorTest extends TestCase
         self::assertSame($publisherId, $entity->publisher->id);
         self::assertSame($publisherName, $entity->publisher->name);
         self::assertSame(133, $entity->views);
+    }
+
+    #[Test]
+    public function hydrateContinuesWhenJoinKeyMissingFromPayload(): void
+    {
+        $id            = '6bda4f06-4b7e-4cd5-b779-66a1b76187f9';
+        $title         = 'title';
+        $authorId      = 'dfc857d2-3564-4ed5-8a66-859158122169';
+        $authorName    = 'llun';
+        $publisherId   = 'a3fc1993-0930-4a9d-a2ad-3bf3a15ecee0';
+        $publisherName = 'dasdsadas';
+
+        $entity = new Hydrator()->hydrate(
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
+            [
+                'id' => $id,
+                'author_id' => $authorId,
+                'publisher_id' => $publisherId,
+                'contents' => bin2hex(random_bytes(133)),
+                'views' => 133,
+                'created' => date('Y-m-d H:i:s e'),
+                'modified' => date('Y-m-d H:i:s e'),
+                'next_blog_post' => null,
+                'title' => $title,
+                'author' => resolve([
+                    'id' => $authorId,
+                    'name' => $authorName,
+                ]),
+                'publisher' => [
+                    'id' => $publisherId,
+                    'name' => $publisherName,
+                ],
+                'comments' => awaitObservable(Observable::fromArray([])),
+            ],
+        );
+
+        self::assertSame($authorId, $entity->author->id);
+        self::assertSame($publisherName, $entity->publisher->name);
+    }
+
+    #[Test]
+    public function hydrateLazyJoinNullPayloadThrowsWhenAccessed(): void
+    {
+        $id            = '6bda4f06-4b7e-4cd5-b779-66a1b76187f9';
+        $title         = 'title';
+        $authorId      = 'dfc857d2-3564-4ed5-8a66-859158122169';
+        $authorName    = 'llun';
+        $publisherId   = 'a3fc1993-0930-4a9d-a2ad-3bf3a15ecee0';
+        $publisherName = 'dasdsadas';
+
+        $entity = new Hydrator()->hydrate(
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
+            [
+                'id' => $id,
+                'author_id' => $authorId,
+                'publisher_id' => $publisherId,
+                'contents' => bin2hex(random_bytes(133)),
+                'views' => 133,
+                'created' => date('Y-m-d H:i:s e'),
+                'modified' => date('Y-m-d H:i:s e'),
+                'previous_blog_post' => resolve(null),
+                'next_blog_post' => null,
+                'title' => $title,
+                'author' => [
+                    'id' => $authorId,
+                    'name' => $authorName,
+                ],
+                'publisher' => [
+                    'id' => $publisherId,
+                    'name' => $publisherName,
+                ],
+                'comments' => awaitObservable(Observable::fromArray([])),
+            ],
+        );
+
+        try {
+            /** @phpstan-ignore property.nonObject */
+            self::assertSame('', $entity->previousBlogPost->id);
+            self::fail('Expected lazy join resolution to fail');
+        } catch (RuntimeException $exception) {
+            self::assertStringContainsString('Unable to resolve lazy ' . BlogPostStub::class, $exception->getMessage());
+        }
+    }
+
+    #[Test]
+    public function hydrateLazyJoinUnexpectedPayloadType(): void
+    {
+        $id            = '6bda4f06-4b7e-4cd5-b779-66a1b76187f9';
+        $title         = 'title';
+        $authorId      = 'dfc857d2-3564-4ed5-8a66-859158122169';
+        $authorName    = 'llun';
+        $publisherId   = 'a3fc1993-0930-4a9d-a2ad-3bf3a15ecee0';
+        $publisherName = 'dasdsadas';
+
+        $entity = new Hydrator()->hydrate(
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
+            [
+                'id' => $id,
+                'author_id' => $authorId,
+                'publisher_id' => $publisherId,
+                'contents' => bin2hex(random_bytes(133)),
+                'views' => 133,
+                'created' => date('Y-m-d H:i:s e'),
+                'modified' => date('Y-m-d H:i:s e'),
+                'previous_blog_post' => resolve('not-an-array'),
+                'next_blog_post' => null,
+                'title' => $title,
+                'author' => [
+                    'id' => $authorId,
+                    'name' => $authorName,
+                ],
+                'publisher' => [
+                    'id' => $publisherId,
+                    'name' => $publisherName,
+                ],
+                'comments' => awaitObservable(Observable::fromArray([])),
+            ],
+        );
+
+        try {
+            /** @phpstan-ignore property.nonObject */
+            self::assertSame('', $entity->previousBlogPost->id);
+            self::fail('Expected lazy join payload type check to fail');
+        } catch (RuntimeException $exception) {
+            self::assertStringContainsString('Unexpected lazy join payload type for ' . BlogPostStub::class, $exception->getMessage());
+        }
     }
 }

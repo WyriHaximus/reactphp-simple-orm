@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace WyriHaximus\React\Tests\SimpleORM;
 
+use DateTimeImmutable;
 use PgAsync\Client as PgClient;
 use PgAsync\Connection;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\Test;
-use Safe\DateTimeImmutable;
 use Testcontainers\Container\GenericContainer;
 use Testcontainers\Container\StartedTestContainer;
 use Testcontainers\Modules\PostgresContainer;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
+use WyriHaximus\AsyncTestUtilities\TimeOut;
 use WyriHaximus\DevApp\React\SimpleORM\BlogPostStub;
 use WyriHaximus\DevApp\React\SimpleORM\CommentStub;
 use WyriHaximus\DevApp\React\SimpleORM\LogStub;
@@ -39,6 +40,7 @@ use function str_contains;
 use function time;
 use function usleep;
 
+#[TimeOut(120)]
 final class FunctionalTest extends AsyncTestCase
 {
     private StartedTestContainer|null $testContainer = null;

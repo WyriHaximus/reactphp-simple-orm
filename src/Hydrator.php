@@ -6,6 +6,7 @@ namespace WyriHaximus\React\SimpleORM;
 
 use React\Promise\PromiseInterface;
 use ReflectionClass;
+use RuntimeException;
 use WyriHaximus\React\SimpleORM\Generated\Hydrator as GeneratedHydrator;
 
 use function array_key_exists;
@@ -105,21 +106,26 @@ final readonly class Hydrator
         return new ReflectionClass(
             $inspectedEntity->class(),
         )->newLazyProxy(
+            /** @phpstan-ignore argument.type */
             function () use ($inspectedEntity, $object): EntityInterface {
-                /** @var array<string, mixed> $data */
+                /** @phpstan-ignore wyrihaximus.reactphp.async.awaitWithoutAsync */
                 $data = await($object);
 
-                /**
-                 * Needs a proper fix, but this will work for now
-                 *
-                 * @phpstan-ignore instanceof.alwaysFalse
-                 */
                 if ($data instanceof EntityInterface) {
                     return $data;
                 }
 
+                if ($data === null) {
+                    throw new RuntimeException('Unable to resolve lazy ' . $inspectedEntity->class());
+                }
+
+                if (! is_array($data)) {
+                    throw new RuntimeException('Unexpected lazy join payload type for ' . $inspectedEntity->class());
+                }
+
                 return $this->hydrate(
                     $inspectedEntity,
+                    /** @phpstan-ignore argument.type */
                     $data,
                 );
             },

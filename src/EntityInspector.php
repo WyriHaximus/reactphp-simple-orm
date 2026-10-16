@@ -68,11 +68,11 @@ final class EntityInspector
             $tableAttribute = current($tableAttributes)->newInstance();
 
             $fields = $joins = [];
-            foreach ($this->fields($class) as $fieldOrJoin) {
+            foreach ($this->fields($class) as $propertyName => $fieldOrJoin) {
                 if ($fieldOrJoin instanceof Field) {
-                    $fields[] = $fieldOrJoin;
+                    $fields[$propertyName] = $fieldOrJoin;
                 } elseif ($fieldOrJoin instanceof Join) {
-                    $joins[] = $fieldOrJoin;
+                    $joins[$propertyName] = $fieldOrJoin;
                 }
             }
 

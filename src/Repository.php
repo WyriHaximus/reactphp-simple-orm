@@ -179,16 +179,13 @@ final class Repository implements RepositoryInterface
 
         $fields = $this->prepareFields($fields);
 
-        $i = 0;
         foreach (
             $this->connection->query(
                 $this->queryFactory->insert($this->entity->table(), $fields)->asExpression(),
-            ) as $underscore
+            ) as $queryRow
         ) {
-            // No-op: Do nothing but ensure we complete the query
-            $i++;
+            unset($queryRow);
         }
-        unset($i);
 
         /** @var false|T $first */ // phpcs:disable
         $first = false;
@@ -221,7 +218,6 @@ final class Repository implements RepositoryInterface
         $fields['modified'] = new DateTimeImmutable();
         $fields             = $this->prepareFields($fields);
 
-        $i = 0;
         foreach (
             $this->connection->query(
                 $this->queryFactory->update(
@@ -231,12 +227,10 @@ final class Repository implements RepositoryInterface
                 /** @phpstan-ignore property.notFound */
                     field('id')->eq($entity->id),
                 )->asExpression(),
-            ) as $underscore
+            ) as $queryRow
         ) {
-            // No-op: Do nothing but ensure we complete the query
-            $i++;
+            unset($queryRow);
         }
-        unset($i);
 
         /** @var false|T $first */ // phpcs:disable
         $first = false;
@@ -264,14 +258,18 @@ final class Repository implements RepositoryInterface
     /** @param T $entity */
     public function delete(EntityInterface $entity): null
     {
-        $this->connection->query(
-            $this->queryFactory->delete(
-                $this->entity->table(),
-            )->where(
-            /** @phpstan-ignore property.notFound */
-                field('id')->eq($entity->id),
-            )->asExpression(),
-        );
+        foreach (
+            $this->connection->query(
+                $this->queryFactory->delete(
+                    $this->entity->table(),
+                )->where(
+                /** @phpstan-ignore property.notFound */
+                    field('id')->eq($entity->id),
+                )->asExpression(),
+            ) as $queryRow
+        ) {
+            unset($queryRow);
+        }
 
         return null;
     }
@@ -490,7 +488,7 @@ final class Repository implements RepositoryInterface
                 continue;
             }
 
-            if ($join->type === JointType::INNER) {
+            if ($join->type === JointType::INNER && ($join->lazy === JoinInterface::IS_LAZY || $entity->class() === $join->entity->class())) {
                 foreach ($join->clause as $clause) {
                     if (!array_key_exists($tableKey, $this->tableAliases) || !array_key_exists($this->tableAliases[$tableKey], $row) || !array_key_exists($clause->localKey, $row[$this->tableAliases[$tableKey]]) || $row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
                         $tree[$join->mapTo] = null;
@@ -563,7 +561,7 @@ final class Repository implements RepositoryInterface
                 /** @phpstan-ignore method.deprecatedClass,new.deprecatedClass */
                 $tree[$join->mapTo] = new LazyPromise(fn (): PromiseInterface => new Promise(function (callable $resolve, callable $reject) use ($row, $join, $tableKey): void {
                     foreach ($join->clause as $clause) {
-                        if ($row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
+                        if (! array_key_exists($tableKey, $this->tableAliases) || ! array_key_exists($this->tableAliases[$tableKey], $row) || ! array_key_exists($clause->localKey, $row[$this->tableAliases[$tableKey]]) || $row[$this->tableAliases[$tableKey]][$clause->localKey] === null) {
                             $resolve(null);
 
                             return;

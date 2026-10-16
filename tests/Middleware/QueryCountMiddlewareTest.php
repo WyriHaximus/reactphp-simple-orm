@@ -34,6 +34,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
                 yield 1;
             }) as $row
         ) {
+            unset($row);
             self::assertSame([
                 'initiated' => 1,
                 'successful' => 0,
@@ -84,6 +85,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
                 yield 1;
             }) as $row
         ) {
+            unset($row);
             self::assertSame([
                 'initiated' => 1,
                 'successful' => 0,
@@ -134,6 +136,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
                     throw new Exception('whoops');
                 }) as $row
             ) {
+                unset($row);
                 self::assertSame([
                     'initiated' => 1,
                     'successful' => 0,
@@ -190,6 +193,7 @@ final class QueryCountMiddlewareTest extends AsyncTestCase
                     throw new Exception('whoops');
                 }) as $row
             ) {
+                unset($row);
                 self::assertSame([
                     'initiated' => 1,
                     'successful' => 0,

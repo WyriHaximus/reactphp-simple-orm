@@ -13,6 +13,10 @@ use WyriHaximus\DevApp\React\SimpleORM\UserStub;
 use WyriHaximus\React\SimpleORM\Attribute\Clause;
 use WyriHaximus\React\SimpleORM\Configuration;
 use WyriHaximus\React\SimpleORM\EntityInspector;
+use WyriHaximus\React\Tests\SimpleORM\Fixtures\RuntimeInspectBlogPostStub;
+use WyriHaximus\React\Tests\SimpleORM\Fixtures\RuntimeInspectBlogPostWithCommentsStub;
+use WyriHaximus\React\Tests\SimpleORM\Fixtures\RuntimeInspectLeftJoinFirstStub;
+use WyriHaximus\React\Tests\SimpleORM\Fixtures\RuntimeInspectUserStub;
 
 use function current;
 
@@ -24,6 +28,14 @@ final class EntityInspectorTest extends AsyncTestCase
     protected function createEntityInspector(): void
     {
         $this->entityInspector = new EntityInspector(new Configuration(''));
+    }
+
+    #[Test]
+    public function inspectTablePrefix(): void
+    {
+        $inspectedEntity = new EntityInspector(new Configuration('app_'))->entity(RuntimeInspectUserStub::class);
+
+        self::assertSame('app_runtime_inspect_users', $inspectedEntity->table());
     }
 
     #[Test]
@@ -71,6 +83,10 @@ final class EntityInspectorTest extends AsyncTestCase
             self::assertSame($type, $fields[$key]->type, $key);
         }
 
+        self::assertArrayNotHasKey('author', $fields);
+        self::assertArrayNotHasKey('publisher', $fields);
+        self::assertArrayNotHasKey('previousBlogPost', $fields);
+
         $joins = $inspectedEntity->joins();
         self::assertCount(5, $joins);
 
@@ -100,6 +116,7 @@ final class EntityInspectorTest extends AsyncTestCase
         self::assertArrayHasKey('author', $joins['comments']->entity->joins());
         self::assertSame(UserStub::class, $joins['comments']->entity->joins()['author']->entity->class());
         self::assertCount(2, $joins['comments']->entity->joins()['author']->entity->fields());
+        self::assertSame('string', $joins['comments']->entity->fields()['author_id']->type);
         $commentAuthorClause = current($joins['comments']->entity->joins()['author']->clause);
         self::assertInstanceOf(Clause::class, $commentAuthorClause);
         self::assertSame('author_id', $commentAuthorClause->localKey);
@@ -109,5 +126,33 @@ final class EntityInspectorTest extends AsyncTestCase
         self::assertNull($commentAuthorClause->foreignCast);
         self::assertNull($commentAuthorClause->foreignFunction);
         self::assertSame('author', $joins['comments']->entity->joins()['author']->property);
+    }
+
+    #[Test]
+    public function inspectRuntimeInnerJoinExposesForeignKeyField(): void
+    {
+        $fields = $this->entityInspector->entity(RuntimeInspectBlogPostStub::class)->fields();
+
+        self::assertArrayHasKey('author_id', $fields);
+        self::assertSame('string', $fields['author_id']->type);
+    }
+
+    #[Test]
+    public function inspectLeftJoinDoesNotExposeJoinPropertyAsScalarField(): void
+    {
+        $fields = $this->entityInspector->entity(RuntimeInspectBlogPostWithCommentsStub::class)->fields();
+
+        self::assertArrayHasKey('id', $fields);
+        self::assertArrayNotHasKey('comments', $fields);
+        self::assertCount(1, $fields);
+    }
+
+    #[Test]
+    public function inspectLeftJoinPropertyStillYieldsFollowingScalarFields(): void
+    {
+        $fields = $this->entityInspector->entity(RuntimeInspectLeftJoinFirstStub::class)->fields();
+
+        self::assertArrayHasKey('id', $fields);
+        self::assertSame('string', $fields['id']->type);
     }
 }

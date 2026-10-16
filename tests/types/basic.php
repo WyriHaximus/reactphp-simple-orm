@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use PgAsync\Client as PgClient;
-use React\EventLoop\Loop;
 use WyriHaximus\DevApp\React\SimpleORM\LogStub;
 use WyriHaximus\React\SimpleORM\Adapter\Postgres;
 use WyriHaximus\React\SimpleORM\Client;
@@ -22,7 +21,6 @@ $client     = Client::create(
                 'password' => 'postgres',
                 'database' => 'postgres',
             ],
-            Loop::get(),
         ),
     ),
     new Configuration(''),

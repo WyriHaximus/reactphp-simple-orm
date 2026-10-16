@@ -11,7 +11,9 @@ use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\Test;
+use RuntimeException;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
+use WyriHaximus\AsyncTestUtilities\TimeOut;
 use WyriHaximus\DevApp\React\SimpleORM\BlogPostStub;
 use WyriHaximus\DevApp\React\SimpleORM\CommentStub;
 use WyriHaximus\DevApp\React\SimpleORM\UserStub;
@@ -24,10 +26,13 @@ use WyriHaximus\React\SimpleORM\Hydrator;
 use WyriHaximus\React\SimpleORM\MiddlewareInterface;
 use WyriHaximus\React\SimpleORM\MiddlewareRunner;
 use WyriHaximus\React\SimpleORM\Query\Order;
+use WyriHaximus\React\SimpleORM\Query\Order\Asc;
 use WyriHaximus\React\SimpleORM\Query\Where;
+use WyriHaximus\React\SimpleORM\Query\Where\Expression as WhereExpression;
 use WyriHaximus\React\SimpleORM\Repository;
 
 use function date;
+use function Latitude\QueryBuilder\field;
 use function str_contains;
 
 final class RepositoryTest extends AsyncTestCase
@@ -421,5 +426,352 @@ final class RepositoryTest extends AsyncTestCase
         self::assertSame('0da49bee-ab27-4b24-a949-7b71a0b0449a', $comments[3]->author->id);
         self::assertSame('99d00028-28d6-4194-b377-a0039b278c4d', $comments[3]->blogPost->id);
         self::assertSame('3fbf8eec-8a3f-4b01-ba9a-355f6650644b', $comments[3]->blogPost->author->id);
+    }
+
+    #[Test]
+    public function page(): void
+    {
+        $this->adapter->shouldReceive('query')
+            ->once()
+            ->with(Mockery::on(static function (ExpressionInterface $expression): bool {
+                $sql = $expression->sql(new PostgresEngine());
+                self::assertStringContainsString('OFFSET 0', $sql);
+
+                return true;
+            }))
+            ->andReturn([
+                [
+                    't0___id' => 'user-id',
+                    't0___name' => 'name',
+                ],
+            ]);
+
+        $repository = new Repository(
+            new EntityInspector(new Configuration(''))->entity(UserStub::class),
+            $this->client,
+            new QueryFactory(),
+            $this->connection,
+            new Hydrator(),
+        );
+
+        $users = [...$repository->page(1, perPage: 10)];
+
+        self::assertCount(1, $users);
+        self::assertSame('user-id', $users[0]->id);
+    }
+
+    #[Test]
+    public function pageSecondPageUsesOffset(): void
+    {
+        $this->adapter->shouldReceive('query')
+            ->once()
+            ->with(Mockery::on(static function (ExpressionInterface $expression): bool {
+                $sql = $expression->sql(new PostgresEngine());
+                self::assertStringContainsString('OFFSET 10', $sql);
+
+                return true;
+            }))
+            ->andReturn([]);
+
+        $repository = new Repository(
+            new EntityInspector(new Configuration(''))->entity(UserStub::class),
+            $this->client,
+            new QueryFactory(),
+            $this->connection,
+            new Hydrator(),
+        );
+
+        self::assertSame([], [...$repository->page(2, perPage: 10)]);
+    }
+
+    #[Test]
+    public function delete(): void
+    {
+        $this->adapter->shouldReceive('query')
+            ->once()
+            ->andReturn([]);
+
+        $repository = new Repository(
+            new EntityInspector(new Configuration(''))->entity(UserStub::class),
+            $this->client,
+            new QueryFactory(),
+            $this->connection,
+            new Hydrator(),
+        );
+
+        $repository->delete(new UserStub('delete-me', 'name'));
+    }
+
+    #[Test]
+    public function fetchWithAscOrder(): void
+    {
+        $this->adapter->shouldReceive('query')
+            ->once()
+            ->andReturn([
+                [
+                    't0___id' => 'user-id',
+                    't0___name' => 'name',
+                ],
+            ]);
+
+        $repository = new Repository(
+            new EntityInspector(new Configuration(''))->entity(UserStub::class),
+            $this->client,
+            new QueryFactory(),
+            $this->connection,
+            new Hydrator(),
+        );
+
+        $users = [
+            ...$repository->fetch(
+                new Where(new Where\Field('name', 'eq', ['n'])),
+                new Order(new Asc('name')),
+            ),
+        ];
+
+        self::assertSame('user-id', $users[0]->id);
+    }
+
+    #[Test]
+    public function fetchWithWhereExpression(): void
+    {
+        $this->adapter->shouldReceive('query')
+            ->once()
+            ->andReturn([
+                [
+                    't0___id' => 'user-id',
+                    't0___name' => 'name',
+                ],
+            ]);
+
+        $repository = new Repository(
+            new EntityInspector(new Configuration(''))->entity(UserStub::class),
+            $this->client,
+            new QueryFactory(),
+            $this->connection,
+            new Hydrator(),
+        );
+
+        $inner = (new QueryFactory()->select()->from('users')->where(field('name')->eq('n')))->asExpression();
+        $users = [...$repository->fetch(new Where(new WhereExpression($inner, 'eq', ['n'])))];
+
+        self::assertSame('user-id', $users[0]->id);
+    }
+
+    #[Test]
+    public function fetchWithLazySelfJoin(): void
+    {
+        $nestedRepository = new Repository(
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
+            $this->client,
+            new QueryFactory(),
+            $this->connection,
+            new Hydrator(),
+        );
+
+        $this->client->shouldReceive('repository')
+            ->with(BlogPostStub::class)
+            ->andReturn($nestedRepository);
+
+        $this->adapter->shouldReceive('query')
+            ->twice()
+            ->andReturn(
+                [
+                    [
+                        't0___id' => 'post-id',
+                        't0___title' => 'title',
+                        't0___views' => 1,
+                        't0___author_id' => 'author-id',
+                        't0___publisher_id' => 'publisher-id',
+                        't0___contents' => 'body',
+                        't0___created' => date('Y-m-d H:i:s e'),
+                        't0___modified' => date('Y-m-d H:i:s e'),
+                        't0___previous_blog_post_id' => 'prev-id',
+                        't0___next_blog_post_id' => null,
+                        't1___id' => 'author-id',
+                        't1___name' => 'author',
+                        't2___id' => 'publisher-id',
+                        't2___name' => 'publisher',
+                    ],
+                ],
+                [
+                    [
+                        't0___id' => 'prev-id',
+                        't0___title' => 'prev',
+                        't0___views' => 2,
+                        't0___author_id' => 'author-id',
+                        't0___publisher_id' => 'publisher-id',
+                        't0___contents' => 'body',
+                        't0___created' => date('Y-m-d H:i:s e'),
+                        't0___modified' => date('Y-m-d H:i:s e'),
+                        't0___previous_blog_post_id' => null,
+                        't0___next_blog_post_id' => null,
+                        't1___id' => 'author-id',
+                        't1___name' => 'author',
+                        't2___id' => 'publisher-id',
+                        't2___name' => 'publisher',
+                    ],
+                ],
+            );
+
+        $repository = new Repository(
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
+            $this->client,
+            new QueryFactory(),
+            $this->connection,
+            new Hydrator(),
+        );
+
+        $blogPost = $repository->first(new Where(new Where\Field('id', 'eq', ['post-id'])));
+
+        self::assertSame('post-id', $blogPost->id);
+        self::assertSame('prev-id', $blogPost->previousBlogPost?->id);
+    }
+
+    #[Test]
+    public function fetchWithLazySelfJoinMissingForeignKey(): void
+    {
+        $this->adapter->shouldReceive('query')
+            ->once()
+            ->andReturn([
+                [
+                    't0___id' => 'post-id',
+                    't0___title' => 'title',
+                    't0___views' => 1,
+                    't0___author_id' => 'author-id',
+                    't0___publisher_id' => 'publisher-id',
+                    't0___contents' => 'body',
+                    't0___created' => date('Y-m-d H:i:s e'),
+                    't0___modified' => date('Y-m-d H:i:s e'),
+                    't0___next_blog_post_id' => null,
+                    't1___id' => 'author-id',
+                    't1___name' => 'author',
+                    't2___id' => 'publisher-id',
+                    't2___name' => 'publisher',
+                ],
+            ]);
+
+        $repository = new Repository(
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
+            $this->client,
+            new QueryFactory(),
+            $this->connection,
+            new Hydrator(),
+        );
+
+        $blogPost = $repository->first(new Where(new Where\Field('id', 'eq', ['post-id'])));
+
+        self::assertSame('post-id', $blogPost->id);
+    }
+
+    #[Test]
+    #[TimeOut(10)]
+    public function fetchWithLazySelfJoinNotFound(): void
+    {
+        $nestedRepository = new Repository(
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
+            $this->client,
+            new QueryFactory(),
+            $this->connection,
+            new Hydrator(),
+        );
+
+        $this->client->shouldReceive('repository')
+            ->with(BlogPostStub::class)
+            ->andReturn($nestedRepository);
+
+        $this->adapter->shouldReceive('query')
+            ->twice()
+            ->andReturn(
+                [
+                    [
+                        't0___id' => 'post-id',
+                        't0___title' => 'title',
+                        't0___views' => 1,
+                        't0___author_id' => 'author-id',
+                        't0___publisher_id' => 'publisher-id',
+                        't0___contents' => 'body',
+                        't0___created' => date('Y-m-d H:i:s e'),
+                        't0___modified' => date('Y-m-d H:i:s e'),
+                        't0___previous_blog_post_id' => 'missing-prev-id',
+                        't0___next_blog_post_id' => null,
+                        't1___id' => 'author-id',
+                        't1___name' => 'author',
+                        't2___id' => 'publisher-id',
+                        't2___name' => 'publisher',
+                    ],
+                ],
+                [],
+            );
+
+        $repository = new Repository(
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
+            $this->client,
+            new QueryFactory(),
+            $this->connection,
+            new Hydrator(),
+        );
+
+        $blogPost = $repository->first(new Where(new Where\Field('id', 'eq', ['post-id'])));
+
+        $this->expectException(RuntimeException::class);
+        /** @phpstan-ignore property.nonObject */
+        self::assertSame('', $blogPost->previousBlogPost->id);
+    }
+
+    #[Test]
+    #[TimeOut(10)]
+    public function fetchWithLazySelfJoinFetchFailure(): void
+    {
+        $nestedRepository = new Repository(
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
+            $this->client,
+            new QueryFactory(),
+            $this->connection,
+            new Hydrator(),
+        );
+
+        $this->client->shouldReceive('repository')
+            ->with(BlogPostStub::class)
+            ->andReturn($nestedRepository);
+
+        $this->adapter->shouldReceive('query')
+            ->once()
+            ->andReturn([
+                [
+                    't0___id' => 'post-id',
+                    't0___title' => 'title',
+                    't0___views' => 1,
+                    't0___author_id' => 'author-id',
+                    't0___publisher_id' => 'publisher-id',
+                    't0___contents' => 'body',
+                    't0___created' => date('Y-m-d H:i:s e'),
+                    't0___modified' => date('Y-m-d H:i:s e'),
+                    't0___previous_blog_post_id' => 'prev-id',
+                    't0___next_blog_post_id' => null,
+                    't1___id' => 'author-id',
+                    't1___name' => 'author',
+                    't2___id' => 'publisher-id',
+                    't2___name' => 'publisher',
+                ],
+            ]);
+
+        $this->adapter->shouldReceive('query')
+            ->once()
+            ->andThrow(new RuntimeException('fetch failed'));
+
+        $repository = new Repository(
+            new EntityInspector(new Configuration(''))->entity(BlogPostStub::class),
+            $this->client,
+            new QueryFactory(),
+            $this->connection,
+            new Hydrator(),
+        );
+
+        $blogPost = $repository->first(new Where(new Where\Field('id', 'eq', ['post-id'])));
+
+        $this->expectException(RuntimeException::class);
+        /** @phpstan-ignore property.nonObject */
+        self::assertSame('', $blogPost->previousBlogPost->id);
     }
 }

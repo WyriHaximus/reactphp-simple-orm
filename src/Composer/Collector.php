@@ -18,8 +18,9 @@ final class Collector implements ItemCollector
     public function collect(ReflectionClass $class): iterable
     {
         $entityClass = $class->getName();
-        assert(is_subclass_of($entityClass, EntityInterface::class));
-
-        yield new Item($entityClass);
+        echo $entityClass, PHP_EOL;
+        if (is_subclass_of($entityClass, EntityInterface::class)) {
+            yield new Item($entityClass);
+        }
     }
 }
