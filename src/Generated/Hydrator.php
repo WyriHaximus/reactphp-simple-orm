@@ -30,34 +30,34 @@ class Hydrator implements ObjectMapper
             default => throw UnableToHydrateObject::noHydrationDefined($className, $this->hydrationStack),
         };
     }
+
     
-            
     private function hydrateWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️LogStub(array $payload): \WyriHaximus\DevApp\React\SimpleORM\LogStub
     {
-        $properties = []; 
+        $properties = [];
         $missingFields = [];
         try {
             $value = $payload['id'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'id';
-                goto after_id;
+                goto after_id_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️LogStub;
             }
 
             $properties['id'] = $value;
 
-            after_id:
+            after_id_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️LogStub:
 
             $value = $payload['message'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'message';
-                goto after_message;
+                goto after_message_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️LogStub;
             }
 
             $properties['message'] = $value;
 
-            after_message:
+            after_message_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️LogStub:
 
         } catch (\Throwable $exception) {
             throw UnableToHydrateObject::dueToError(\WyriHaximus\DevApp\React\SimpleORM\LogStub::class, $exception, stack: $this->hydrationStack);
@@ -74,28 +74,28 @@ class Hydrator implements ObjectMapper
         }
     }
 
-        
+
     private function hydrateWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub(array $payload): \WyriHaximus\DevApp\React\SimpleORM\BlogPostStub
     {
-        $properties = []; 
+        $properties = [];
         $missingFields = [];
         try {
             $value = $payload['id'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'id';
-                goto after_id;
+                goto after_id_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             $properties['id'] = $value;
 
-            after_id:
+            after_id_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:
 
             $value = $payload['previous_blog_post'] ?? null;
 
             if ($value === null) {
                 $properties['previousBlogPost'] = null;
-                goto after_previousBlogPost;
+                goto after_previousBlogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             static $previousBlogPostCaster1;
@@ -104,7 +104,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'previous_blog_post_id',
      'foreignKey' => 'id',
      'localCast' => NULL,
@@ -114,14 +114,13 @@ class Hydrator implements ObjectMapper
   ]),
 ],
   'lazy' => true,
-]
-);
+]);
 
             $value = $previousBlogPostCaster1->cast($value, $this);
 
             if ($value === null) {
                                 $properties['previousBlogPost'] = null;
-                goto after_previousBlogPost;
+                goto after_previousBlogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             if (is_array($value)) {
@@ -135,13 +134,13 @@ class Hydrator implements ObjectMapper
 
             $properties['previousBlogPost'] = $value;
 
-            after_previousBlogPost:
+            after_previousBlogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:
 
             $value = $payload['next_blog_post'] ?? null;
 
             if ($value === null) {
                 $properties['nextBlogPost'] = null;
-                goto after_nextBlogPost;
+                goto after_nextBlogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             static $nextBlogPostCaster1;
@@ -150,7 +149,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'next_blog_post_id',
      'foreignKey' => 'id',
      'localCast' => NULL,
@@ -160,14 +159,13 @@ class Hydrator implements ObjectMapper
   ]),
 ],
   'lazy' => true,
-]
-);
+]);
 
             $value = $nextBlogPostCaster1->cast($value, $this);
 
             if ($value === null) {
                                 $properties['nextBlogPost'] = null;
-                goto after_nextBlogPost;
+                goto after_nextBlogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             if (is_array($value)) {
@@ -181,35 +179,35 @@ class Hydrator implements ObjectMapper
 
             $properties['nextBlogPost'] = $value;
 
-            after_nextBlogPost:
+            after_nextBlogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:
 
             $value = $payload['title'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'title';
-                goto after_title;
+                goto after_title_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             $properties['title'] = $value;
 
-            after_title:
+            after_title_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:
 
             $value = $payload['contents'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'contents';
-                goto after_contents;
+                goto after_contents_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             $properties['contents'] = $value;
 
-            after_contents:
+            after_contents_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:
 
             $value = $payload['author'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'author';
-                goto after_author;
+                goto after_author_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             static $authorCaster1;
@@ -218,7 +216,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'author_id',
      'foreignKey' => 'id',
      'localCast' => NULL,
@@ -227,14 +225,13 @@ class Hydrator implements ObjectMapper
      'foreignFunction' => NULL,
   ]),
 ],
-]
-);
+]);
 
             $value = $authorCaster1->cast($value, $this);
 
             if ($value === null) {
                                 $missingFields[] = 'author';
-                goto after_author;
+                goto after_author_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             if (is_array($value)) {
@@ -248,13 +245,13 @@ class Hydrator implements ObjectMapper
 
             $properties['author'] = $value;
 
-            after_author:
+            after_author_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:
 
             $value = $payload['publisher'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'publisher';
-                goto after_publisher;
+                goto after_publisher_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             static $publisherCaster1;
@@ -263,7 +260,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'publisher_id',
      'foreignKey' => 'id',
      'localCast' => NULL,
@@ -272,14 +269,13 @@ class Hydrator implements ObjectMapper
      'foreignFunction' => NULL,
   ]),
 ],
-]
-);
+]);
 
             $value = $publisherCaster1->cast($value, $this);
 
             if ($value === null) {
                                 $missingFields[] = 'publisher';
-                goto after_publisher;
+                goto after_publisher_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             if (is_array($value)) {
@@ -293,13 +289,13 @@ class Hydrator implements ObjectMapper
 
             $properties['publisher'] = $value;
 
-            after_publisher:
+            after_publisher_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:
 
             $value = $payload['comments'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'comments';
-                goto after_comments;
+                goto after_comments_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             static $commentsCaster1;
@@ -308,7 +304,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'id',
      'foreignKey' => 'blog_post_id',
      'localCast' => 'BIGINT',
@@ -318,92 +314,88 @@ class Hydrator implements ObjectMapper
   ]),
 ],
   'lazy' => true,
-]
-);
+]);
 
             $value = $commentsCaster1->cast($value, $this);
 
             if ($value === null) {
                                 $missingFields[] = 'comments';
-                goto after_comments;
+                goto after_comments_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             $properties['comments'] = $value;
 
-            after_comments:
+            after_comments_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:
 
             $value = $payload['views'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'views';
-                goto after_views;
+                goto after_views_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             static $viewsCaster1;
 
             $viewsCaster1 ??= new \EventSauce\ObjectHydrator\PropertyCasters\CastToType(... [
   0 => 'integer',
-]
-);
+]);
 
             $value = $viewsCaster1->cast($value, $this);
 
             if ($value === null) {
                                 $missingFields[] = 'views';
-                goto after_views;
+                goto after_views_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             $properties['views'] = $value;
 
-            after_views:
+            after_views_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:
 
             $value = $payload['created'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'created';
-                goto after_created;
+                goto after_created_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             static $createdCaster1;
 
             $createdCaster1 ??= new \EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable(... [
-]
-);
+]);
 
             $value = $createdCaster1->cast($value, $this);
 
             if ($value === null) {
                                 $missingFields[] = 'created';
-                goto after_created;
+                goto after_created_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             $properties['created'] = $value;
 
-            after_created:
+            after_created_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:
 
             $value = $payload['modified'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'modified';
-                goto after_modified;
+                goto after_modified_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             static $modifiedCaster1;
 
             $modifiedCaster1 ??= new \EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable(... [
-]
-);
+]);
 
             $value = $modifiedCaster1->cast($value, $this);
 
             if ($value === null) {
                                 $missingFields[] = 'modified';
-                goto after_modified;
+                goto after_modified_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
             }
 
             $properties['modified'] = $value;
 
-            after_modified:
+            after_modified_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:
 
         } catch (\Throwable $exception) {
             throw UnableToHydrateObject::dueToError(\WyriHaximus\DevApp\React\SimpleORM\BlogPostStub::class, $exception, stack: $this->hydrationStack);
@@ -420,28 +412,28 @@ class Hydrator implements ObjectMapper
         }
     }
 
-        
+
     private function hydrateWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub(array $payload): \WyriHaximus\DevApp\React\SimpleORM\CommentStub
     {
-        $properties = []; 
+        $properties = [];
         $missingFields = [];
         try {
             $value = $payload['id'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'id';
-                goto after_id;
+                goto after_id_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub;
             }
 
             $properties['id'] = $value;
 
-            after_id:
+            after_id_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub:
 
             $value = $payload['author'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'author';
-                goto after_author;
+                goto after_author_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub;
             }
 
             static $authorCaster1;
@@ -450,7 +442,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'author_id',
      'foreignKey' => 'id',
      'localCast' => NULL,
@@ -459,14 +451,13 @@ class Hydrator implements ObjectMapper
      'foreignFunction' => NULL,
   ]),
 ],
-]
-);
+]);
 
             $value = $authorCaster1->cast($value, $this);
 
             if ($value === null) {
                                 $missingFields[] = 'author';
-                goto after_author;
+                goto after_author_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub;
             }
 
             if (is_array($value)) {
@@ -480,13 +471,13 @@ class Hydrator implements ObjectMapper
 
             $properties['author'] = $value;
 
-            after_author:
+            after_author_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub:
 
             $value = $payload['blog_post'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'blog_post';
-                goto after_blogPost;
+                goto after_blogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub;
             }
 
             static $blogPostCaster1;
@@ -495,7 +486,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'blog_post_id',
      'foreignKey' => 'id',
      'localCast' => NULL,
@@ -504,14 +495,13 @@ class Hydrator implements ObjectMapper
      'foreignFunction' => NULL,
   ]),
 ],
-]
-);
+]);
 
             $value = $blogPostCaster1->cast($value, $this);
 
             if ($value === null) {
                                 $missingFields[] = 'blog_post';
-                goto after_blogPost;
+                goto after_blogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub;
             }
 
             if (is_array($value)) {
@@ -525,18 +515,18 @@ class Hydrator implements ObjectMapper
 
             $properties['blogPost'] = $value;
 
-            after_blogPost:
+            after_blogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub:
 
             $value = $payload['contents'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'contents';
-                goto after_contents;
+                goto after_contents_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub;
             }
 
             $properties['contents'] = $value;
 
-            after_contents:
+            after_contents_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub:
 
         } catch (\Throwable $exception) {
             throw UnableToHydrateObject::dueToError(\WyriHaximus\DevApp\React\SimpleORM\CommentStub::class, $exception, stack: $this->hydrationStack);
@@ -553,33 +543,33 @@ class Hydrator implements ObjectMapper
         }
     }
 
-        
+
     private function hydrateWyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub(array $payload): \WyriHaximus\DevApp\React\SimpleORM\UserStub
     {
-        $properties = []; 
+        $properties = [];
         $missingFields = [];
         try {
             $value = $payload['id'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'id';
-                goto after_id;
+                goto after_id_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub;
             }
 
             $properties['id'] = $value;
 
-            after_id:
+            after_id_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub:
 
             $value = $payload['name'] ?? null;
 
             if ($value === null) {
                 $missingFields[] = 'name';
-                goto after_name;
+                goto after_name_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub;
             }
 
             $properties['name'] = $value;
 
-            after_name:
+            after_name_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub:
 
         } catch (\Throwable $exception) {
             throw UnableToHydrateObject::dueToError(\WyriHaximus\DevApp\React\SimpleORM\UserStub::class, $exception, stack: $this->hydrationStack);
@@ -595,7 +585,7 @@ class Hydrator implements ObjectMapper
             throw UnableToHydrateObject::dueToError(\WyriHaximus\DevApp\React\SimpleORM\UserStub::class, $exception, stack: $this->hydrationStack);
         }
     }
-    
+
     private function serializeViaTypeMap(string $accessor, object $object, array $payloadToTypeMap): array
     {
         foreach ($payloadToTypeMap as $payloadType => [$valueType, $method]) {
@@ -637,16 +627,15 @@ class Hydrator implements ObjectMapper
             throw UnableToSerializeObject::dueToError($className, $exception);
         }
     }
-    
+
     
     private function serializeValuearray(mixed $value): mixed
     {
         static $serializer;
-        
+
         $serializer ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeArrayItems(... [
-]
-);
-        
+]);
+
         return $serializer->serialize($value, $this);
     }
 
@@ -654,11 +643,10 @@ class Hydrator implements ObjectMapper
     private function serializeValueRamsey⚡️Uuid⚡️UuidInterface(mixed $value): mixed
     {
         static $serializer;
-        
+
         $serializer ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeUuidToString(... [
-]
-);
-        
+]);
+
         return $serializer->serialize($value, $this);
     }
 
@@ -666,11 +654,10 @@ class Hydrator implements ObjectMapper
     private function serializeValueDateTime(mixed $value): mixed
     {
         static $serializer;
-        
+
         $serializer ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
-]
-);
-        
+]);
+
         return $serializer->serialize($value, $this);
     }
 
@@ -678,11 +665,10 @@ class Hydrator implements ObjectMapper
     private function serializeValueDateTimeImmutable(mixed $value): mixed
     {
         static $serializer;
-        
+
         $serializer ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
-]
-);
-        
+]);
+
         return $serializer->serialize($value, $this);
     }
 
@@ -690,11 +676,10 @@ class Hydrator implements ObjectMapper
     private function serializeValueDateTimeInterface(mixed $value): mixed
     {
         static $serializer;
-        
+
         $serializer ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
-]
-);
-        
+]);
+
         return $serializer->serialize($value, $this);
     }
 
@@ -736,7 +721,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'previous_blog_post_id',
      'foreignKey' => 'id',
      'localCast' => NULL,
@@ -746,9 +731,8 @@ class Hydrator implements ObjectMapper
   ]),
 ],
   'lazy' => true,
-]
-);
-        
+]);
+
         $previousBlogPost = $previousBlogPostSerializer0->serialize($previousBlogPost, $this);
         after_previousBlogPost:        $result['previous_blog_post'] = $previousBlogPost;
 
@@ -764,7 +748,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'next_blog_post_id',
      'foreignKey' => 'id',
      'localCast' => NULL,
@@ -774,9 +758,8 @@ class Hydrator implements ObjectMapper
   ]),
 ],
   'lazy' => true,
-]
-);
-        
+]);
+
         $nextBlogPost = $nextBlogPostSerializer0->serialize($nextBlogPost, $this);
         after_nextBlogPost:        $result['next_blog_post'] = $nextBlogPost;
 
@@ -796,7 +779,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'author_id',
      'foreignKey' => 'id',
      'localCast' => NULL,
@@ -805,9 +788,8 @@ class Hydrator implements ObjectMapper
      'foreignFunction' => NULL,
   ]),
 ],
-]
-);
-        
+]);
+
         $author = $authorSerializer0->serialize($author, $this);
         after_author:        $result['author'] = $author;
 
@@ -819,7 +801,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'publisher_id',
      'foreignKey' => 'id',
      'localCast' => NULL,
@@ -828,9 +810,8 @@ class Hydrator implements ObjectMapper
      'foreignFunction' => NULL,
   ]),
 ],
-]
-);
-        
+]);
+
         $publisher = $publisherSerializer0->serialize($publisher, $this);
         after_publisher:        $result['publisher'] = $publisher;
 
@@ -842,7 +823,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'id',
      'foreignKey' => 'blog_post_id',
      'localCast' => 'BIGINT',
@@ -852,9 +833,8 @@ class Hydrator implements ObjectMapper
   ]),
 ],
   'lazy' => true,
-]
-);
-        
+]);
+
         $comments = $commentsSerializer0->serialize($comments, $this);
         after_comments:        $result['comments'] = $comments;
 
@@ -864,9 +844,8 @@ class Hydrator implements ObjectMapper
 
         $viewsSerializer0 ??= new \EventSauce\ObjectHydrator\PropertyCasters\CastToType(... [
   0 => 'integer',
-]
-);
-        
+]);
+
         $views = $viewsSerializer0->serialize($views, $this);
         after_views:        $result['views'] = $views;
 
@@ -875,9 +854,8 @@ class Hydrator implements ObjectMapper
         static $createdSerializer0;
 
         $createdSerializer0 ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
-]
-);
-        
+]);
+
         $created = $createdSerializer0->serialize($created, $this);
         after_created:        $result['created'] = $created;
 
@@ -886,9 +864,8 @@ class Hydrator implements ObjectMapper
         static $modifiedSerializer0;
 
         $modifiedSerializer0 ??= new \EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime(... [
-]
-);
-        
+]);
+
         $modified = $modifiedSerializer0->serialize($modified, $this);
         after_modified:        $result['modified'] = $modified;
 
@@ -913,7 +890,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'author_id',
      'foreignKey' => 'id',
      'localCast' => NULL,
@@ -922,9 +899,8 @@ class Hydrator implements ObjectMapper
      'foreignFunction' => NULL,
   ]),
 ],
-]
-);
-        
+]);
+
         $author = $authorSerializer0->serialize($author, $this);
         after_author:        $result['author'] = $author;
 
@@ -936,7 +912,7 @@ class Hydrator implements ObjectMapper
   'clause' => 
  [
   0 => 
-  new \WyriHaximus\React\SimpleORM\Attribute\Clause(...[
+  \WyriHaximus\React\SimpleORM\Attribute\Clause::__set_state([
      'localKey' => 'blog_post_id',
      'foreignKey' => 'id',
      'localCast' => NULL,
@@ -945,9 +921,8 @@ class Hydrator implements ObjectMapper
      'foreignFunction' => NULL,
   ]),
 ],
-]
-);
-        
+]);
+
         $blogPost = $blogPostSerializer0->serialize($blogPost, $this);
         after_blogPost:        $result['blog_post'] = $blogPost;
 
@@ -975,8 +950,8 @@ class Hydrator implements ObjectMapper
 
         return $result;
     }
-    
-    
+
+
 
     /**
      * @template T

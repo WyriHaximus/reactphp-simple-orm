@@ -37,7 +37,7 @@ final class Plugin implements GenerativePlugin
         return match ($stage) {
             LogStages::Init => 'Locating entities',
             LogStages::Error => 'An error occurred: %s',
-            LogStages::Collected => 'Found %d action(s)',
+            LogStages::Collected => 'Found %d entit(y|ies)',
             LogStages::Completion => 'Generated static abstract action manager and action list in %s second(s)',
         };
     }
@@ -58,7 +58,8 @@ final class Plugin implements GenerativePlugin
 
     public function compile(string $rootPath, ItemContract ...$items): void
     {
-        Remove::directoryContents($rootPath . '/src/Generated');
+        Remove::directoryContentsOnlyIfItExists($rootPath . '/src/Entity/InspectedEntity');
+        Remove::fileOnlyIfItExists($rootPath . '/src/Entity/InspectedEntityMap.php');
 
         File::write(
             $rootPath . '/src/Generated/Hydrator.php',
@@ -79,7 +80,7 @@ final class Plugin implements GenerativePlugin
 
         TwigFile::render(
             $rootPath . '/etc/generated_templates/InspectedEntityMap.php.twig',
-            $rootPath . '/src/Generated/InspectedEntityMap.php',
+            $rootPath . '/src/Entity/InspectedEntityMap.php',
             ['map' => $entityToGenerateClassesClassNameSuffixMapping],
         );
 
@@ -88,7 +89,7 @@ final class Plugin implements GenerativePlugin
             $entityClass = $this->entityClass($item);
             TwigFile::render(
                 $rootPath . '/etc/generated_templates/InspectedEntity.php.twig',
-                $rootPath . '/src/Generated/InspectedEntity/' . $entityToGenerateClassesClassNameSuffixMapping[$entityClass] . '.php',
+                $rootPath . '/src/Entity/InspectedEntity/' . $entityToGenerateClassesClassNameSuffixMapping[$entityClass] . '.php',
                 [
                     'entity' => $entityInspector->entity($entityClass),
                     'entityToGenerateClassesClassNameSuffixMapping' => $entityToGenerateClassesClassNameSuffixMapping,
