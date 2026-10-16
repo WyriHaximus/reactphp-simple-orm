@@ -690,11 +690,11 @@ class Hydrator implements ObjectMapper
         $result = [];
 
         $id = $object->id;
-        after_id:        $result['id'] = $id;
+        after_id_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️LogStub:        $result['id'] = $id;
 
         
         $message = $object->message;
-        after_message:        $result['message'] = $message;
+        after_message_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️LogStub:        $result['message'] = $message;
 
 
         return $result;
@@ -707,13 +707,13 @@ class Hydrator implements ObjectMapper
         $result = [];
 
         $id = $object->id;
-        after_id:        $result['id'] = $id;
+        after_id_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:        $result['id'] = $id;
 
         
         $previousBlogPost = $object->previousBlogPost;
 
         if (!$previousBlogPost instanceof \WyriHaximus\DevApp\React\SimpleORM\BlogPostStub) {
-            goto after_previousBlogPost;
+            goto after_previousBlogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
         }
         static $previousBlogPostSerializer0;
 
@@ -734,13 +734,13 @@ class Hydrator implements ObjectMapper
 ]);
 
         $previousBlogPost = $previousBlogPostSerializer0->serialize($previousBlogPost, $this);
-        after_previousBlogPost:        $result['previous_blog_post'] = $previousBlogPost;
+        after_previousBlogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:        $result['previous_blog_post'] = $previousBlogPost;
 
         
         $nextBlogPost = $object->nextBlogPost;
 
         if (!$nextBlogPost instanceof \WyriHaximus\DevApp\React\SimpleORM\BlogPostStub) {
-            goto after_nextBlogPost;
+            goto after_nextBlogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub;
         }
         static $nextBlogPostSerializer0;
 
@@ -761,15 +761,15 @@ class Hydrator implements ObjectMapper
 ]);
 
         $nextBlogPost = $nextBlogPostSerializer0->serialize($nextBlogPost, $this);
-        after_nextBlogPost:        $result['next_blog_post'] = $nextBlogPost;
+        after_nextBlogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:        $result['next_blog_post'] = $nextBlogPost;
 
         
         $title = $object->title;
-        after_title:        $result['title'] = $title;
+        after_title_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:        $result['title'] = $title;
 
         
         $contents = $object->contents;
-        after_contents:        $result['contents'] = $contents;
+        after_contents_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:        $result['contents'] = $contents;
 
         
         $author = $object->author;
@@ -791,7 +791,7 @@ class Hydrator implements ObjectMapper
 ]);
 
         $author = $authorSerializer0->serialize($author, $this);
-        after_author:        $result['author'] = $author;
+        after_author_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:        $result['author'] = $author;
 
         
         $publisher = $object->publisher;
@@ -813,7 +813,7 @@ class Hydrator implements ObjectMapper
 ]);
 
         $publisher = $publisherSerializer0->serialize($publisher, $this);
-        after_publisher:        $result['publisher'] = $publisher;
+        after_publisher_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:        $result['publisher'] = $publisher;
 
         
         $comments = $object->comments;
@@ -836,7 +836,7 @@ class Hydrator implements ObjectMapper
 ]);
 
         $comments = $commentsSerializer0->serialize($comments, $this);
-        after_comments:        $result['comments'] = $comments;
+        after_comments_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:        $result['comments'] = $comments;
 
         
         $views = $object->views;
@@ -847,7 +847,7 @@ class Hydrator implements ObjectMapper
 ]);
 
         $views = $viewsSerializer0->serialize($views, $this);
-        after_views:        $result['views'] = $views;
+        after_views_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:        $result['views'] = $views;
 
         
         $created = $object->created;
@@ -857,7 +857,7 @@ class Hydrator implements ObjectMapper
 ]);
 
         $created = $createdSerializer0->serialize($created, $this);
-        after_created:        $result['created'] = $created;
+        after_created_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:        $result['created'] = $created;
 
         
         $modified = $object->modified;
@@ -867,7 +867,7 @@ class Hydrator implements ObjectMapper
 ]);
 
         $modified = $modifiedSerializer0->serialize($modified, $this);
-        after_modified:        $result['modified'] = $modified;
+        after_modified_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️BlogPostStub:        $result['modified'] = $modified;
 
 
         return $result;
@@ -880,7 +880,7 @@ class Hydrator implements ObjectMapper
         $result = [];
 
         $id = $object->id;
-        after_id:        $result['id'] = $id;
+        after_id_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub:        $result['id'] = $id;
 
         
         $author = $object->author;
@@ -902,7 +902,7 @@ class Hydrator implements ObjectMapper
 ]);
 
         $author = $authorSerializer0->serialize($author, $this);
-        after_author:        $result['author'] = $author;
+        after_author_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub:        $result['author'] = $author;
 
         
         $blogPost = $object->blogPost;
@@ -924,11 +924,11 @@ class Hydrator implements ObjectMapper
 ]);
 
         $blogPost = $blogPostSerializer0->serialize($blogPost, $this);
-        after_blogPost:        $result['blog_post'] = $blogPost;
+        after_blogPost_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub:        $result['blog_post'] = $blogPost;
 
         
         $contents = $object->contents;
-        after_contents:        $result['contents'] = $contents;
+        after_contents_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️CommentStub:        $result['contents'] = $contents;
 
 
         return $result;
@@ -941,11 +941,11 @@ class Hydrator implements ObjectMapper
         $result = [];
 
         $id = $object->id;
-        after_id:        $result['id'] = $id;
+        after_id_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub:        $result['id'] = $id;
 
         
         $name = $object->name;
-        after_name:        $result['name'] = $name;
+        after_name_WyriHaximus⚡️DevApp⚡️React⚡️SimpleORM⚡️UserStub:        $result['name'] = $name;
 
 
         return $result;
