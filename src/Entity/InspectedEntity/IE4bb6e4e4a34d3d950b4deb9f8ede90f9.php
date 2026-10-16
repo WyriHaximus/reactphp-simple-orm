@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WyriHaximus\React\SimpleORM\Generated\InspectedEntity;
+namespace WyriHaximus\React\SimpleORM\Entity\InspectedEntity;
 
 use WyriHaximus\DevApp\React\SimpleORM\UserStub;
 use WyriHaximus\React\SimpleORM\Entity\Field;

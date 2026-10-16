@@ -14,9 +14,9 @@ use RuntimeException;
 use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
 use WyriHaximus\React\SimpleORM\Attribute\Table;
 use WyriHaximus\React\SimpleORM\Entity\Field;
+use WyriHaximus\React\SimpleORM\Entity\InspectedEntityMap;
 use WyriHaximus\React\SimpleORM\Entity\Join;
 use WyriHaximus\React\SimpleORM\Entity\JointType;
-use WyriHaximus\React\SimpleORM\Generated\InspectedEntityMap;
 use WyriHaximus\React\SimpleORM\Tools\NaivePropertyTypeResolver;
 
 use function array_key_exists;
