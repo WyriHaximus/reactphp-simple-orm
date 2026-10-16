@@ -58,6 +58,7 @@ final class Plugin implements GenerativePlugin
 
     public function compile(string $rootPath, ItemContract ...$items): void
     {
+        Remove::directoryContentsOnlyIfItExists($rootPath . '/src/Generated');
         Remove::directoryContentsOnlyIfItExists($rootPath . '/src/Entity/InspectedEntity');
         Remove::fileOnlyIfItExists($rootPath . '/src/Entity/InspectedEntityMap.php');
 
