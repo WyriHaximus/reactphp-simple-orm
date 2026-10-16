@@ -1,0 +1,17 @@
+<?php
+
+declare(strict_types=1);
+
+namespace WyriHaximus\React\SimpleORM\Attribute;
+
+use Attribute;
+
+/** @api */
+#[Attribute(Attribute::TARGET_CLASS)]
+final readonly class Schema
+{
+    public function __construct(
+        public string $schema,
+    ) {
+    }
+}

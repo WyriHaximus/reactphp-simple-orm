@@ -12,6 +12,7 @@ use Roave\BetterReflection\BetterReflection;
 use Roave\BetterReflection\Reflection\ReflectionProperty;
 use RuntimeException;
 use WyriHaximus\React\SimpleORM\Attribute\JoinInterface;
+use WyriHaximus\React\SimpleORM\Attribute\Schema;
 use WyriHaximus\React\SimpleORM\Attribute\Table;
 use WyriHaximus\React\SimpleORM\Entity\Field;
 use WyriHaximus\React\SimpleORM\Entity\InspectedEntityMap;
@@ -58,6 +59,14 @@ final class EntityInspector
         }
 
         if (! array_key_exists($entity, $this->entities)) {
+            $schemaPrefix     = '';
+            $class            = new ReflectionClass($entity);
+            $schemaAttributes = $class->getAttributes(Schema::class);
+            if (count($schemaAttributes) > 0) {
+                $schemaAttribute = current($schemaAttributes)->newInstance();
+                $schemaPrefix    = $schemaAttribute->schema . '.';
+            }
+
             $class           = new ReflectionClass($entity);
             $tableAttributes = $class->getAttributes(Table::class);
 
@@ -79,7 +88,7 @@ final class EntityInspector
             /** @phpstan-ignore assign.propertyType */
             $this->entities[$entity] = new InspectedEntity(
                 $entity,
-                $this->configuration->tablePrefix . $tableAttribute->table,
+                $schemaPrefix . $this->configuration->tablePrefix . $tableAttribute->table,
                 $fields,
                 $joins,
             );

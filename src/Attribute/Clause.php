@@ -17,4 +17,17 @@ final readonly class Clause
         public string|null $foreignFunction = null,
     ) {
     }
+
+    /** @param array{localKey: string, foreignKey: string, localCast: string|null, localFunction: string|null, foreignCast: string|null, foreignFunction: string|null} $properties */
+    public static function __set_state(array $properties): Clause
+    {
+        return new self(
+            $properties['localKey'],
+            $properties['foreignKey'],
+            $properties['localCast'],
+            $properties['localFunction'],
+            $properties['foreignCast'],
+            $properties['foreignFunction'],
+        );
+    }
 }
