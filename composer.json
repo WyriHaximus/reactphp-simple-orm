@@ -34,7 +34,7 @@
     "shipmonk/dead-code-detector": "^0.14.1 || ^0.15.0 || ^1.0.0",
     "symfony/http-client": "^8.1",
     "symfony/yaml": "^5.4 || ^7.0 || ^8 || ^9",
-    "testcontainers/testcontainers": "^1.0",
+    "testcontainers/testcontainers": "^1.1.0",
     "vlucas/phpdotenv": "^5.6.3",
     "wyrihaximus/async-test-utilities": "^14.5.0",
     "wyrihaximus/makefiles": "^0.15.4"

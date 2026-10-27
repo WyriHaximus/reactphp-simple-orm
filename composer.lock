@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a3aa0e43beaf45495a776be6fa8f1850",
+    "content-hash": "8c7a4629755d1a0ff613ade0982a1d11",
     "packages": [
         {
             "name": "brick/math",
@@ -2077,30 +2077,30 @@
         },
         {
             "name": "roave/better-reflection",
-            "version": "6.73.0",
+            "version": "6.75.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/BetterReflection.git",
-                "reference": "a6a93a3bd7681627f2750bfa8f41e586d32dc67d"
+                "reference": "b68eed282302be0278a2615ccb4448a9c9d1d4c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/BetterReflection/zipball/a6a93a3bd7681627f2750bfa8f41e586d32dc67d",
-                "reference": "a6a93a3bd7681627f2750bfa8f41e586d32dc67d",
+                "url": "https://api.github.com/repos/Roave/BetterReflection/zipball/b68eed282302be0278a2615ccb4448a9c9d1d4c3",
+                "reference": "b68eed282302be0278a2615ccb4448a9c9d1d4c3",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "jetbrains/phpstorm-stubs": "2026.2",
-                "nikic/php-parser": "^5.8.0",
-                "php": "~8.4.1 || ~8.5.0"
+                "nikic/php-parser": "^5.9.0",
+                "php": "~8.4.1 || ~8.5.0 || ~8.6.0"
             },
             "conflict": {
                 "thecodingmachine/safe": "<1.1.3"
             },
             "require-dev": {
                 "phpbench/phpbench": "^1.7.0",
-                "phpunit/phpunit": "^13.3.2"
+                "phpunit/phpunit": "^13.4.3"
             },
             "suggest": {
                 "composer/composer": "Required to use the ComposerSourceLocator"
@@ -2140,9 +2140,9 @@
             "description": "Better Reflection - an improved code reflection API",
             "support": {
                 "issues": "https://github.com/Roave/BetterReflection/issues",
-                "source": "https://github.com/Roave/BetterReflection/tree/6.73.0"
+                "source": "https://github.com/Roave/BetterReflection/tree/6.75.0"
             },
-            "time": "2026-09-09T19:57:09+00:00"
+            "time": "2026-10-17T21:34:56+00:00"
         },
         {
             "name": "seld/jsonlint",
@@ -5298,16 +5298,16 @@
         },
         {
             "name": "ergebnis/phpstan-rules",
-            "version": "2.14.1",
+            "version": "2.14.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ergebnis/phpstan-rules.git",
-                "reference": "3478c12d9272fa134e453fccd18ced31e945bc65"
+                "reference": "a8d8695a4197b79f74e1ed1353ef52c41578c0ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ergebnis/phpstan-rules/zipball/3478c12d9272fa134e453fccd18ced31e945bc65",
-                "reference": "3478c12d9272fa134e453fccd18ced31e945bc65",
+                "url": "https://api.github.com/repos/ergebnis/phpstan-rules/zipball/a8d8695a4197b79f74e1ed1353ef52c41578c0ab",
+                "reference": "a8d8695a4197b79f74e1ed1353ef52c41578c0ab",
                 "shasum": ""
             },
             "require": {
@@ -5372,7 +5372,7 @@
                 "security": "https://github.com/ergebnis/phpstan-rules/blob/main/.github/SECURITY.md",
                 "source": "https://github.com/ergebnis/phpstan-rules"
             },
-            "time": "2026-10-16T09:48:05+00:00"
+            "time": "2026-10-16T14:36:23+00:00"
         },
         {
             "name": "ergebnis/phpunit-slow-test-detector",
@@ -6227,20 +6227,21 @@
         },
         {
             "name": "league/uri",
-            "version": "7.8.1",
+            "version": "7.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/uri.git",
-                "reference": "08cf38e3924d4f56238125547b5720496fac8fd4"
+                "reference": "fcc872a3d872aa13f935e0cd1887b9abb06da07f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/uri/zipball/08cf38e3924d4f56238125547b5720496fac8fd4",
-                "reference": "08cf38e3924d4f56238125547b5720496fac8fd4",
+                "url": "https://api.github.com/repos/thephpleague/uri/zipball/fcc872a3d872aa13f935e0cd1887b9abb06da07f",
+                "reference": "fcc872a3d872aa13f935e0cd1887b9abb06da07f",
                 "shasum": ""
             },
             "require": {
-                "league/uri-interfaces": "^7.8.1",
+                "ext-mbstring": "*",
+                "league/uri-interfaces": "^7.9.0",
                 "php": "^8.1",
                 "psr/http-factory": "^1"
             },
@@ -6313,7 +6314,7 @@
                 "docs": "https://uri.thephpleague.com",
                 "forum": "https://thephpleague.slack.com",
                 "issues": "https://github.com/thephpleague/uri-src/issues",
-                "source": "https://github.com/thephpleague/uri/tree/7.8.1"
+                "source": "https://github.com/thephpleague/uri/tree/7.9.0"
             },
             "funding": [
                 {
@@ -6321,20 +6322,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-03-15T20:22:25+00:00"
+            "time": "2026-10-16T15:19:33+00:00"
         },
         {
             "name": "league/uri-interfaces",
-            "version": "7.8.1",
+            "version": "7.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/uri-interfaces.git",
-                "reference": "85d5c77c5d6d3af6c54db4a78246364908f3c928"
+                "reference": "eb5f6d24e6a4fe0a8e9c78ded4eb1dfff1404f58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/uri-interfaces/zipball/85d5c77c5d6d3af6c54db4a78246364908f3c928",
-                "reference": "85d5c77c5d6d3af6c54db4a78246364908f3c928",
+                "url": "https://api.github.com/repos/thephpleague/uri-interfaces/zipball/eb5f6d24e6a4fe0a8e9c78ded4eb1dfff1404f58",
+                "reference": "eb5f6d24e6a4fe0a8e9c78ded4eb1dfff1404f58",
                 "shasum": ""
             },
             "require": {
@@ -6397,7 +6398,7 @@
                 "docs": "https://uri.thephpleague.com",
                 "forum": "https://thephpleague.slack.com",
                 "issues": "https://github.com/thephpleague/uri-src/issues",
-                "source": "https://github.com/thephpleague/uri-interfaces/tree/7.8.1"
+                "source": "https://github.com/thephpleague/uri-interfaces/tree/7.9.0"
             },
             "funding": [
                 {
@@ -6405,7 +6406,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-03-08T20:05:35+00:00"
+            "time": "2026-10-16T15:19:33+00:00"
         },
         {
             "name": "localheinz/diff",

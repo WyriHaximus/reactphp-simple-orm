@@ -30,15 +30,16 @@ use WyriHaximus\React\SimpleORM\RepositoryInterface;
 
 use function array_map;
 use function array_values;
+use function basename;
 use function bin2hex;
 use function current;
+use function glob;
 use function is_string;
 use function random_bytes;
 use function React\Async\await;
 use function React\Promise\Timer\sleep;
-use function str_contains;
+use function sort;
 use function time;
-use function usleep;
 
 #[TimeOut(120)]
 final class FunctionalTest extends AsyncTestCase
@@ -64,30 +65,36 @@ final class FunctionalTest extends AsyncTestCase
             $ip = current($this->testContainer->getNetworkNames());
         } while (! is_string($ip));
 
-        $migrationsContainer = new GenericContainer('flyway/flyway')
-            ->withCommand(['migrate'])
-            ->withEnvironment([
-                'FLYWAY_LOCATIONS' => 'filesystem:/flyway/migrations',
-                'FLYWAY_URL' => 'jdbc:postgresql://' . $this->testContainer->getIpAddress($ip) . ':5432/postgres?searchpath=postgres&currentSchema=postgres&stringtype=unspecified',
-                'FLYWAY_USER' => 'postgres',
-                'FLYWAY_PASSWORD' => 'postgres',
+        $migrationsContainer = new GenericContainer('arigaio/atlas')
+            ->withCommand([
+                'migrate',
+                'apply',
+                '--dir=file://migrations',
+                '--url=postgresql://postgres:postgres@' . $this->testContainer->getIpAddress($ip) . ':5432/postgres?search_path=public&sslmode=disable',
             ])
-            ->withMount(__DIR__ . '/../etc/db', '/flyway/migrations')
-            ->withMount('/var/run/docker.sock', '/var/run/docker.sock')
+            ->withMount(__DIR__ . '/../etc/db', '/var/atlas')
+            ->withWorkingDir('/var/atlas')
+            ->withNetwork($ip)
             ->start();
 
-        $logsBuffer = $migrationsContainer->logs();
-        while (! str_contains($logsBuffer, ' (execution time ')) {
-            /**
-             * It's fine, this is during setup
-             *
-             * @phpstan-ignore wyrihaximus.reactphp.blocking.function.usleep
-             */
-            usleep(100);
-            $logsBuffer .= $migrationsContainer->logs();
+        $migrationsContainer->getClient()->containerWait($migrationsContainer->getId());
+
+        $rawSeedFiles = glob(__DIR__ . '/../etc/db/seeds/V*__seed_*.sql');
+        $seedFiles    = $rawSeedFiles === false ? [] : $rawSeedFiles;
+        sort($seedFiles);
+        $seedCommands = ['psql', 'postgresql://postgres:postgres@' . $this->testContainer->getIpAddress($ip) . ':5432/postgres'];
+        foreach ($seedFiles as $seedFile) {
+            $seedCommands[] = '-f';
+            $seedCommands[] = '/var/seeds/' . basename($seedFile);
         }
 
-        $migrationsContainer->stop();
+        $seedsContainer = new GenericContainer('postgres:16')
+            ->withCommand($seedCommands)
+            ->withMount(__DIR__ . '/../etc/db/seeds', '/var/seeds')
+            ->withNetwork($ip)
+            ->start();
+
+        $seedsContainer->getClient()->containerWait($seedsContainer->getId());
 
         $this->counter = new QueryCountMiddleware(1);
 
@@ -115,7 +122,6 @@ final class FunctionalTest extends AsyncTestCase
     public function shutdownContainer(): void
     {
         $this->testContainer?->stop();
-        sleep(3);
     }
 
     #[Test]
@@ -249,7 +255,6 @@ final class FunctionalTest extends AsyncTestCase
     public function firstBlogPostCommentAuthorIds(): void
     {
         foreach ($this->client?->repository(BlogPostStub::class)->fetch() ?? [] as $blogPost) {
-//            var_export([$blogPost, ...$blogPost->comments]);
             self::assertSame(
                 [
                     '2fa0d077-d374-4409-b1ef-9687c6729158',

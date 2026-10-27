@@ -501,13 +501,26 @@ migrations-ai-append-etc-agents-md-to-agents-md: #### Append `etc/AGENTS.md` to 
 
 
 ## Our default jobs
-install_db: migrations seeds
+#extra-services-up: #### Start Post for integration tests ##
+#	$(MAKE) setup-local-postgres
+#
+#extra-services-down: #### Stop RabbitMQ ##
+#	$(MAKE) teardown-local-postgres
 
-migrations:
-	php ./vendor/bin/phinx migrate
+setup-local-postgres: #### Start RabbitMQ for integration tests ##
+	docker network rm wyrihaximus-reactphp-simple-orm-postgres-test || true
+	docker network create wyrihaximus-reactphp-simple-orm-postgres-test
+	docker run -d --network wyrihaximus-reactphp-simple-orm-postgres-test --name wyrihaximus-reactphp-simple-orm-postgres-test --rm -e POSTGRES_PASSWORD=postgres -p 5432:5432 --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=5 postgres:16.2
 
-seeds:
-	php ./vendor/bin/phinx seed:run -v
+teardown-local-postgres: #### Stop RabbitMQ ##
+	docker stop wyrihaximus-reactphp-simple-orm-postgres-test
+	docker network rm wyrihaximus-reactphp-simple-orm-postgres-test
+
+migrations-generate: ## Build dashboard into public/dashboard ####
+	docker run -i --network=wyrihaximus-reactphp-simple-orm-postgres-test -v "`pwd`/etc/db:/var/atlas" -w "/var/atlas" -v "/var/run/docker.sock:/var/run/docker.sock" arigaio/atlas migrate diff initial --to file:///var/atlas/schema.sql --dev-url "postgres://postgres:postgres@wyrihaximus-reactphp-simple-orm-postgres-test:5432/postgres?search_path=public&sslmode=disable"
+
+migrations-apply: ## Build dashboard into public/dashboard ####
+	docker run -i --network=wyrihaximus-reactphp-simple-orm-postgres-test -v "`pwd`/etc/db:/var/atlas" -w "/var/atlas" -v "/var/run/docker.sock:/var/run/docker.sock" arigaio/atlas migrate apply --url "postgres://postgres:postgres@wyrihaximus-reactphp-simple-orm-postgres-test:5432/postgres?search_path=public&sslmode=disable"
 
 on-install-or-update: ## Tasks, like migrations, that specifically have be run after composer install or update. These will also run by self hosted Renovate ####
 ifeq ("$(ON_INSTALL_OR_UPDATE_HAS_DIRECT_DOCKER_TASKS)","TRUE")
@@ -680,6 +693,7 @@ help: ## Show this help ####
 	@printf "  \033[32m%-32s\033[0m %s\n" 'outdated' 'Show outdated dependencies'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'rector-upgrade' 'Upgrade any automatically upgradable old code'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'run' 'Provides access in the expected environment to run a single command and then return'
+	@printf "  \033[32m%-32s\033[0m %s\n" 'setup-local-postgres' 'Start RabbitMQ for integration tests'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'shell' 'Provides Shell access in the expected environment'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'stan' 'Run static analysis (PHPStan)'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'supported-features' 'CI: List the features this package supports'
@@ -689,6 +703,7 @@ help: ## Show this help ####
 	@printf "  \033[32m%-32s\033[0m %s\n" 'task-list-ci-high' 'CI: Generate a JSON array of jobs to run against the highest dependencies on the primary threading target'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'task-list-ci-locked' 'CI: Generate a JSON array of jobs to run against the locked dependencies on the primary threading target'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'task-list-ci-low' 'CI: Generate a JSON array of jobs to run against the lowest dependencies on the primary threading target'
+	@printf "  \033[32m%-32s\033[0m %s\n" 'teardown-local-postgres' 'Stop RabbitMQ'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'unit-testing' 'Run tests'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'unit-testing-filter' 'Run tests with specified filter'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'unit-testing-raw' 'Run tests'
@@ -706,6 +721,7 @@ help-migrations: ## Show the migrations help ####
 	@printf "\n"
 	@printf "\033[33mTargets:\033[0m\n"
 	@printf "  \033[32m%-32s\033[0m %s\n" 'migrations-ai-append-etc-agents-md-to-agents-md' 'Append `etc/AGENTS.md` to `AGENTS.md` when present'
+	@printf "  \033[32m%-32s\033[0m %s\n" 'migrations-apply' 'Build dashboard into public/dashboard'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'migrations-docs-create-documentation-markdownlint-config-if-not-exists' 'Create `etc/qa/documentation.markdownlint-cli2.yaml` when missing'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'migrations-docs-create-license-when-it-doesnt-exists' 'Create license when it doesn'\''t exists'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'migrations-docs-create-lychee-config-if-not-exists' 'Create `etc/qa/lychee.toml` when missing'
@@ -724,6 +740,7 @@ help-migrations: ## Show the migrations help ####
 	@printf "  \033[32m%-32s\033[0m %s\n" 'migrations-docs-update-license-copyright-year-to-current' 'Update license copyright year to current'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'migrations-docs-update-readme-copyright-c-year-to-current' 'Update readme copyright year to current'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'migrations-docs-update-readme-copyright-year-to-current' 'Update readme copyright year to current'
+	@printf "  \033[32m%-32s\033[0m %s\n" 'migrations-generate' 'Build dashboard into public/dashboard'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'migrations-git-enforce-agents-md-contents' 'Enforce `AGENTS.md` contents'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'migrations-git-enforce-editorconfig-contents' 'Enforce `.editorconfig` contents'
 	@printf "  \033[32m%-32s\033[0m %s\n" 'migrations-git-enforce-gitattributes-contents' 'Enforce `.gitattributes` contents'
